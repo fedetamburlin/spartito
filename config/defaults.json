@@ -1,0 +1,69 @@
+{
+  "page": {
+    "format": "A4",
+    "orientation": "portrait",
+    "widthMm": 210,
+    "heightMm": 297,
+    "marginsMm": { "top": 5, "right": 5, "bottom": 5, "left": 5 },
+    "marginsMinMm": 4,
+    "marginsMaxMm": 10
+  },
+  "layout": {
+    "textPtDefault": 11,
+    "chordPtDefault": 10,
+    "textPtMin": 10,
+    "chordPtMin": 9,
+    "textPtMax": 14,
+    "leading": 1.25,
+    "sectionGapEm": 0.5,
+    "columnsDefault": 1,
+    "columnsMax": 2,
+    "autoColumns": true,
+    "autoFit": true,
+    "autoGrow": false
+  },
+  "typography": {
+    "fontDefault": "inter",
+    "editorFont": "jetbrains-mono",
+    "fonts": [
+      { "id": "inter", "family": "Inter", "role": "sans", "license": "OFL-1.1" },
+      { "id": "source-serif", "family": "Source Serif 4", "role": "serif", "license": "OFL-1.1" },
+      { "id": "jetbrains-mono", "family": "JetBrains Mono", "role": "mono", "license": "OFL-1.1" }
+    ],
+    "boldItalicByRole": {
+      "title": { "bold": true, "italic": false },
+      "chorus": { "bold": true, "italic": false },
+      "comment": { "bold": false, "italic": true },
+      "sectionLabel": { "bold": true, "italic": false }
+    }
+  },
+  "colors": {
+    "text": "#111111",
+    "chord": "#1a4f8a",
+    "chorus": "#111111",
+    "comment": "#666666",
+    "palette": [
+      "#111111",
+      "#333333",
+      "#1a4f8a",
+      "#b3261e",
+      "#2e6b3e",
+      "#6a3d9a",
+      "#8a5a00",
+      "#666666"
+    ]
+  },
+  "export": {
+    "referenceBrowser": "chromium",
+    "bestEffortBrowsers": ["firefox", "safari"],
+    "printScale": 100,
+    "preferCssPageSize": true,
+    "pdfMetadata": { "titleFromSong": true }
+  },
+  "storage": {
+    "driver": "localStorage",
+    "autosaveDebounceMs": 800,
+    "importExtensions": [".cho", ".crd", ".json"],
+    "exportExtensions": [".cho", ".json"]
+  }
+}
