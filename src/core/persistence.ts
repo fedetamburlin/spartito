@@ -34,15 +34,7 @@ export function saveState(state: StoredState): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch {
-    // storage non disponibile: l'app resta utilizzabile senza autosave
-  }
-}
-
-export function clearState(): void {
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch {
-    // ignore
+    // storage unavailable: the app stays usable without autosave
   }
 }
 
@@ -66,7 +58,7 @@ export function parseImported(text: string, filename: string): ImportedSong {
         };
       }
     } catch {
-      // non è un wrapper JSON: trattato come sorgente testuale
+      // not a JSON wrapper: treated as plain text source
     }
   }
   return { source: text };

@@ -125,6 +125,14 @@
   font-weight: 700;
 }
 
+.section-label {
+  break-inside: avoid;
+  margin: 0 0 0.15em;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--comment-color, #666666);
+}
+
 .line {
   break-inside: avoid;
 }
