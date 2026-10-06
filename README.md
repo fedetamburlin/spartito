@@ -1,5 +1,9 @@
 # Spartito
 
+[![Deploy su GitHub Pages](https://github.com/fedetamburlin/spartito/actions/workflows/deploy.yml/badge.svg)](https://github.com/fedetamburlin/spartito/actions/workflows/deploy.yml)
+
+Sito: https://fedetamburlin.github.io/spartito/
+
 Editor minimale per creare **spartiti PDF A4 verticali** (testo + accordi), pensati per essere letti su qualsiasi tablet come PDF: una canzone = una pagina, colonne automatiche, margini risicati per sfruttare tutto il foglio.
 
 Documentazione di progetto: `doc/sota.md`, `doc/stack.md`, `doc/features.md`, `doc/market.md`. Default modificabili in `config/defaults.json`.
