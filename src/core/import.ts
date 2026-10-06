@@ -102,7 +102,7 @@ export function importSong(raw: string): ImportResult {
 
   const { text, tabsRemoved } = normalize(raw);
   stats.tabsRemoved = tabsRemoved;
-  if (tabsRemoved > 0) warnings.push(`Rimossi ${tabsRemoved} blocchi di tablatura`);
+  if (tabsRemoved > 0) warnings.push(`Removed ${tabsRemoved} tab block${tabsRemoved === 1 ? '' : 's'}`);
 
   const lines = text.split('\n').map((line) => line.trimEnd());
   const out: string[] = [];
@@ -243,7 +243,7 @@ export function importSong(raw: string): ImportResult {
   const chordpro = compact.join('\n').trim() + '\n';
 
   if (stats.merged + stats.grids === 0 && !hasInlineChords(lines)) {
-    warnings.push('Nessun accordo riconosciuto: il testo è stato importato così com\u2019è');
+    warnings.push('No chords recognized: text imported as-is');
   }
 
   return { chordpro, warnings, stats };

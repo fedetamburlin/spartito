@@ -14,8 +14,8 @@
     onApply,
     onClose,
     initialText = '',
-    title = 'Incolla testo',
-    hint = 'Incolla accordi e testo copiati da un sito (Ultimate Guitar, Accordi e Spartiti, …) o direttamente in ChordPro: la conversione è automatica.'
+    title = 'Paste text',
+    hint = 'Paste chords and lyrics copied from a site (Ultimate Guitar, Accordi e Spartiti, …) or straight ChordPro: conversion is automatic.'
   }: Props = $props();
 
   let raw = $state(untrack(() => initialText));
@@ -27,10 +27,10 @@
     if (!result) return '';
     const { merged, grids, sections, comments } = result.stats;
     return [
-      merged ? `${merged} righe unite` : '',
-      grids ? `${grids} righe di soli accordi` : '',
-      sections ? `${sections} sezioni` : '',
-      comments ? `${comments} commenti` : ''
+      merged ? `${merged} merged rows` : '',
+      grids ? `${grids} chord-only lines` : '',
+      sections ? `${sections} sections` : '',
+      comments ? `${comments} comments` : ''
     ]
       .filter(Boolean)
       .join(' · ');
@@ -66,7 +66,7 @@
       bind:value={raw}
       oninput={() => (result = null)}
       spellcheck="false"
-      placeholder="Incolla qui il testo copiato…"
+      placeholder="Paste the copied text here…"
     ></textarea>
     {#if result}
       <div class="summary">
@@ -80,11 +80,11 @@
       <div class="preview">{result.chordpro}</div>
     {/if}
     <footer>
-      <button onclick={pasteFromClipboard}>Incolla dagli appunti</button>
+      <button onclick={pasteFromClipboard}>Paste from clipboard</button>
       <span class="spacer"></span>
-      <button onclick={onClose}>Annulla</button>
-      <button onclick={convert} disabled={!raw.trim()}>Converti</button>
-      <button class="primary" onclick={apply} disabled={!result}>Sostituisci nell'editor</button>
+      <button onclick={onClose}>Cancel</button>
+      <button onclick={convert} disabled={!raw.trim()}>Convert</button>
+      <button class="primary" onclick={apply} disabled={!result}>Replace in editor</button>
     </footer>
   </div>
 </div>

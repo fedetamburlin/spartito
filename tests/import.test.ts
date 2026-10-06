@@ -10,8 +10,8 @@ import type { Section } from '../src/core/model';
 const fixturesDir = join(dirname(fileURLToPath(import.meta.url)), 'fixtures');
 const load = (name: string) => readFileSync(join(fixturesDir, name), 'utf8');
 
-describe('grammatica degli accordi', () => {
-  it('riconosce accordi internazionali e italiani', () => {
+describe('chord grammar', () => {
+  it('recognizes international and Italian chords', () => {
     const chords = [
       'C', 'Cm', 'C7', 'Cmaj7', 'Cm7b5', 'C/G', 'F#m', 'Bb',
       'G7+', 'Dsus4', 'A7sus4', 'Cadd9', 'E5', 'N.C.',
@@ -22,26 +22,26 @@ describe('grammatica degli accordi', () => {
     }
   });
 
-  it('accetta qualità con maiuscole miste', () => {
+  it('accepts mixed-case qualities', () => {
     for (const chord of ['AMaj7', 'CSus4', 'FMin7', 'Bsus2', 'CMIN7', 'EMaj9']) {
       expect(isChordToken(chord), chord).toBe(true);
     }
   });
 
-  it('rifiuta parole e testo', () => {
+  it('rejects words and lyrics', () => {
     for (const word of ['Dove', 'Walking', 'home', 'Ciao', 'Hello', 'ove', 'mi', 'la']) {
       expect(isChordToken(word), word).toBe(false);
     }
   });
 
-  it('distingue righe di soli accordi da righe di testo', () => {
+  it('tells chord-only lines from lyric lines', () => {
     expect(chordLineTokens('Am   F   |  C  (2x)')).not.toBeNull();
     expect(chordLineTokens('MIm   LAm7')).not.toBeNull();
     expect(chordLineTokens('Walking down the road')).toBeNull();
     expect(chordLineTokens('Dove cammino senza fretta')).toBeNull();
   });
 
-  it('allinea gli accordi alla parola giusta', () => {
+  it('aligns chords to the right word', () => {
     expect(mergeChordLine('C        G', 'Walking home tonight')).toBe(
       '[C]Walking [G]home tonight'
     );
@@ -52,7 +52,7 @@ describe('grammatica degli accordi', () => {
 });
 
 describe('importSong', () => {
-  it('converte un copia-incolla in stile Ultimate Guitar', () => {
+  it('converts an Ultimate Guitar style copy-paste', () => {
     const result = importSong(load('import-ug.txt'));
     expect(result.chordpro).toContain('{start_of_verse: Verse 1}');
     expect(result.chordpro).toContain('{start_of_chorus}');
@@ -60,10 +60,10 @@ describe('importSong', () => {
     expect(result.chordpro).toContain('[C]Sing it loud [G]sing it clear');
     expect(result.chordpro).toContain('{capo: 2}');
     expect(result.chordpro).not.toContain('[tab]');
-    expect(result.warnings.some((warning) => warning.includes('tablatura'))).toBe(true);
+    expect(result.warnings.some((warning) => warning.includes('tab block'))).toBe(true);
   });
 
-  it('converte accordi sopra il testo (notazione internazionale)', () => {
+  it('converts chords above lyrics (international notation)', () => {
     const result = importSong(load('import-above.txt'));
     expect(result.chordpro).toContain('{start_of_verse: Intro}');
     expect(result.chordpro).toContain('[C] [G] [Am] [F]');
@@ -73,32 +73,32 @@ describe('importSong', () => {
     expect(result.stats.grids).toBe(1);
   });
 
-  it('converte accordi sopra il testo (notazione italiana)', () => {
+  it('converts chords above lyrics (Italian notation)', () => {
     const result = importSong(load('import-it-above.txt'));
     expect(result.chordpro).toContain('[MIm]Dove cammino senza [LAm7]fretta');
     expect(result.chordpro).toContain('il [LAm6]ricordo di una [SI7][MIm]estate');
     expect(result.stats.merged).toBe(2);
   });
 
-  it('lascia passare il ChordPro già valido', () => {
+  it('passes valid ChordPro through unchanged', () => {
     const result = importSong('{title: X}\n[Am]Ciao [F]mondo\n');
     expect(result.chordpro).toContain('{title: X}');
     expect(result.chordpro).toContain('[Am]Ciao [F]mondo');
     expect(result.warnings).toHaveLength(0);
   });
 
-  it('segnala quando non trova accordi', () => {
+  it('warns when no chords are found', () => {
     const result = importSong('Ciao mondo\ncome stai\n');
-    expect(result.warnings.some((warning) => warning.includes('Nessun accordo'))).toBe(true);
+    expect(result.warnings.some((warning) => warning.includes('No chords'))).toBe(true);
   });
 
-  it('riconosce intestazioni con parentesi spaiate e scarta il rumore', () => {
+  it('recognizes headers with unmatched brackets and drops noise', () => {
     const result = importSong('Intro]\nC  G\nWalking home\n\nPage 1/2\n');
     expect(result.chordpro).toContain('{start_of_verse: Intro}');
     expect(result.chordpro).not.toContain('Page 1/2');
   });
 
-  it('converte una pagina reale (Intro], AMaj7, paginazione, cluster di accordi)', () => {
+  it('converts a real page (Intro], AMaj7, pagination, chord clusters)', () => {
     const result = importSong(load('import-real-shape.txt'));
     expect(result.chordpro).toContain('{start_of_verse: Intro}');
     expect(result.chordpro).toContain('{start_of_chorus}');
@@ -111,7 +111,7 @@ describe('importSong', () => {
     expect(result.stats.sections).toBe(4);
   });
 
-  it('tratta le annotazioni tra parentesi come commenti', () => {
+  it('treats bracketed annotations as comments', () => {
     const result = importSong(load('import-annotations.txt'));
     expect(result.chordpro).toContain('[G] [D] [Am7]');
     expect(result.chordpro).toContain('{comment: (instrumental)}');
@@ -121,7 +121,7 @@ describe('importSong', () => {
     expect(result.stats.comments).toBe(2);
   });
 
-  it('riconosce titolo, artista e capo; scarta anno e decorazioni', () => {
+  it('recognizes title, artist and capo; drops year and decorations', () => {
     const result = importSong(load('import-ug-header.txt'));
     expect(result.chordpro).toContain('{title: My Fake Song}');
     expect(result.chordpro).toContain('{subtitle: The Fake Band}');
@@ -134,7 +134,7 @@ describe('importSong', () => {
     expect(result.chordpro).not.toContain('Chords');
   });
 
-  it('produce ChordPro rileggibile dal parser', () => {
+  it('produces ChordPro readable by the parser', () => {
     for (const fixture of ['import-ug.txt', 'import-above.txt', 'import-it-above.txt']) {
       const { chordpro } = importSong(load(fixture));
       const doc = parseChordPro(chordpro);

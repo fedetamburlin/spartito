@@ -71,5 +71,5 @@ export function fileBaseName(title: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
-  return slug || 'canzone';
+  return slug || 'song';
 }

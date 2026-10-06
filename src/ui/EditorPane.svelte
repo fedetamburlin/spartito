@@ -7,7 +7,7 @@
 </script>
 
 <section class="editor">
-  <h2 class="pane-title">Testo (ChordPro)</h2>
+  <h2 class="pane-title">Text (ChordPro)</h2>
   <textarea
     class="editor-area"
     spellcheck="false"

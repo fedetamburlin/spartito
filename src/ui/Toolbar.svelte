@@ -59,16 +59,16 @@
     try {
       const { text, hasText } = await extractPdfText(await file.arrayBuffer());
       if (!hasText) {
-        alert('PDF senza testo estraibile: se \u00e8 una scansione serve l\u2019OCR, non supportato.');
+        alert('PDF has no extractable text: if it is a scan, OCR is required (not supported).');
         return;
       }
       importSeed = text;
-      importTitle = 'Importa PDF (testo estratto)';
+      importTitle = 'Import PDF (extracted text)';
       importHint =
-        'Testo estratto dal PDF (best effort): controlla ordine e allineamento degli accordi, poi Converti.';
+        'Text extracted from the PDF (best effort): check chord order and alignment, then Convert.';
       importOpen = true;
     } catch {
-      alert('PDF non leggibile (protetto, corrotto o senza testo).');
+      alert('PDF not readable (protected, corrupted or without text).');
     } finally {
       input.value = '';
     }
@@ -132,7 +132,7 @@
         {/each}
       </select>
     </label>
-    <label>Testo
+    <label>Text
       <input
         type="number"
         min={config.layout.textPtMin}
@@ -142,14 +142,14 @@
         onchange={setTextPt}
       /> pt
     </label>
-    <label>Colonne
+    <label>Columns
       <select value={columnValue} onchange={setColumns}>
         <option value="auto">auto</option>
         <option value="1">1</option>
         <option value="2">2</option>
       </select>
     </label>
-    <label>Margini
+    <label>Margins
       <input
         type="number"
         min={config.page.marginsMinMm}
@@ -159,54 +159,54 @@
         onchange={setMargins}
       /> mm
     </label>
-    <label>Trasponi
+    <label>Transpose
       <span class="stepper">
         <button
           type="button"
-          title="Un semitono sotto"
+          title="One semitone down"
           disabled={settings.transpose <= TRANSPOSE_MIN}
           onclick={() => (settings = withTranspose(settings, -1))}>−</button>
         <button
           type="button"
           class="stepper-value"
-          title="Azzera trasposizione"
+          title="Reset transposition"
           disabled={settings.transpose === 0}
           onclick={() => (settings = sanitizeSettings({ ...settings, transpose: 0 }))}
         >{settings.transpose > 0 ? `+${settings.transpose}` : settings.transpose}</button>
         <button
           type="button"
-          title="Un semitono sopra"
+          title="One semitone up"
           disabled={settings.transpose >= TRANSPOSE_MAX}
           onclick={() => (settings = withTranspose(settings, 1))}>+</button>
       </span>
     </label>
   </div>
   <div class="toolbar-group">
-    <label>Accordi <input
+    <label>Chords <input
         type="color"
         value={settings.chordColor}
         oninput={(event) => setColor('chordColor', event)}
       /></label>
-    <label>Testo <input
+    <label>Text <input
         type="color"
         value={settings.textColor}
         oninput={(event) => setColor('textColor', event)}
       /></label>
-    <label>Commenti <input
+    <label>Comments <input
         type="color"
         value={settings.commentColor}
         oninput={(event) => setColor('commentColor', event)}
       /></label>
   </div>
   <div class="toolbar-group toolbar-actions">
-    <button class="btn-import" onclick={openPaste}>Incolla testo</button>
-    <button class="btn-import" onclick={() => fileInput?.click()}>Importa file</button>
-    <button class="btn-export" onclick={exportCho}>Esporta .cho</button>
-    <button class="btn-export" onclick={exportJson}>Esporta .json</button>
+    <button class="btn-import" onclick={openPaste}>Paste text</button>
+    <button class="btn-import" onclick={() => fileInput?.click()}>Import file</button>
+    <button class="btn-export" onclick={exportCho}>Export .cho</button>
+    <button class="btn-export" onclick={exportJson}>Export .json</button>
     <button
       class="primary"
-      title="Salva come PDF · margini predefiniti · intestazioni disattivate"
-      onclick={() => window.print()}>Stampa PDF</button>
+      title="Save as PDF · default margins · headers off"
+      onclick={() => window.print()}>Print PDF</button>
     <input
       class="hidden-input"
       type="file"

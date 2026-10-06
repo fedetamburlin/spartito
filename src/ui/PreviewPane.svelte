@@ -51,17 +51,17 @@
   });
 
   const statusText = $derived.by(() => {
-    if (!outcome) return 'Calcolo impaginazione...';
-    const columns = outcome.params.columns === 2 ? '2 colonne' : '1 colonna';
+    if (!outcome) return 'Calculating layout...';
+    const columns = outcome.params.columns === 2 ? '2 columns' : '1 column';
     switch (outcome.status) {
       case 'fits':
         return `${columns} · ${outcome.params.textPt}pt`;
       case 'columns':
         return `${columns} · ${outcome.params.textPt}pt (auto)`;
       case 'shrunk':
-        return `${columns} · ${outcome.params.textPt}pt (ridotto)`;
+        return `${columns} · ${outcome.params.textPt}pt (shrunk)`;
       case 'overflow':
-        return 'Non entra in una pagina: riduci il testo o scegli 2 colonne';
+        return 'Does not fit on one page: reduce the text size or pick 2 columns';
     }
   });
 
