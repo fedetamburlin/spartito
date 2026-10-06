@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Editor minimale per creare spartiti PDF A4 (testo + accordi) da leggere su tablet",
+  "description": "Minimal editor to create A4 PDF song sheets (lyrics + chords) to read on a tablet",
   "license": "MIT",
   "scripts": {
     "dev": "vite",

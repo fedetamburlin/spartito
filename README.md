@@ -1,76 +1,77 @@
 # Spartito
 
-[![Deploy su GitHub Pages](https://github.com/fedetamburlin/spartito/actions/workflows/deploy.yml/badge.svg)](https://github.com/fedetamburlin/spartito/actions/workflows/deploy.yml)
+[![Deploy to GitHub Pages](https://github.com/fedetamburlin/spartito/actions/workflows/deploy.yml/badge.svg)](https://github.com/fedetamburlin/spartito/actions/workflows/deploy.yml)
 
-Sito: https://fedetamburlin.github.io/spartito/
+Live site: https://fedetamburlin.github.io/spartito/
 
-Editor minimale per creare **spartiti PDF A4 verticali** (testo + accordi), pensati per essere letti su qualsiasi tablet come PDF: una canzone = una pagina, colonne automatiche, margini risicati per sfruttare tutto il foglio.
+Minimal editor to create **A4 portrait PDF song sheets** (lyrics + chords), meant to be read on any tablet as a PDF: one song = one page, automatic columns, tight margins to use the whole sheet.
 
-Documentazione di progetto: `doc/sota.md`, `doc/stack.md`, `doc/features.md`, `doc/market.md`. Default modificabili in `config/defaults.json`.
+The app UI is in Italian.
 
-## Requisiti
+Project documentation: `doc/sota.md`, `doc/stack.md`, `doc/features.md`, `doc/market.md` (in Italian). Defaults can be changed in `config/defaults.json`.
 
-- Node.js 18.19+ (consigliati 20/22/24 LTS). Con Node 18 il progetto usa Vite 6 + Svelte 5.
+## Requirements
+
+- Node.js 18.19+ (20/22/24 LTS recommended). On Node 18 the project uses Vite 6 + Svelte 5.
 - npm.
 
-## Avvio
+## Getting started
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Script
+## Scripts
 
-| Comando | Cosa fa |
+| Command | What it does |
 |---|---|
-| `npm run dev` | server di sviluppo Vite |
-| `npm run build` | build statica in `dist/` |
-| `npm run preview` | serve la build |
+| `npm run dev` | Vite dev server |
+| `npm run build` | static build into `dist/` |
+| `npm run preview` | serve the build |
 | `npm run check` | svelte-check (TypeScript + Svelte) |
-| `npm test` | test unitari (Vitest) |
+| `npm test` | unit tests (Vitest) |
 
-## Uso
+## Usage
 
-Sorgente in **ChordPro (subset)** nell'editor a sinistra, anteprima A4 a destra:
+Source in **ChordPro (subset)** in the left editor, A4 preview on the right:
 
-- `{title: ...}`, `{subtitle: ...}`, `{comment: ...}` (o `{c: ...}`)
-- accordi inline: `[Am]parola`, anche multipli `[C][G]parola`
-- ritornello: `{start_of_chorus}`/`{soc}` … `{end_of_chorus}`/`{eoc}`; strofe `{start_of_verse}`/`{sov}` opzionale
-- le direttive non supportate vengono ignorate in resa ma **preservate** all'export
+- `{title: ...}`, `{subtitle: ...}`, `{comment: ...}` (or `{c: ...}`)
+- inline chords: `[Am]word`, also multiple `[C][G]word`
+- chorus: `{start_of_chorus}`/`{soc}` … `{end_of_chorus}`/`{eoc}`; verse `{start_of_verse}`/`{sov}` optional
+- unsupported directives are ignored in the preview but **preserved** on export
 
-Auto-fit: prova 1 colonna → 2 colonne → riduzione del font fino ai minimi (6pt testo / 5pt accordi; default 11/10) → avviso se il brano non entra. Il PDF esportato resta di una pagina.
+Auto-fit: tries 1 column → 2 columns → font reduction down to the minimum (6pt lyrics / 5pt chords; default 11/10) → warning if the song does not fit. The exported PDF stays on one page.
 
-Export PDF: pulsante **Stampa PDF** (Chrome/Chromium), scegliendo "Salva come PDF" con margini predefiniti e intestazioni disattivate. Import/export dei sorgenti in `.cho` e `.json`; autosave in `localStorage`.
+PDF export: **Stampa PDF** button (Chrome/Chromium), choosing "Save as PDF" with default margins and headers disabled. Source import/export in `.cho` and `.json`; autosave in `localStorage`.
 
-**Import da siti ("Incolla testo"):** copia testo/accordi da un sito (Ultimate Guitar, Accordi e Spartiti, …) e incollalo nella finestra. La conversione è automatica: accordi sopra il testo allineati per colonne → inline, notazione internazionale e italiana (`MIm`, `LAm7`, `DO7+`, `MIm/RE`), intestazioni sezione (`[Verse]`, `[Chorus]`, `Ritornello`, …), titolo/artista dalle pagine UG (marcatore "Chords"/"Tabs"), `Capo/Tuning` e annotazioni `(instrumental)`/`(2x)` come commenti, tablature e righe decorative/di paginazione scartate, righe di soli accordi rese come intro. Il ChordPro già valido passa invariato. Dizionari e pattern sono in `config/import.json`.
+**Import from websites ("Incolla testo"):** copy lyrics/chords from a site (Ultimate Guitar, Accordi e Spartiti, …) and paste them into the dialog. Conversion is automatic: chords above lyrics aligned by columns → inline, international and Italian notation (`MIm`, `LAm7`, `DO7+`, `MIm/RE`), section headers (`[Verse]`, `[Chorus]`, `Ritornello`, …), title/artist from UG pages ("Chords"/"Tabs" marker), `Capo/Tuning` and `(instrumental)`/`(2x)` annotations as comments, tablature and decorative/pagination lines dropped, chord-only lines rendered as an intro. Valid ChordPro passes through unchanged. Dictionaries and patterns live in `config/import.json`.
 
-**Trasposizione:** stepper `Trasponi − [0] +` in toolbar (o tasti `+`/`−` quando l'editor non è a fuoco; click sul valore per azzerare). Cambia anteprima e PDF, **non** il sorgente né l'export `.cho`; la scelta è salvata nelle impostazioni. La notazione (internazionale/italiana) e i suffissi degli accordi sono preservati.
+**Transposition:** `Trasponi − [0] +` stepper in the toolbar (or `+`/`−` keys when the editor is not focused; click the value to reset). It changes the preview and the PDF, **not** the source or the `.cho` export; the choice is saved in the settings. Notation (international/Italian) and chord suffixes are preserved.
 
-**Import da PDF:** "Importa file" accetta anche `.pdf` (solo PDF con testo, non scansioni): estrae il testo con `unpdf`, ricostruisce righe e colonne dalle coordinate e apre la revisione nell'ImportDialog. L'allineamento accordo/sillaba è preservato; PDF anomali vanno controllati prima di applicare.
+**PDF import:** "Importa file" also accepts `.pdf` (text PDFs only, not scans): it extracts text with `unpdf`, rebuilds lines and columns from coordinates and opens the review in ImportDialog. Chord/syllable alignment is preserved; unusual PDFs should be checked before applying.
 
-**Capo:** direttiva `{capo: N}` (numeri arabi o romani) letta dal sorgente e mostrata come "Capo N" sotto il titolo. Se il brano ha un capo, la trasposizione muove il capo e lascia invariate le forme (es. "Capo 2", +2 → "Capo 4" con gli stessi accordi); se `C0+T` scende sotto zero, il capo si ferma a 0 e gli accordi scendono. Senza capo, trasposizione classica. L'import converte "Capo 3"/"capo at V" in `{capo: N}`.
+**Capo:** `{capo: N}` directive (Arabic or Roman numerals) read from the source and shown as "Capo N" under the title. If the song has a capo, transposition moves the capo and leaves the shapes unchanged (e.g. "Capo 2", +2 → "Capo 4" with the same chords); if `C0+T` goes below zero, the capo stops at 0 and the chords go down. Without a capo, classic transposition. Import converts "Capo 3"/"capo at V" into `{capo: N}`.
 
-## Struttura
+## Structure
 
 ```
-config/defaults.json     default di progetto (pagina, layout, font, colori, export)
-config/import.json       dizionari import (sezioni, etichette metadati)
-public/fonts/            font OFL (Inter, Source Serif 4, JetBrains Mono) + licenze
-src/core/                TS puro: config, model, chordpro (parse/serialize), chords (grammatica),
-                         transpose, import (conversione copia-incolla), pdf (estrazione da PDF),
+config/defaults.json     project defaults (page, layout, fonts, colors, export)
+config/import.json       import dictionaries (sections, metadata labels)
+public/fonts/            OFL fonts (Inter, Source Serif 4, JetBrains Mono) + licenses
+src/core/                pure TS: config, model, chordpro (parse/serialize), chords (grammar),
+                         transpose, import (copy-paste conversion), pdf (PDF text extraction),
                          fit, persistence, settings
-src/ui/                  componenti Svelte + stili (app.css, paper.css) + measure.ts
-tests/                   fixture ChordPro/import e test unitari
-spike/                   spike di validazione stampa A4 e misura overflow (Fase 0)
+src/ui/                  Svelte components + styles (app.css, paper.css) + measure.ts
+tests/                   ChordPro/import fixtures and unit tests
 ```
 
-## Stato
+## Status
 
-POC funzionante (P0): editor singola canzone, anteprima A4, auto-fit, export PDF, import/export, persistenza locale, import copia-incolla da siti, import da PDF (testo), trasposizione e capo.
-Backlog P1/P2 in `doc/features.md` (CodeMirror 6, export automatico, PWA, libreria canzoni, notazione, MCP).
+Working POC (P0): single-song editor, A4 preview, auto-fit, PDF export, import/export, local persistence, copy-paste import from websites, PDF import (text), transposition and capo.
+P1/P2 backlog in `doc/features.md` (CodeMirror 6, automatic export, PWA, song library, notation, MCP).
 
-## Licenza
+## License
 
-MIT. Donazioni: link PayPal da definire.
-Font sotto SIL Open Font License 1.1 (vedi `public/fonts/OFL-*.txt`).
+MIT. Donations: PayPal link to be defined.
+Fonts under SIL Open Font License 1.1 (see `public/fonts/OFL-*.txt`).

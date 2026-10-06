@@ -45,7 +45,7 @@
       raw = await navigator.clipboard.readText();
       result = null;
     } catch {
-      // permesso negato: l'utente incolla manualmente
+      // permission denied: the user pastes manually
     }
   }
 
