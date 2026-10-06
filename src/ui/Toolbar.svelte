@@ -1,5 +1,6 @@
 <script lang="ts">
   import { config } from '../core/config';
+  import type { BridgeStatus } from '../core/bridge';
   import { importSong } from '../core/import';
   import type { SongDocument } from '../core/model';
   import { extractPdfText } from '../core/pdf';
@@ -12,9 +13,17 @@
     doc: SongDocument;
     source: string;
     settings: SongSettings;
+    bridgeStatus: BridgeStatus;
+    onToggleBridge: () => void;
   }
 
-  let { doc, source = $bindable(), settings = $bindable() }: Props = $props();
+  let {
+    doc,
+    source = $bindable(),
+    settings = $bindable(),
+    bridgeStatus,
+    onToggleBridge
+  }: Props = $props();
 
   let fileInput = $state<HTMLInputElement | null>(null);
   let importOpen = $state(false);
@@ -203,6 +212,14 @@
     <button class="btn-import" onclick={() => fileInput?.click()}>Import file</button>
     <button class="btn-export" onclick={exportCho}>Export .cho</button>
     <button class="btn-export" onclick={exportJson}>Export .json</button>
+    <button
+      class="btn-bridge"
+      class:connected={bridgeStatus === 'connected'}
+      class:connecting={bridgeStatus === 'connecting'}
+      title={bridgeStatus === 'connected'
+        ? 'Disconnect from the opencode MCP bridge'
+        : 'Connect to the opencode MCP bridge (run node packages/mcp/dist/index.js)'}
+      onclick={onToggleBridge}>opencode</button>
     <button
       class="primary"
       title="Save as PDF · default margins · headers off"

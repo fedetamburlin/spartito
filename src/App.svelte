@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { createBridge, type BridgeStatus } from './core/bridge';
   import { config } from './core/config';
+  import { clearDocumentHash, readDocumentFromHash } from './core/deeplink';
   import { parseChordPro } from './core/chordpro';
   import { DEMO_SONG } from './core/demo';
   import { loadState, saveState } from './core/persistence';
@@ -9,11 +11,33 @@
   import PreviewPane from './ui/PreviewPane.svelte';
   import Toolbar from './ui/Toolbar.svelte';
 
+  const shared = readDocumentFromHash(location.hash);
+  if (shared) clearDocumentHash();
+  const ephemeral = shared !== null;
+
   const stored = loadState();
-  let source = $state(stored?.source ?? DEMO_SONG);
-  let settings = $state<SongSettings>(sanitizeSettings(stored?.settings));
+  let source = $state(shared?.source ?? stored?.source ?? DEMO_SONG);
+  let settings = $state<SongSettings>(sanitizeSettings(shared?.settings ?? stored?.settings));
   let doc = $derived(parseChordPro(source));
   let display = $derived(transposedForDisplay(doc, settings.transpose));
+
+  let bridgeStatus = $state<BridgeStatus>('disconnected');
+  const bridge = createBridge({
+    getState: () => ({ source, settings: { ...settings } }),
+    setSource: (value) => {
+      source = value;
+    },
+    updateSettings: (patch) => {
+      settings = sanitizeSettings({ ...settings, ...patch });
+      return { ...settings };
+    }
+  });
+  bridge.onStatus((next) => (bridgeStatus = next));
+
+  function toggleBridge() {
+    if (bridgeStatus === 'connected') bridge.disconnect();
+    else bridge.connect();
+  }
 
   function isEditing(target: EventTarget | null): boolean {
     const el = target as HTMLElement | null;
@@ -101,15 +125,20 @@
       settings: { ...settings }
     };
     document.title = doc.title ? doc.title : 'Spartito';
+    if (ephemeral) return;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => saveState(payload), config.storage.autosaveDebounceMs);
+  });
+
+  $effect(() => {
+    bridge.sendState({ source, settings: { ...settings } });
   });
 </script>
 
 <svelte:window onkeydown={onKeydown} />
 
 <div class="app">
-  <Toolbar {doc} bind:source bind:settings />
+  <Toolbar {doc} bind:source bind:settings {bridgeStatus} onToggleBridge={toggleBridge} />
   <main
     class="app-workspace"
     class:dragging

@@ -168,6 +168,32 @@ button.primary {
   border-color: var(--ui-export-text);
 }
 
+.btn-bridge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-bridge::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #9aa4b2;
+}
+
+.btn-bridge.connecting::before {
+  background: #d9a441;
+}
+
+.btn-bridge.connected {
+  border-color: var(--ui-export-border);
+}
+
+.btn-bridge.connected::before {
+  background: #2e6b3e;
+}
+
 .hidden-input {
   display: none;
 }
