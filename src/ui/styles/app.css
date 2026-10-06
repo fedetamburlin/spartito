@@ -255,8 +255,29 @@ button.primary {
 .app-workspace {
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(280px, 32%) 1fr;
+  grid-template-columns: minmax(200px, var(--editor-pct, 32%)) 6px minmax(280px, 1fr);
   min-height: 0;
+}
+
+.app-workspace.dragging {
+  cursor: col-resize;
+  user-select: none;
+}
+
+.splitter {
+  cursor: col-resize;
+  background: var(--ui-border);
+  touch-action: none;
+}
+
+.splitter:hover,
+.app-workspace.dragging .splitter {
+  background: var(--ui-accent);
+}
+
+.splitter:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: -2px;
 }
 
 .editor {
@@ -264,7 +285,6 @@ button.primary {
   flex-direction: column;
   min-height: 0;
   background: var(--ui-panel);
-  border-right: 1px solid var(--ui-border);
 }
 
 .pane-title {
@@ -351,6 +371,7 @@ button.primary {
 
   .app-toolbar,
   .editor,
+  .splitter,
   .preview-meta {
     display: none !important;
   }
