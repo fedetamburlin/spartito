@@ -5,13 +5,19 @@
   "type": "module",
   "description": "Minimal editor to create A4 PDF song sheets (lyrics + chords) to read on a tablet",
   "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "mcp:build": "npm run build -w spartito-mcp",
+    "mcp:check": "npm run check -w spartito-mcp",
+    "mcp:test": "npm run test -w spartito-mcp"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
