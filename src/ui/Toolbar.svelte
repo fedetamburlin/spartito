@@ -125,10 +125,6 @@
 
 <header class="app-toolbar">
   <div class="toolbar-group">
-    <button class="btn-import" onclick={openPaste}>Incolla testo</button>
-    <button class="btn-import" onclick={() => fileInput?.click()}>Importa file</button>
-  </div>
-  <div class="toolbar-group">
     <label>Font
       <select value={settings.fontId} onchange={setFont}>
         {#each config.typography.fonts as font}
@@ -203,6 +199,8 @@
       /></label>
   </div>
   <div class="toolbar-group toolbar-actions">
+    <button class="btn-import" onclick={openPaste}>Incolla testo</button>
+    <button class="btn-import" onclick={() => fileInput?.click()}>Importa file</button>
     <button class="btn-export" onclick={exportCho}>Esporta .cho</button>
     <button class="btn-export" onclick={exportJson}>Esporta .json</button>
     <button
