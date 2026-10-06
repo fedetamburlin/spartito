@@ -287,15 +287,132 @@ button.primary {
   background: var(--ui-panel);
 }
 
+.pane-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--ui-border);
+}
+
 .pane-title {
   margin: 0;
-  padding: 8px 12px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--ui-muted);
-  border-bottom: 1px solid var(--ui-border);
+}
+
+.help {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.help-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ui-muted);
+  cursor: pointer;
+}
+
+.help-icon:hover,
+.help-icon[aria-expanded='true'] {
+  color: var(--ui-accent);
+}
+
+.help-icon:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 1px;
+}
+
+.help-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 40;
+  width: min(380px, calc(100vw - 36px));
+  max-height: min(65vh, 460px);
+  overflow: auto;
+  padding: 10px 12px;
+  background: var(--ui-panel);
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(15, 25, 40, 0.22);
+  text-transform: none;
+  letter-spacing: normal;
+  text-align: left;
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--ui-text);
+}
+
+.help-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.help-head strong {
+  font-size: 13px;
+}
+
+.help-close {
+  padding: 0 6px;
+  border: 0;
+  background: transparent;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--ui-muted);
+  cursor: pointer;
+}
+
+.help-close:hover {
+  color: var(--ui-accent);
+}
+
+.help-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.help-table td {
+  padding: 3px 0;
+  vertical-align: top;
+}
+
+.help-table td:first-child {
+  padding-right: 12px;
+}
+
+.help-table code {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11.5px;
+  white-space: nowrap;
+  background: #f1f4f8;
+  border: 1px solid #e0e6ee;
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+
+.help-effect {
+  color: var(--ui-muted);
+}
+
+.help-note {
+  margin: 8px 0 0;
+  font-size: 11.5px;
+  color: var(--ui-muted);
 }
 
 .editor-area {
@@ -311,6 +428,7 @@ button.primary {
 }
 
 .preview {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -343,8 +461,55 @@ button.primary {
 }
 
 .preview-wrap {
+  width: calc(var(--page-w, 210mm) * var(--zoom, 1));
+  height: calc(var(--page-h, 297mm) * var(--zoom, 1));
+  margin: 0 auto;
+}
+
+.zoom-layer {
+  width: var(--page-w, 210mm);
+  height: var(--page-h, 297mm);
+  transform: scale(var(--zoom, 1));
+  transform-origin: top left;
+}
+
+.zoom-controls {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 5;
   display: flex;
-  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  background: var(--ui-panel);
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(15, 25, 40, 0.15);
+}
+
+.zoom-controls button {
+  min-width: 26px;
+  padding: 2px 6px;
+  border: 0;
+  background: transparent;
+  line-height: 1.4;
+}
+
+.zoom-controls button:hover:not(:disabled) {
+  background: #eef2f7;
+}
+
+.zoom-controls button:disabled {
+  color: var(--ui-muted);
+  cursor: default;
+}
+
+.zoom-controls .zoom-value {
+  min-width: 44px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ui-muted);
 }
 
 .page {
@@ -372,7 +537,8 @@ button.primary {
   .app-toolbar,
   .editor,
   .splitter,
-  .preview-meta {
+  .preview-meta,
+  .zoom-controls {
     display: none !important;
   }
 
@@ -384,6 +550,17 @@ button.primary {
     padding: 0;
     margin: 0;
     overflow: visible;
+  }
+
+  .preview-wrap {
+    width: auto;
+    height: auto;
+  }
+
+  .zoom-layer {
+    width: auto;
+    height: auto;
+    transform: none;
   }
 
   .page {

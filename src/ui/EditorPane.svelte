@@ -1,4 +1,6 @@
 <script lang="ts">
+  import ChordProHelp from './ChordProHelp.svelte';
+
   interface Props {
     source: string;
   }
@@ -7,7 +9,10 @@
 </script>
 
 <section class="editor">
-  <h2 class="pane-title">Text (ChordPro)</h2>
+  <div class="pane-header">
+    <h2 class="pane-title">Text (ChordPro)</h2>
+    <ChordProHelp />
+  </div>
   <textarea
     class="editor-area"
     spellcheck="false"

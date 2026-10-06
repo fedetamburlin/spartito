@@ -3,6 +3,7 @@
   import { decideLayout, type FitOutcome, type LayoutParams } from '../core/fit';
   import type { SongDocument } from '../core/model';
   import type { SongSettings } from '../core/settings';
+  import { stepZoom, ZOOM_MAX, ZOOM_MIN } from '../core/zoom';
   import { createMeasure } from './measure';
   import Page from './Page.svelte';
 
@@ -15,6 +16,9 @@
   let { doc, capo, settings }: Props = $props();
 
   let wrapEl = $state<HTMLElement | null>(null);
+  let scrollEl = $state<HTMLElement | null>(null);
+  let zoom = $state(1);
+  let zoomPct = $derived(Math.round(zoom * 100));
   let layout = $state<LayoutParams>({
     columns: config.layout.columnsDefault,
     textPt: config.layout.textPtDefault,
@@ -50,6 +54,18 @@
     return () => cancelAnimationFrame(frame);
   });
 
+  $effect(() => {
+    const el = scrollEl;
+    if (!el) return;
+    const onWheel = (event: WheelEvent) => {
+      if (!event.ctrlKey && !event.metaKey) return;
+      event.preventDefault();
+      zoom = stepZoom(zoom, event.deltaY < 0 ? 1 : -1);
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  });
+
   const statusText = $derived.by(() => {
     if (!outcome) return 'Calculating layout...';
     const columns = outcome.params.columns === 2 ? '2 columns' : '1 column';
@@ -79,9 +95,34 @@
       <span class="badge">{statusText}</span>
     </div>
   {/if}
-  <div class="preview-scroll">
-    <div class="preview-wrap" bind:this={wrapEl}>
-      <Page {doc} {layout} {settings} {capo} />
+  <div class="preview-scroll" bind:this={scrollEl}>
+    <div
+      class="preview-wrap"
+      bind:this={wrapEl}
+      style={`--zoom: ${zoom}; --page-w: ${config.page.widthMm}mm; --page-h: ${config.page.heightMm}mm`}
+    >
+      <div class="zoom-layer">
+        <Page {doc} {layout} {settings} {capo} />
+      </div>
     </div>
+  </div>
+  <div class="zoom-controls">
+    <button
+      type="button"
+      aria-label="Zoom out"
+      title="Zoom out"
+      disabled={zoom <= ZOOM_MIN}
+      onclick={() => (zoom = stepZoom(zoom, -1))}>−</button>
+    <button
+      type="button"
+      class="zoom-value"
+      title="Reset zoom to 100%"
+      onclick={() => (zoom = 1)}>{zoomPct}%</button>
+    <button
+      type="button"
+      aria-label="Zoom in"
+      title="Zoom in"
+      disabled={zoom >= ZOOM_MAX}
+      onclick={() => (zoom = stepZoom(zoom, 1))}>+</button>
   </div>
 </div>
