@@ -23,7 +23,7 @@ function unknownRaws(doc: ReturnType<typeof parseChordPro>): string[] {
 }
 
 describe('parseChordPro', () => {
-  it('legge titolo e accordi inline', () => {
+  it('reads title and inline chords', () => {
     const doc = parseChordPro(load('minimal.cho'));
     expect(doc.title).toBe('Canzone Minima');
     const section = doc.blocks[0] as Section;
@@ -31,14 +31,14 @@ describe('parseChordPro', () => {
     expect(section.type).toBe('verse');
     expect(section.explicit).toBe(false);
     const line = section.items[0];
-    if (line.kind !== 'line') throw new Error('atteso una riga');
+    if (line.kind !== 'line') throw new Error('line expected');
     expect(line.words).toEqual([
       { text: 'Ciao', chords: ['Am'] },
       { text: 'mondo', chords: ['F'] }
     ]);
   });
 
-  it('gestisce ritornello esplicito, commenti e sottotitolo', () => {
+  it('handles explicit chorus, comments and subtitle', () => {
     const doc = parseChordPro(load('complete.cho'));
     expect(doc.subtitle).toBe('Testo inventato');
     const chorus = doc.blocks.find(
@@ -47,11 +47,11 @@ describe('parseChordPro', () => {
     expect(chorus.explicit).toBe(true);
     expect(chorus.items.filter((item) => item.kind === 'line')).toHaveLength(2);
     const first = doc.blocks[0];
-    if (first.kind !== 'section') throw new Error('attesa una sezione implicita');
+    if (first.kind !== 'section') throw new Error('implicit section expected');
     expect(first.items[0].kind).toBe('comment');
   });
 
-  it('preserva le direttive sconosciute in ordine e legge il capo', () => {
+  it('preserves unknown directives in order and reads the capo', () => {
     const doc = parseChordPro(load('unknown.cho'));
     expect(unknownRaws(doc)).toEqual(['{key: G}', '{x_custom: 42}']);
     expect(doc.capo).toBe(3);
@@ -61,12 +61,12 @@ describe('parseChordPro', () => {
     expect(serialized).toContain('{capo: 3}');
   });
 
-  it('gestisce accenti, alterati, slash e accordi multipli', () => {
+  it('handles accents, accidentals, slash chords and multiple chords', () => {
     const doc = parseChordPro(load('edge.cho'));
     expect(doc.title).toBe('Accenti È À Ò');
     const section = doc.blocks[0] as Section;
     const first = section.items[0];
-    if (first.kind !== 'line') throw new Error('attesa una riga');
+    if (first.kind !== 'line') throw new Error('line expected');
     expect(first.words.map((word) => word.chords)).toEqual([
       ['F#m'],
       ['Bb'],
@@ -75,20 +75,20 @@ describe('parseChordPro', () => {
       ['N.C.']
     ]);
     const second = section.items[1];
-    if (second.kind !== 'line') throw new Error('attesa una riga');
+    if (second.kind !== 'line') throw new Error('line expected');
     expect(second.words[0].chords).toEqual(['C', 'G']);
   });
 
-  it('accetta fine riga CRLF', () => {
+  it('accepts CRLF line endings', () => {
     const doc = parseChordPro('{title: X}\r\n\r\n[Am]Ciao\r\n');
     expect(doc.title).toBe('X');
     const section = doc.blocks[0] as Section;
     const line = section.items[0];
-    if (line.kind !== 'line') throw new Error('attesa una riga');
+    if (line.kind !== 'line') throw new Error('line expected');
     expect(line.words).toEqual([{ text: 'Ciao', chords: ['Am'] }]);
   });
 
-  it('gestisce righe di soli accordi (grid) e le preserva al roundtrip', () => {
+  it('handles chord-only lines (grid) and preserves them on roundtrip', () => {
     const doc = parseChordPro('[C] [G]\n[Am]Testo\n');
     const section = doc.blocks[0] as Section;
     expect(section.items[0]).toEqual({ kind: 'grid', chords: ['C', 'G'] });
@@ -99,7 +99,7 @@ describe('parseChordPro', () => {
 
 describe('roundtrip parse/serialize', () => {
   for (const name of ['minimal.cho', 'complete.cho', 'edge.cho', 'unknown.cho']) {
-    it(`preserva il modello per ${name}`, () => {
+    it(`preserves the model for ${name}`, () => {
       const doc = parseChordPro(load(name));
       const roundtripped = parseChordPro(serializeChordPro(doc));
       expect(roundtripped).toEqual(doc);

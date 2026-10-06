@@ -23,7 +23,7 @@ const item = (str: string, x: number, y: number, width?: number, height = 10): P
 const squeeze = (text: string) => text.replace(/\s+/g, ' ').trim();
 
 describe('itemsToLines', () => {
-  it('ricostruisce una riga di accordi sopra il testo', () => {
+  it('rebuilds a chord line above the lyrics', () => {
     const lines = itemsToLines([
       item('G', 100, 100),
       item('C', 0, 100),
@@ -36,25 +36,25 @@ describe('itemsToLines', () => {
     expect(squeeze(lines[1])).toBe('Walking home tonight');
   });
 
-  it('mantiene la distanza orizzontale tra gli accordi', () => {
+  it('keeps the horizontal spacing between chords', () => {
     const lines = itemsToLines([item('Em', 0, 100), item('D', 150, 100)]);
     expect(lines[0]).toBe(`Em${' '.repeat(50)}D`);
   });
 
-  it('unisce item con piccole differenze di y', () => {
+  it('merges items with small y differences', () => {
     const lines = itemsToLines([item('C', 0, 100), item('G', 100, 99.5)]);
     expect(lines).toHaveLength(1);
     expect(squeeze(lines[0])).toBe('C G');
   });
 
-  it('ignora item vuoti o senza contenuto', () => {
+  it('ignores empty or blank items', () => {
     expect(itemsToLines([])).toEqual([]);
     expect(itemsToLines([item('   ', 0, 10)])).toEqual([]);
   });
 });
 
 describe('extractPdfText', () => {
-  it('estrae il testo e non consuma il buffer di input', async () => {
+  it('extracts text and does not consume the input buffer', async () => {
     const file = readFileSync(join(fixturesDir, 'mini.pdf'));
     const buffer = file.buffer.slice(
       file.byteOffset,
@@ -70,7 +70,7 @@ describe('extractPdfText', () => {
 });
 
 describe('splitColumns', () => {
-  it('separa due colonne e le legge in ordine', () => {
+  it('splits two columns and reads them in order', () => {
     const items = [
       item('Intro]', 0, 200, 30),
       item('Em', 0, 180),
@@ -82,7 +82,7 @@ describe('splitColumns', () => {
     expect(itemsToText(items).split('\n').map(squeeze)).toEqual(['Intro]', 'Em', 'E AMaj7', 'In']);
   });
 
-  it('non divide una colonna singola attraversata dal testo', () => {
+  it('does not split a single column crossed by long text', () => {
     const items = [item('a long lyric line', 0, 100, 400), item('C', 0, 88)];
     expect(splitColumns(items)).toHaveLength(1);
   });

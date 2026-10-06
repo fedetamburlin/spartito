@@ -4,11 +4,11 @@ import { buildJsonExport, fileBaseName, parseImported } from '../src/core/persis
 import { defaultSettings, sanitizeSettings } from '../src/core/settings';
 
 describe('sanitizeSettings', () => {
-  it('applica i default', () => {
+  it('applies defaults', () => {
     expect(sanitizeSettings()).toEqual(defaultSettings());
   });
 
-  it('limita i valori fuori range', () => {
+  it('clamps out-of-range values', () => {
     expect(sanitizeSettings({ textPt: 99 }).textPt).toBe(config.layout.textPtMax);
     expect(sanitizeSettings({ textPt: 1 }).textPt).toBe(config.layout.textPtMin);
     expect(sanitizeSettings({ marginsMm: 1 }).marginsMm).toBe(config.page.marginsMinMm);
@@ -17,8 +17,8 @@ describe('sanitizeSettings', () => {
   });
 });
 
-describe('esportazione e importazione', () => {
-  it('roundtrip JSON con sorgente e impostazioni', () => {
+describe('export and import', () => {
+  it('JSON roundtrip with source and settings', () => {
     const settings = defaultSettings();
     const exported = buildJsonExport('{title: X}\n[Am]Ciao\n', settings);
     const imported = parseImported(exported, 'brano.json');
@@ -27,13 +27,13 @@ describe('esportazione e importazione', () => {
     expect(imported.settings?.textPt).toBe(settings.textPt);
   });
 
-  it('tratta un file .cho come sorgente puro', () => {
+  it('treats a .cho file as plain source', () => {
     const imported = parseImported('{title: X}\n[Am]Ciao\n', 'brano.cho');
     expect(imported.source).toContain('[Am]Ciao');
     expect(imported.settings).toBeUndefined();
   });
 
-  it('non scambia un .cho con direttive per un wrapper JSON', () => {
+  it('does not mistake a .cho with directives for a JSON wrapper', () => {
     const imported = parseImported('{title: X}\n[Am]Ciao\n', 'brano.txt');
     expect(imported.settings).toBeUndefined();
     expect(imported.source).toBe('{title: X}\n[Am]Ciao\n');
@@ -41,8 +41,8 @@ describe('esportazione e importazione', () => {
 });
 
 describe('fileBaseName', () => {
-  it('normalizza titolo con accenti e spazi', () => {
+  it('normalizes title with accents and spaces', () => {
     expect(fileBaseName('Perché È Così')).toBe('perche-e-cosi');
-    expect(fileBaseName('!!!')).toBe('canzone');
+    expect(fileBaseName('!!!')).toBe('song');
   });
 });

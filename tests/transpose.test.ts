@@ -10,30 +10,30 @@ import {
 } from '../src/core/transpose';
 
 describe('transposeChord', () => {
-  it('trasporta le note internazionali con wrap', () => {
+  it('transposes international notes with wrap-around', () => {
     expect(transposeChord('C', 2)).toBe('D');
     expect(transposeChord('Am', -2)).toBe('Gm');
     expect(transposeChord('B', 1)).toBe('C');
     expect(transposeChord('C', -1)).toBe('B');
   });
 
-  it('mantiene il suffisso e trasporta il basso', () => {
+  it('keeps the suffix and transposes the bass note', () => {
     expect(transposeChord('C/E', 2)).toBe('D/F#');
     expect(transposeChord('Am7/G', 2)).toBe('Bm7/A');
   });
 
-  it('eredita lo stile bemolle dell\u2019accordo', () => {
+  it('inherits the flat style of the chord', () => {
     expect(transposeChord('Bb', 1)).toBe('B');
     expect(transposeChord('Eb', -1)).toBe('D');
     expect(transposeChord('Bb/D', 2)).toBe('C/E');
   });
 
-  it('usa i diesis quando l\u2019accordo non ha bemolli', () => {
+  it('uses sharps when the chord has no flats', () => {
     expect(transposeChord('F', 1)).toBe('F#');
     expect(transposeChord('C7b5', 1)).toBe('C#7b5');
   });
 
-  it('preserva la notazione italiana', () => {
+  it('preserves Italian notation', () => {
     expect(transposeChord('MIm', 1)).toBe('FAm');
     expect(transposeChord('LAm', 2)).toBe('SIm');
     expect(transposeChord('DO', 2)).toBe('RE');
@@ -41,7 +41,7 @@ describe('transposeChord', () => {
     expect(transposeChord('MIm/RE', 2)).toBe('FA#m/MI');
   });
 
-  it('lascia intatti N.C., token sconosciuti e delta zero', () => {
+  it('leaves N.C., unknown tokens and zero delta untouched', () => {
     expect(transposeChord('N.C.', 2)).toBe('N.C.');
     expect(transposeChord('xyz', 2)).toBe('xyz');
     expect(transposeChord('C#m7', 0)).toBe('C#m7');
@@ -74,13 +74,13 @@ describe('transposeDocument', () => {
     ]
   };
 
-  it('trasporta accordi su parole e grid, non commenti e direttive', () => {
+  it('transposes chords on words and grids, not comments and directives', () => {
     const result = transposeDocument(doc, 2);
     expect(result.title).toBe('Prova');
     expect(result.blocks[0]).toEqual({ kind: 'comment', text: 'Capo at V' });
 
     const section = result.blocks[1];
-    if (section.kind !== 'section') throw new Error('sezione attesa');
+    if (section.kind !== 'section') throw new Error('section expected');
     expect(section.items[0]).toEqual({
       kind: 'line',
       words: [
@@ -93,34 +93,34 @@ describe('transposeDocument', () => {
     expect(section.items[3]).toEqual({ kind: 'unknown', raw: '{key: G}' });
   });
 
-  it('con delta zero restituisce lo stesso documento', () => {
+  it('returns the same document with zero delta', () => {
     expect(transposeDocument(doc, 0)).toBe(doc);
   });
 
-  it('si integra con il parser ChordPro', () => {
+  it('integrates with the ChordPro parser', () => {
     const parsed = parseChordPro('{title: X}\n[Am]Ciao [C]mondo\n');
     const result = transposeDocument(parsed, 3);
     const before = parsed.blocks[0];
     const after = result.blocks[0];
-    if (before.kind !== 'section' || after.kind !== 'section') throw new Error('sezione attesa');
+    if (before.kind !== 'section' || after.kind !== 'section') throw new Error('section expected');
     const lineBefore = before.items[0];
     const lineAfter = after.items[0];
-    if (lineBefore.kind !== 'line' || lineAfter.kind !== 'line') throw new Error('linea attesa');
+    if (lineBefore.kind !== 'line' || lineAfter.kind !== 'line') throw new Error('line expected');
     expect(lineBefore.words[0].chords).toEqual(['Am']);
     expect(lineAfter.words[0].chords).toEqual(['Cm']);
     expect(lineAfter.words[1].chords).toEqual(['D#']);
   });
 });
 
-describe('trasposizione nelle impostazioni', () => {
-  it('applica default e limiti', () => {
+describe('transposition in settings', () => {
+  it('applies defaults and limits', () => {
     expect(defaultSettings().transpose).toBe(0);
     expect(sanitizeSettings({ transpose: 99 }).transpose).toBe(TRANSPOSE_MAX);
     expect(sanitizeSettings({ transpose: -99 }).transpose).toBe(TRANSPOSE_MIN);
     expect(sanitizeSettings({ transpose: 2.7 }).transpose).toBe(3);
   });
 
-  it('incrementa e limita con withTranspose', () => {
+  it('increments and clamps with withTranspose', () => {
     expect(withTranspose(defaultSettings(), 1).transpose).toBe(1);
     expect(withTranspose({ ...defaultSettings(), transpose: TRANSPOSE_MAX }, 1).transpose).toBe(
       TRANSPOSE_MAX

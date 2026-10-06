@@ -9,7 +9,7 @@ const baseOptions = (overrides: Partial<{ columns: 'auto' | 1 | 2; textPt: numbe
 });
 
 describe('decideLayout', () => {
-  it('usa il default quando entra in una colonna', () => {
+  it('uses the default when it fits in one column', () => {
     const seen: LayoutParams[] = [];
     const result = decideLayout(
       (params) => {
@@ -26,7 +26,7 @@ describe('decideLayout', () => {
     expect(seen).toHaveLength(1);
   });
 
-  it('passa a due colonne quando una sola sfora', () => {
+  it('switches to two columns when one overflows', () => {
     const result = decideLayout((params) => params.columns === 1, config, baseOptions());
     expect(result.status).toBe('columns');
     expect(result.params.columns).toBe(2);
@@ -34,7 +34,7 @@ describe('decideLayout', () => {
     expect(result.attempts).toBe(2);
   });
 
-  it('riduce il font quando anche due colonne sforano', () => {
+  it('shrinks the font when two columns overflow too', () => {
     const result = decideLayout(
       (params) => params.textPt > 10.5,
       config,
@@ -45,7 +45,7 @@ describe('decideLayout', () => {
     expect(result.params.columns).toBe(2);
   });
 
-  it('scende fino al minimo di leggibilità', () => {
+  it('goes down to the minimum readable size', () => {
     const result = decideLayout(
       (params) => params.textPt > config.layout.textPtMin,
       config,
@@ -55,13 +55,13 @@ describe('decideLayout', () => {
     expect(result.params.textPt).toBe(config.layout.textPtMin);
   });
 
-  it('segnala overflow quando nulla entra', () => {
+  it('reports overflow when nothing fits', () => {
     const result = decideLayout(() => true, config, baseOptions());
     expect(result.status).toBe('overflow');
     expect(result.params.textPt).toBe(config.layout.textPtMin);
   });
 
-  it('non usa mai due colonne con colonne fisse a 1', () => {
+  it('never uses two columns with fixed 1 column', () => {
     const columns = new Set<number>();
     const result = decideLayout(
       (params) => {
@@ -76,7 +76,7 @@ describe('decideLayout', () => {
     expect(result.params.textPt).toBe(config.layout.textPtMin);
   });
 
-  it('con colonne fisse a 2 non prova la singola colonna', () => {
+  it('with fixed 2 columns does not try a single column', () => {
     const columns = new Set<number>();
     decideLayout(
       (params) => {
@@ -89,7 +89,7 @@ describe('decideLayout', () => {
     expect([...columns]).toEqual([2]);
   });
 
-  it('deriva il font degli accordi mantenendo il minimo', () => {
+  it('derives the chord font while keeping the minimum', () => {
     expect(chordPtFor(config.layout.textPtDefault, config)).toBe(config.layout.chordPtDefault);
     expect(chordPtFor(config.layout.textPtMin, config)).toBe(config.layout.chordPtMin);
     expect(chordPtFor(config.layout.textPtMax, config)).toBe(
