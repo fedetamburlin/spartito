@@ -86,6 +86,14 @@ describe('parseChordPro', () => {
     if (line.kind !== 'line') throw new Error('attesa una riga');
     expect(line.words).toEqual([{ text: 'Ciao', chords: ['Am'] }]);
   });
+
+  it('gestisce righe di soli accordi (grid) e le preserva al roundtrip', () => {
+    const doc = parseChordPro('[C] [G]\n[Am]Testo\n');
+    const section = doc.blocks[0] as Section;
+    expect(section.items[0]).toEqual({ kind: 'grid', chords: ['C', 'G'] });
+    const roundtripped = parseChordPro(serializeChordPro(doc));
+    expect(roundtripped).toEqual(doc);
+  });
 });
 
 describe('roundtrip parse/serialize', () => {

@@ -60,7 +60,14 @@ Obiettivo: import/export compatibile con i file `.cho` esistenti senza perdere i
 - Autosave locale (localStorage) con debounce; nessun account, nessun server.
 - Il PDF esportato: una pagina, testo vettoriale selezionabile, font incorporati, metadati titolo.
 
-### 2.6 Non-obiettivi P0
+### 2.6 Import da testo incollato (implementato)
+
+- Dialog "Incolla testo": incolla da sito (Ultimate Guitar, Accordi e Spartiti, …) o ChordPro già valido.
+- Conversione generica basata su grammatica (non per-sito): accordi sopra il testo allineati per colonne → inline; notazione internazionale e italiana (`MIm`, `LAm7`, `DO7+`, `MIm/RE`); intestazioni sezione; `Capo/Tuning` come commenti; tablature rimosse; righe di soli accordi come grid/intro.
+- Dizionari e pattern in `config/import.json` (sezioni, etichette metadati), estendibili senza toccare la logica.
+- Riepilogo e avvisi prima di sostituire il sorgente (correzione manuale immediata in editor).
+
+### 2.7 Non-obiettivi P0
 
 - Nessuna libreria/setlist, nessuna trasposizione, nessuna notazione, nessun sync, nessuna app Android, nessun MCP.
 
@@ -80,6 +87,7 @@ Obiettivo: import/export compatibile con i file `.cho` esistenti senza perdere i
 - Setlist/canzonieri multipagina con indice e copertina (qui torna utile `break-before: page`).
 - Notazione: melodie via ABC/abcjs; spartiti via MusicXML/OSMD.
 - Diagrammi accordi e voicing; tablature.
+- **Import da PDF** (valutazione): estrazione testo con pdf.js → stessa pipeline copia-incolla. Limiti: il testo PDF può avere ordine di lettura alterato, colonne multiple, accordi posizionati graficamente e non nel layer testuale; i PDF scansionati richiederebbero OCR (fuori scope). Fattibile per PDF "testo nativo" con chord sheet semplice, da valutare solo dopo l'import testuale.
 - Sync/cloud opzionale; esposizione MCP per chatbot/AI.
 - App Android via Capacitor.
 

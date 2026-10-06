@@ -8,6 +8,11 @@ export interface Line {
   words: Word[];
 }
 
+export interface GridLine {
+  kind: 'grid';
+  chords: string[];
+}
+
 export interface CommentItem {
   kind: 'comment';
   text: string;
@@ -18,7 +23,7 @@ export interface UnknownItem {
   raw: string;
 }
 
-export type SectionItem = Line | CommentItem | UnknownItem;
+export type SectionItem = Line | GridLine | CommentItem | UnknownItem;
 
 export type SectionType = 'verse' | 'chorus' | 'bridge';
 

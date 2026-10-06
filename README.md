@@ -39,20 +39,24 @@ Auto-fit: prova 1 colonna → 2 colonne → riduzione del font fino ai minimi (1
 
 Export PDF: pulsante **Stampa PDF** (Chrome/Chromium), scegliendo "Salva come PDF" con margini predefiniti e intestazioni disattivate. Import/export dei sorgenti in `.cho` e `.json`; autosave in `localStorage`.
 
+**Import da siti ("Incolla testo"):** copia testo/accordi da un sito (Ultimate Guitar, Accordi e Spartiti, …) e incollalo nella finestra. La conversione è automatica: accordi sopra il testo allineati per colonne → inline, notazione internazionale e italiana (`MIm`, `LAm7`, `DO7+`, `MIm/RE`), intestazioni sezione (`[Verse]`, `[Chorus]`, `Ritornello`, …), `Capo/Tuning` e annotazioni `(instrumental)`/`(2x)` come commenti, tablature rimosse, righe di soli accordi rese come intro. Il ChordPro già valido passa invariato. Dizionari e pattern sono in `config/import.json`.
+
 ## Struttura
 
 ```
 config/defaults.json     default di progetto (pagina, layout, font, colori, export)
+config/import.json       dizionari import (sezioni, etichette metadati)
 public/fonts/            font OFL (Inter, Source Serif 4, JetBrains Mono) + licenze
-src/core/                TS puro: config, model, chordpro (parse/serialize), fit, persistence, settings
+src/core/                TS puro: config, model, chordpro (parse/serialize), chords (grammatica),
+                         import (conversione copia-incolla), fit, persistence, settings
 src/ui/                  componenti Svelte + stili (app.css, paper.css) + measure.ts
-tests/                   fixture ChordPro e test unitari
+tests/                   fixture ChordPro/import e test unitari
 spike/                   spike di validazione stampa A4 e misura overflow (Fase 0)
 ```
 
 ## Stato
 
-POC funzionante (P0): editor singola canzone, anteprima A4, auto-fit, export PDF, import/export, persistenza locale.
+POC funzionante (P0): editor singola canzone, anteprima A4, auto-fit, export PDF, import/export, persistenza locale, import copia-incolla da siti.
 Backlog P1/P2 in `doc/features.md` (trasposizione, CodeMirror 6, export automatico, PWA, libreria canzoni, notazione, MCP).
 
 ## Licenza

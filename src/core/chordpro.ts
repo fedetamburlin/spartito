@@ -60,6 +60,17 @@ export function serializeLine(line: Line): string {
     .join(' ');
 }
 
+export function bracketChords(text: string): string[] {
+  const chords: string[] = [];
+  const re = /\[([^\]]*)\]/g;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(text))) {
+    const chord = match[1].trim();
+    if (chord) chords.push(chord);
+  }
+  return chords;
+}
+
 export function parseChordPro(source: string): SongDocument {
   const doc: SongDocument = { title: '', subtitle: '', blocks: [] };
   let current: Section | null = null;
@@ -141,7 +152,12 @@ export function parseChordPro(source: string): SongDocument {
 
     const parsed = parseLine(line);
     if (parsed.words.length === 0) {
-      closeImplicit();
+      const chords = bracketChords(line);
+      if (chords.length > 0) {
+        pushItem({ kind: 'grid', chords });
+      } else {
+        closeImplicit();
+      }
       continue;
     }
     pushItem(parsed);
@@ -160,6 +176,8 @@ export function serializeChordPro(doc: SongDocument): string {
   const pushItem = (item: SectionItem) => {
     if (item.kind === 'line') {
       out.push(serializeLine(item));
+    } else if (item.kind === 'grid') {
+      out.push(item.chords.map((chord) => `[${chord}]`).join(' '));
     } else if (item.kind === 'comment') {
       out.push(`{comment: ${item.text}}`);
     } else {

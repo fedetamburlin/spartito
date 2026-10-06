@@ -4,3 +4,6 @@ dist/
 *.local
 spike/*.pdf
 spike/*.png
+pdf_test/
+copy_paste_samples/
+copy_paste_samples/

@@ -48,6 +48,8 @@
           {#each block.items as item}
             {#if item.kind === 'line'}
               <div class="line">{#each item.words as word, index}<span class="pair">{#if word.chords.length > 0}<span class="chords">{#each word.chords as chord}<span class="chord">{chord}</span>{/each}</span>{/if}<span class="word">{word.text}</span></span>{#if index < item.words.length - 1}{' '}{/if}{/each}</div>
+            {:else if item.kind === 'grid'}
+              <div class="line grid">{#each item.chords as chord}<span class="gchord">{chord}</span>{/each}</div>
             {:else if item.kind === 'comment'}
               <div class="comment">{item.text}</div>
             {/if}

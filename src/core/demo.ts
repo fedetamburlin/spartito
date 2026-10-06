@@ -3,6 +3,8 @@ export const DEMO_SONG = `{title: La strada di casa}
 
 {comment: Prova di impaginazione su due colonne}
 
+[Am] [F] [C] [G]
+
 [Am]Cammino lungo la strada di casa [F]con la chitarra legata alla schiena
 [C]Le luci della sera si accendono piano [G]e il vento porta odore di terra bagnata
 [Am]Conto i passi le pietre i ricordi [F]di un'estate che non tornerà

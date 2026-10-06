@@ -1,8 +1,10 @@
 <script lang="ts">
   import { config } from '../core/config';
+  import { importSong } from '../core/import';
   import type { SongDocument } from '../core/model';
   import { buildJsonExport, fileBaseName, parseImported } from '../core/persistence';
   import { sanitizeSettings, type SongSettings } from '../core/settings';
+  import ImportDialog from './ImportDialog.svelte';
 
   interface Props {
     doc: SongDocument;
@@ -13,6 +15,7 @@
   let { doc, source = $bindable(), settings = $bindable() }: Props = $props();
 
   let fileInput = $state<HTMLInputElement | null>(null);
+  let importOpen = $state(false);
 
   const columnValue = $derived(
     settings.columns === 'auto' ? 'auto' : String(settings.columns)
@@ -47,9 +50,11 @@
     const reader = new FileReader();
     reader.onload = () => {
       const imported = parseImported(String(reader.result ?? ''), file.name);
-      source = imported.source;
       if (imported.settings) {
+        source = imported.source;
         settings = sanitizeSettings({ ...settings, ...imported.settings });
+      } else {
+        source = importSong(imported.source).chordpro;
       }
       input.value = '';
     };
@@ -138,16 +143,24 @@
       /></label>
   </div>
   <div class="toolbar-group toolbar-actions">
-    <button onclick={() => fileInput?.click()}>Importa</button>
+    <button onclick={() => (importOpen = true)}>Incolla testo</button>
+    <button onclick={() => fileInput?.click()}>Importa file</button>
     <button onclick={exportCho}>Esporta .cho</button>
     <button onclick={exportJson}>Esporta .json</button>
     <button class="primary" onclick={() => window.print()}>Stampa PDF</button>
     <input
       class="hidden-input"
       type="file"
-      accept=".cho,.crd,.json,text/plain"
+      accept=".cho,.crd,.json,.txt,text/plain"
       bind:this={fileInput}
       onchange={onImport}
     />
   </div>
 </header>
+
+{#if importOpen}
+  <ImportDialog
+    onApply={(text) => (source = text)}
+    onClose={() => (importOpen = false)}
+  />
+{/if}

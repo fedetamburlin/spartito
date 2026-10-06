@@ -1,0 +1,53 @@
+{
+  "sections": {
+    "intro": "verse",
+    "introduzione": "verse",
+    "verse": "verse",
+    "verso": "verse",
+    "strofa": "verse",
+    "estrofe": "verse",
+    "primeira parte": "verse",
+    "parte": "verse",
+    "chorus": "chorus",
+    "coro": "chorus",
+    "ritornello": "chorus",
+    "refrao": "chorus",
+    "refrão": "chorus",
+    "estribillo": "chorus",
+    "bridge": "bridge",
+    "ponte": "bridge",
+    "puente": "bridge",
+    "solo": "verse",
+    "assolo": "verse",
+    "interlude": "verse",
+    "interludio": "verse",
+    "outro": "verse",
+    "final": "verse",
+    "coda": "verse"
+  },
+  "noise": [
+    "^Page \\d+\\s*/\\s*\\d+$",
+    "^\\d+\\s*(?:of|di)\\s*\\d+$"
+  ],
+  "metadata": [
+    "capo",
+    "tuning",
+    "accordatura",
+    "afinação",
+    "tom",
+    "key",
+    "tonalità",
+    "tonalita",
+    "tempo",
+    "bpm",
+    "title",
+    "titolo",
+    "artist",
+    "artista",
+    "album",
+    "anno",
+    "year",
+    "composer",
+    "compositore"
+  ]
+}
