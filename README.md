@@ -20,6 +20,9 @@ Minimal editor for **A4 portrait song sheets** (lyrics + chords), designed to be
 | `npm run preview` | serve the build |
 | `npm run check` | svelte-check (TypeScript + Svelte) |
 | `npm test` | unit tests (Vitest) |
+| `npm run mcp:build` | build the local MCP server (`packages/mcp`) |
+| `npm run mcp:check` | type-check the MCP server |
+| `npm run mcp:test` | unit/integration tests for the MCP server |
 
 ## Usage
 
@@ -40,6 +43,26 @@ Source in **ChordPro (subset)** in the left editor, A4 preview on the right. A d
 - **Transpose** stepper (or `+`/`−` keys): changes preview and PDF only, not the source or `.cho` export
 - `{capo: N}` is shown under the title; transposition moves the capo and keeps the chord shapes
 
+## MCP server (opencode)
+
+`packages/mcp` is a local MCP server that connects the opencode agent to the song open in the web app:
+
+- `get_song` — read the current ChordPro source, parsed document and settings
+- `set_song` — replace the editor source
+- `update_settings` — change font, text size, columns, margins, colors, transposition
+- `export_pdf` — render the current song with headless Chrome into `out/<song>.pdf`
+
+Setup (once):
+
+```bash
+npm install
+npm run mcp:build
+```
+
+`opencode.json` in this repo already registers the server (`type: local`, autostart). Start opencode here, open the web app and click **opencode** in the toolbar: the status dot turns green (the bridge listens on `127.0.0.1:7331` only and accepts the app origin). Without a connected app the tools reply with an explanatory error.
+
+Requirements: Node 18+ and Google Chrome/Chromium for `export_pdf` (override the binary with `SPARTITO_CHROME_PATH`, the app URL with `SPARTITO_APP_URL`, the output folder with `SPARTITO_OUT_DIR`). The same process also exposes a Streamable HTTP MCP endpoint at `http://127.0.0.1:7331/mcp` for other MCP clients; `node packages/mcp/dist/index.js --serve` runs it without stdio.
+
 ## Structure
 
 ```
@@ -47,12 +70,13 @@ config/        project defaults and import dictionaries
 public/fonts/  OFL fonts (Inter, Source Serif 4, JetBrains Mono) + licenses
 src/core/      pure TS: config, model, chordpro, chords, transpose, import, pdf, fit, persistence, settings
 src/ui/        Svelte components, styles and measurement
+packages/mcp/  local MCP server: tools, websocket bridge, stdio/HTTP transports, PDF export
 tests/         fixtures and unit tests
 ```
 
 ## Status
 
-Working POC (P0). P1/P2 backlog: CodeMirror 6, automatic export, PWA, song library, notation, MCP.
+Working POC (P0). P1/P2 backlog: CodeMirror 6, automatic export, PWA, song library, notation.
 
 ## License
 
