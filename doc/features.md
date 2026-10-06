@@ -63,8 +63,11 @@ Obiettivo: import/export compatibile con i file `.cho` esistenti senza perdere i
 ### 2.6 Import da testo incollato (implementato)
 
 - Dialog "Incolla testo": incolla da sito (Ultimate Guitar, Accordi e Spartiti, …) o ChordPro già valido.
-- Conversione generica basata su grammatica (non per-sito): accordi sopra il testo allineati per colonne → inline; notazione internazionale e italiana (`MIm`, `LAm7`, `DO7+`, `MIm/RE`); intestazioni sezione; `Capo/Tuning` come commenti; tablature rimosse; righe di soli accordi come grid/intro.
-- Dizionari e pattern in `config/import.json` (sezioni, etichette metadati), estendibili senza toccare la logica.
+- Conversione generica basata su grammatica (non per-sito): accordi sopra il testo allineati per colonne → inline; notazione internazionale e italiana (`MIm`, `LAm7`, `DO7+`, `MIm/RE`); intestazioni sezione; righe di soli accordi come grid/intro.
+- Contorno scartato (principio: entra solo l'essenziale, il resto si aggiunge a mano): tablature, paginazione (`Page 1/2`), righe decorative, anno/album.
+- Titolo/artista riconosciuti dalle pagine UG (prima riga con marcatore "Chords"/"Tabs" → `{title}`, riga breve successiva → `{subtitle}`).
+- `Capo`/`Tuning` e annotazioni `(instrumental)`, `(quick fade)`, `(2x)` → `{comment}`.
+- Dizionari e pattern in `config/import.json` (sezioni, metadati, metadati senza separatore, rumore, marcatori titolo), estendibili senza toccare la logica.
 - Riepilogo e avvisi prima di sostituire il sorgente (correzione manuale immediata in editor).
 
 ### 2.7 Non-obiettivi P0

@@ -27,8 +27,11 @@
   },
   "noise": [
     "^Page \\d+\\s*/\\s*\\d+$",
-    "^\\d+\\s*(?:of|di)\\s*\\d+$"
+    "^\\d+\\s*(?:of|di)\\s*\\d+$",
+    "^[—–_=*·•\\-]{3,}$"
   ],
+  "titleMarkers": ["chords", "tabs"],
+  "metadataLoose": ["capo", "capotasto"],
   "metadata": [
     "capo",
     "tuning",

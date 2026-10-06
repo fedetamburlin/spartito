@@ -121,6 +121,19 @@ describe('importSong', () => {
     expect(result.stats.comments).toBe(2);
   });
 
+  it('riconosce titolo, artista e capo; scarta anno e decorazioni', () => {
+    const result = importSong(load('import-ug-header.txt'));
+    expect(result.chordpro).toContain('{title: My Fake Song}');
+    expect(result.chordpro).toContain('{subtitle: The Fake Band}');
+    expect(result.chordpro).toContain('{comment: capo at III}');
+    expect(result.chordpro).toContain('{start_of_verse: Intro}');
+    expect(result.chordpro).toContain('[C] [G]');
+    expect(result.chordpro).toContain('[C]La la la [G]la tonight');
+    expect(result.chordpro).not.toContain('Fake Album');
+    expect(result.chordpro).not.toContain('——');
+    expect(result.chordpro).not.toContain('Chords');
+  });
+
   it('produce ChordPro rileggibile dal parser', () => {
     for (const fixture of ['import-ug.txt', 'import-above.txt', 'import-it-above.txt']) {
       const { chordpro } = importSong(load(fixture));

@@ -39,7 +39,7 @@ Auto-fit: prova 1 colonna → 2 colonne → riduzione del font fino ai minimi (1
 
 Export PDF: pulsante **Stampa PDF** (Chrome/Chromium), scegliendo "Salva come PDF" con margini predefiniti e intestazioni disattivate. Import/export dei sorgenti in `.cho` e `.json`; autosave in `localStorage`.
 
-**Import da siti ("Incolla testo"):** copia testo/accordi da un sito (Ultimate Guitar, Accordi e Spartiti, …) e incollalo nella finestra. La conversione è automatica: accordi sopra il testo allineati per colonne → inline, notazione internazionale e italiana (`MIm`, `LAm7`, `DO7+`, `MIm/RE`), intestazioni sezione (`[Verse]`, `[Chorus]`, `Ritornello`, …), `Capo/Tuning` e annotazioni `(instrumental)`/`(2x)` come commenti, tablature rimosse, righe di soli accordi rese come intro. Il ChordPro già valido passa invariato. Dizionari e pattern sono in `config/import.json`.
+**Import da siti ("Incolla testo"):** copia testo/accordi da un sito (Ultimate Guitar, Accordi e Spartiti, …) e incollalo nella finestra. La conversione è automatica: accordi sopra il testo allineati per colonne → inline, notazione internazionale e italiana (`MIm`, `LAm7`, `DO7+`, `MIm/RE`), intestazioni sezione (`[Verse]`, `[Chorus]`, `Ritornello`, …), titolo/artista dalle pagine UG (marcatore "Chords"/"Tabs"), `Capo/Tuning` e annotazioni `(instrumental)`/`(2x)` come commenti, tablature e righe decorative/di paginazione scartate, righe di soli accordi rese come intro. Il ChordPro già valido passa invariato. Dizionari e pattern sono in `config/import.json`.
 
 ## Struttura
 

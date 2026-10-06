@@ -5,6 +5,11 @@ const SECTION_MAP = importDefaults.sections as Record<string, 'verse' | 'chorus'
 const METADATA = new Set(importDefaults.metadata.map((label) => label.toLowerCase()));
 const NOISE = ((importDefaults.noise ?? []) as string[]).map((pattern) => new RegExp(pattern, 'i'));
 const METADATA_RE = new RegExp(`^(${[...METADATA].join('|')})\\b\\s*[:=]\\s*(.+)`, 'i');
+const TITLE_MARKERS = ((importDefaults.titleMarkers ?? []) as string[]).map((marker) => marker.toLowerCase());
+const LOOSE_METADATA = ((importDefaults.metadataLoose ?? []) as string[]).map((label) => label.toLowerCase());
+const LOOSE_METADATA_RE = LOOSE_METADATA.length
+  ? new RegExp(`^(?:${LOOSE_METADATA.join('|')})\\b`, 'i')
+  : /$^/;
 
 const DIRECTIVE_RE = /^\{\s*[a-zA-Z_][a-zA-Z0-9_]*\s*(?::[\s\S]*?)?\}$/;
 const BRACKET_HEADER_RE = /^\[([^\]]+)\]$/;
@@ -65,6 +70,21 @@ function hasInlineChords(lines: string[]): boolean {
   );
 }
 
+function titleFromMarker(line: string): string | null {
+  const lower = line.toLowerCase();
+  for (const marker of TITLE_MARKERS) {
+    if (lower.endsWith(marker) && line.length > marker.length) {
+      const title = line.slice(0, line.length - marker.length).replace(/[\s\-–—|]+$/, '').trim();
+      return title || null;
+    }
+  }
+  return null;
+}
+
+function isYearLine(line: string): boolean {
+  return /\b(?:19|20)\d{2}\b/.test(line) && line.split(/\s+/).length <= 4;
+}
+
 export function importSong(raw: string): ImportResult {
   const warnings: string[] = [];
   const stats: ImportStats = { merged: 0, grids: 0, sections: 0, comments: 0, tabsRemoved: 0 };
@@ -76,6 +96,15 @@ export function importSong(raw: string): ImportResult {
   const lines = text.split('\n').map((line) => line.trimEnd());
   const out: string[] = [];
   let openSection: string | null = null;
+  let titleFound = false;
+  let subtitleFound = false;
+  let bodyStarted = false;
+
+  const beginBody = () => {
+    if (bodyStarted) return;
+    bodyStarted = true;
+    if (out.length > 0 && out[out.length - 1] !== '') out.push('');
+  };
 
   const closeSection = () => {
     if (openSection) {
@@ -100,6 +129,33 @@ export function importSong(raw: string): ImportResult {
       continue;
     }
 
+    if (!bodyStarted) {
+      if (!titleFound) {
+        const title = titleFromMarker(trimmed);
+        if (title) {
+          out.push(`{title: ${title}}`);
+          titleFound = true;
+          continue;
+        }
+        beginBody();
+      } else if (isYearLine(trimmed)) {
+        continue;
+      } else if (
+        !subtitleFound &&
+        trimmed.split(/\s+/).length <= 5 &&
+        !chordLineTokens(trimmed) &&
+        headerLabel(trimmed) === null &&
+        !DIRECTIVE_RE.test(trimmed) &&
+        !LOOSE_METADATA_RE.test(trimmed)
+      ) {
+        out.push(`{subtitle: ${trimmed}}`);
+        subtitleFound = true;
+        continue;
+      } else {
+        beginBody();
+      }
+    }
+
     if (DIRECTIVE_RE.test(trimmed)) {
       closeSection();
       out.push(trimmed);
@@ -122,6 +178,12 @@ export function importSong(raw: string): ImportResult {
         out.push(`{comment: ${clean}}`);
         stats.comments += 1;
       }
+      continue;
+    }
+
+    if (LOOSE_METADATA_RE.test(trimmed) && trimmed.split(/\s+/).length <= 5) {
+      out.push(`{comment: ${trimmed}}`);
+      stats.comments += 1;
       continue;
     }
 
