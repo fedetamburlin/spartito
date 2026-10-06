@@ -59,9 +59,30 @@ npm install
 npm run mcp:build
 ```
 
-`opencode.json` in this repo already registers the server (`type: local`, autostart). Start opencode here, open the web app and click **opencode** in the toolbar: the status dot turns green (the bridge listens on `127.0.0.1:7331` only and accepts the app origin). Without a connected app the tools reply with an explanatory error.
+`opencode.json` in this repo registers the server with autostart:
 
-Browsers gate WebSocket connections from public pages to `localhost`: Chrome 147+ shows a **local network access** prompt the first time — click Allow. To skip the prompt, open the app locally instead (`npm run build && npm run preview -- --port 4173`, then `http://localhost:4173`), where no permission is needed.
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "spartito": {
+      "type": "local",
+      "command": ["node", "packages/mcp/dist/index.js"]
+    }
+  }
+}
+```
+
+Restart opencode after adding or changing the config: MCP servers are loaded at startup. To verify, ask the agent *"which spartito tools do you have?"* (the four above) and then *"read the open song"*.
+
+Then open the web app and click **opencode** in the toolbar: the status dot turns green when connected. The bridge listens on `127.0.0.1:7331` only and accepts the app origin; without a connected app the tools reply with an explanatory error. If the dot turns red, hover it: the tooltip explains the likely cause (server not running or browser local network access blocked).
+
+Browser notes:
+
+- Chrome/Edge 147+ asks for **local network access** the first time; click Allow.
+- Safari blocks `ws://localhost` from an HTTPS page: use the app locally instead.
+- To skip browser permissions entirely, run the app locally: `npm run build && npm run preview -- --port 4173`, then open `http://localhost:4173`.
+- Only one opencode session can own port `7331`: a second session logs the HTTP/bridge as disabled and its tools cannot reach the app.
 
 Requirements: Node 18+ and Google Chrome/Chromium for `export_pdf` (override the binary with `SPARTITO_CHROME_PATH`, the app URL with `SPARTITO_APP_URL`, the output folder with `SPARTITO_OUT_DIR`). The same process also exposes a Streamable HTTP MCP endpoint at `http://127.0.0.1:7331/mcp` for other MCP clients; `node packages/mcp/dist/index.js --serve` runs it without stdio.
 
