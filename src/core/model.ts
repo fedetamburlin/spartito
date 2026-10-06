@@ -40,5 +40,6 @@ export type Block = Section | CommentItem | UnknownItem;
 export interface SongDocument {
   title: string;
   subtitle: string;
+  capo?: number;
   blocks: Block[];
 }

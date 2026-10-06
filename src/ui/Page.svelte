@@ -8,9 +8,10 @@
     doc: SongDocument;
     layout: LayoutParams;
     settings: SongSettings;
+    capo?: number;
   }
 
-  let { doc, layout, settings }: Props = $props();
+  let { doc, layout, settings, capo = 0 }: Props = $props();
 
   const pageStyle = $derived(
     [
@@ -36,6 +37,7 @@
   <header class="song-head">
     {#if doc.title}<h1 class="song-title">{doc.title}</h1>{/if}
     {#if doc.subtitle}<p class="song-subtitle">{doc.subtitle}</p>{/if}
+    {#if capo > 0}<p class="song-capo">Capo {capo}</p>{/if}
   </header>
   <div class="content">
     {#each doc.blocks as block}

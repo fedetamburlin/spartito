@@ -58,7 +58,7 @@ describe('importSong', () => {
     expect(result.chordpro).toContain('{start_of_chorus}');
     expect(result.chordpro).toContain('[Am]Walking down the empty road');
     expect(result.chordpro).toContain('[C]Sing it loud [G]sing it clear');
-    expect(result.chordpro).toContain('{comment: Capo: 2}');
+    expect(result.chordpro).toContain('{capo: 2}');
     expect(result.chordpro).not.toContain('[tab]');
     expect(result.warnings.some((warning) => warning.includes('tablatura'))).toBe(true);
   });
@@ -125,7 +125,7 @@ describe('importSong', () => {
     const result = importSong(load('import-ug-header.txt'));
     expect(result.chordpro).toContain('{title: My Fake Song}');
     expect(result.chordpro).toContain('{subtitle: The Fake Band}');
-    expect(result.chordpro).toContain('{comment: capo at III}');
+    expect(result.chordpro).toContain('{capo: 3}');
     expect(result.chordpro).toContain('{start_of_verse: Intro}');
     expect(result.chordpro).toContain('[C] [G]');
     expect(result.chordpro).toContain('[C]La la la [G]la tonight');

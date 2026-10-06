@@ -8,10 +8,11 @@
 
   interface Props {
     doc: SongDocument;
+    capo: number;
     settings: SongSettings;
   }
 
-  let { doc, settings }: Props = $props();
+  let { doc, capo, settings }: Props = $props();
 
   let wrapEl = $state<HTMLElement | null>(null);
   let layout = $state<LayoutParams>({
@@ -63,16 +64,24 @@
         return 'Non entra in una pagina: riduci il testo o scegli 2 colonne';
     }
   });
+
+  const showMeta = $derived(
+    outcome !== null &&
+      (outcome.status !== 'fits' ||
+        outcome.params.columns !== 1 ||
+        outcome.params.textPt !== config.layout.textPtDefault)
+  );
 </script>
 
 <div class="preview">
-  <div class="preview-meta" class:warning={outcome?.status === 'overflow'}>
-    <span class="badge">{statusText}</span>
-    <span class="hint">Stampa → Salva come PDF · margini "predefiniti" · intestazioni disattivate</span>
-  </div>
+  {#if showMeta}
+    <div class="preview-meta" class:warning={outcome?.status === 'overflow'}>
+      <span class="badge">{statusText}</span>
+    </div>
+  {/if}
   <div class="preview-scroll">
     <div class="preview-wrap" bind:this={wrapEl}>
-      <Page {doc} {layout} {settings} />
+      <Page {doc} {layout} {settings} {capo} />
     </div>
   </div>
 </div>

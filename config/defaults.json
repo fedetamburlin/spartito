@@ -11,8 +11,8 @@
   "layout": {
     "textPtDefault": 11,
     "chordPtDefault": 10,
-    "textPtMin": 10,
-    "chordPtMin": 9,
+    "textPtMin": 6,
+    "chordPtMin": 5,
     "textPtMax": 14,
     "leading": 1.25,
     "sectionGapEm": 0.5,

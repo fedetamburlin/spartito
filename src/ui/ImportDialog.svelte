@@ -1,15 +1,27 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { importSong, type ImportResult } from '../core/import';
 
   interface Props {
     onApply: (source: string) => void;
     onClose: () => void;
+    initialText?: string;
+    title?: string;
+    hint?: string;
   }
 
-  let { onApply, onClose }: Props = $props();
+  let {
+    onApply,
+    onClose,
+    initialText = '',
+    title = 'Incolla testo',
+    hint = 'Incolla accordi e testo copiati da un sito (Ultimate Guitar, Accordi e Spartiti, …) o direttamente in ChordPro: la conversione è automatica.'
+  }: Props = $props();
 
-  let raw = $state('');
-  let result = $state<ImportResult | null>(null);
+  let raw = $state(untrack(() => initialText));
+  let result = $state<ImportResult | null>(
+    untrack(() => (initialText.trim() ? importSong(initialText) : null))
+  );
 
   const summary = $derived.by(() => {
     if (!result) return '';
@@ -48,11 +60,8 @@
 
 <div class="modal-backdrop">
   <div class="modal" role="dialog" aria-modal="true" tabindex="-1">
-    <h2>Incolla testo</h2>
-    <p class="hint">
-      Incolla accordi e testo copiati da un sito (Ultimate Guitar, Accordi e Spartiti, …) o
-      direttamente in ChordPro: la conversione è automatica.
-    </p>
+    <h2>{title}</h2>
+    <p class="hint">{hint}</p>
     <textarea
       bind:value={raw}
       oninput={() => (result = null)}

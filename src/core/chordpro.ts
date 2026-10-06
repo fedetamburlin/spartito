@@ -27,6 +27,18 @@ const SECTION_END = new Set([
 
 const DIRECTIVE_RE = /^\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?::\s*(.*?))?\s*\}$/;
 const CHORD_RE = /\[([^\]]*)\]/g;
+const ROMAN_VALUES: Record<string, number> = {
+  i: 1, ii: 2, iii: 3, iv: 4, v: 5, vi: 6, vii: 7, viii: 8, ix: 9, x: 10, xi: 11, xii: 12
+};
+
+export function parseCapoValue(value: string): number | null {
+  const normalized = value.trim().toLowerCase();
+  if (/^\d{1,2}$/.test(normalized)) {
+    const capo = Number(normalized);
+    return capo >= 0 && capo <= 12 ? capo : null;
+  }
+  return ROMAN_VALUES[normalized] ?? null;
+}
 
 export function parseLine(text: string): Line {
   const words: Word[] = [];
@@ -130,6 +142,15 @@ export function parseChordPro(source: string): SongDocument {
         case 'c':
           pushItem({ kind: 'comment', text: value });
           break;
+        case 'capo': {
+          const capo = parseCapoValue(value);
+          if (capo !== null) {
+            doc.capo = capo;
+          } else {
+            pushItem({ kind: 'unknown', raw: trimmed });
+          }
+          break;
+        }
         default:
           if (name in SECTION_START) {
             closeImplicit();
@@ -172,6 +193,7 @@ export function serializeChordPro(doc: SongDocument): string {
   const out: string[] = [];
   if (doc.title) out.push(`{title: ${doc.title}}`);
   if (doc.subtitle) out.push(`{subtitle: ${doc.subtitle}}`);
+  if (doc.capo !== undefined) out.push(`{capo: ${doc.capo}}`);
 
   const pushItem = (item: SectionItem) => {
     if (item.kind === 'line') {

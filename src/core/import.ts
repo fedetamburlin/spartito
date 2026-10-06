@@ -1,4 +1,5 @@
 import importDefaults from '../../config/import.json';
+import { parseCapoValue } from './chordpro';
 import { chordLineTokens, isChordToken, mergeChordLine } from './chords';
 
 const SECTION_MAP = importDefaults.sections as Record<string, 'verse' | 'chorus' | 'bridge'>;
@@ -83,6 +84,16 @@ function titleFromMarker(line: string): string | null {
 
 function isYearLine(line: string): boolean {
   return /\b(?:19|20)\d{2}\b/.test(line) && line.split(/\s+/).length <= 4;
+}
+
+function capoFromLine(line: string): number | null {
+  if (!LOOSE_METADATA_RE.test(line)) return null;
+  const value = line
+    .replace(/^(?:capo|capotasto)\b/i, '')
+    .replace(/^\s*[:=]?\s*/, '')
+    .replace(/^(?:at|on|al|sul|fret|tasto|no\.?)\s+/i, '')
+    .trim();
+  return parseCapoValue(value);
 }
 
 export function importSong(raw: string): ImportResult {
@@ -178,6 +189,12 @@ export function importSong(raw: string): ImportResult {
         out.push(`{comment: ${clean}}`);
         stats.comments += 1;
       }
+      continue;
+    }
+
+    const capo = capoFromLine(trimmed);
+    if (capo !== null && trimmed.split(/\s+/).length <= 5) {
+      out.push(`{capo: ${capo}}`);
       continue;
     }
 

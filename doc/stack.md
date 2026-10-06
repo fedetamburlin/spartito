@@ -114,7 +114,7 @@ Fonte unica dei default; l'app non deve hardcodare questi valori. Chiavi princip
 ## 8. Roadmap tecnica
 
 - **P0:** editor singola canzone, anteprima A4, auto-fit, export print CSS, persistenza locale, import/export file.
-- **P1:** trasposizione/capo, auto-grow per canzoni corte, formati pagina extra (Letter/tablet), CodeMirror 6, export Playwright, PWA, tema scuro.
+- **P1:** auto-grow per canzoni corte, formati pagina extra (Letter/tablet), CodeMirror 6, export Playwright, PWA, tema scuro. (Trasposizione e capo completati in `src/core/transpose.ts`.)
 - **P2:** lista canzoni (Dexie), setlist, indice/copertina, notazione (ABC/abcjs), diagrammi accordi, sync, MCP, app Android Capacitor.
 
 ## 9. Opzioni residue

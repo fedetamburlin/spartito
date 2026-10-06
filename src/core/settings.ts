@@ -1,10 +1,12 @@
 import { config } from './config';
+import { TRANSPOSE_MAX, TRANSPOSE_MIN } from './transpose';
 
 export interface SongSettings {
   fontId: string;
   textPt: number;
   columns: 'auto' | 1 | 2;
   marginsMm: number;
+  transpose: number;
   textColor: string;
   chordColor: string;
   commentColor: string;
@@ -16,6 +18,7 @@ export function defaultSettings(): SongSettings {
     textPt: config.layout.textPtDefault,
     columns: 'auto',
     marginsMm: config.page.marginsMm.left,
+    transpose: 0,
     textColor: config.colors.text,
     chordColor: config.colors.chord,
     commentColor: config.colors.comment
@@ -43,8 +46,16 @@ export function sanitizeSettings(partial?: Partial<SongSettings> | null): SongSe
       typeof partial.marginsMm === 'number'
         ? clamp(partial.marginsMm, config.page.marginsMinMm, config.page.marginsMaxMm)
         : base.marginsMm,
+    transpose:
+      typeof partial.transpose === 'number'
+        ? clamp(Math.round(partial.transpose), TRANSPOSE_MIN, TRANSPOSE_MAX)
+        : base.transpose,
     textColor: typeof partial.textColor === 'string' ? partial.textColor : base.textColor,
     chordColor: typeof partial.chordColor === 'string' ? partial.chordColor : base.chordColor,
     commentColor: typeof partial.commentColor === 'string' ? partial.commentColor : base.commentColor
   };
+}
+
+export function withTranspose(settings: SongSettings, delta: number): SongSettings {
+  return sanitizeSettings({ ...settings, transpose: settings.transpose + delta });
 }

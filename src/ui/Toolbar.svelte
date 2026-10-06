@@ -2,8 +2,10 @@
   import { config } from '../core/config';
   import { importSong } from '../core/import';
   import type { SongDocument } from '../core/model';
+  import { extractPdfText } from '../core/pdf';
   import { buildJsonExport, fileBaseName, parseImported } from '../core/persistence';
-  import { sanitizeSettings, type SongSettings } from '../core/settings';
+  import { sanitizeSettings, withTranspose, type SongSettings } from '../core/settings';
+  import { TRANSPOSE_MAX, TRANSPOSE_MIN } from '../core/transpose';
   import ImportDialog from './ImportDialog.svelte';
 
   interface Props {
@@ -16,6 +18,9 @@
 
   let fileInput = $state<HTMLInputElement | null>(null);
   let importOpen = $state(false);
+  let importSeed = $state('');
+  let importTitle = $state<string | undefined>(undefined);
+  let importHint = $state<string | undefined>(undefined);
 
   const columnValue = $derived(
     settings.columns === 'auto' ? 'auto' : String(settings.columns)
@@ -43,10 +48,40 @@
     );
   }
 
+  function openPaste() {
+    importSeed = '';
+    importTitle = undefined;
+    importHint = undefined;
+    importOpen = true;
+  }
+
+  async function importPdf(file: File, input: HTMLInputElement) {
+    try {
+      const { text, hasText } = await extractPdfText(await file.arrayBuffer());
+      if (!hasText) {
+        alert('PDF senza testo estraibile: se \u00e8 una scansione serve l\u2019OCR, non supportato.');
+        return;
+      }
+      importSeed = text;
+      importTitle = 'Importa PDF (testo estratto)';
+      importHint =
+        'Testo estratto dal PDF (best effort): controlla ordine e allineamento degli accordi, poi Converti.';
+      importOpen = true;
+    } catch {
+      alert('PDF non leggibile (protetto, corrotto o senza testo).');
+    } finally {
+      input.value = '';
+    }
+  }
+
   function onImport(event: Event) {
     const input = event.currentTarget as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
+    if (file.name.toLowerCase().endsWith('.pdf')) {
+      void importPdf(file, input);
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => {
       const imported = parseImported(String(reader.result ?? ''), file.name);
@@ -90,6 +125,10 @@
 
 <header class="app-toolbar">
   <div class="toolbar-group">
+    <button class="btn-import" onclick={openPaste}>Incolla testo</button>
+    <button class="btn-import" onclick={() => fileInput?.click()}>Importa file</button>
+  </div>
+  <div class="toolbar-group">
     <label>Font
       <select value={settings.fontId} onchange={setFont}>
         {#each config.typography.fonts as font}
@@ -124,6 +163,27 @@
         onchange={setMargins}
       /> mm
     </label>
+    <label>Trasponi
+      <span class="stepper">
+        <button
+          type="button"
+          title="Un semitono sotto"
+          disabled={settings.transpose <= TRANSPOSE_MIN}
+          onclick={() => (settings = withTranspose(settings, -1))}>−</button>
+        <button
+          type="button"
+          class="stepper-value"
+          title="Azzera trasposizione"
+          disabled={settings.transpose === 0}
+          onclick={() => (settings = sanitizeSettings({ ...settings, transpose: 0 }))}
+        >{settings.transpose > 0 ? `+${settings.transpose}` : settings.transpose}</button>
+        <button
+          type="button"
+          title="Un semitono sopra"
+          disabled={settings.transpose >= TRANSPOSE_MAX}
+          onclick={() => (settings = withTranspose(settings, 1))}>+</button>
+      </span>
+    </label>
   </div>
   <div class="toolbar-group">
     <label>Accordi <input
@@ -143,15 +203,16 @@
       /></label>
   </div>
   <div class="toolbar-group toolbar-actions">
-    <button onclick={() => (importOpen = true)}>Incolla testo</button>
-    <button onclick={() => fileInput?.click()}>Importa file</button>
-    <button onclick={exportCho}>Esporta .cho</button>
-    <button onclick={exportJson}>Esporta .json</button>
-    <button class="primary" onclick={() => window.print()}>Stampa PDF</button>
+    <button class="btn-export" onclick={exportCho}>Esporta .cho</button>
+    <button class="btn-export" onclick={exportJson}>Esporta .json</button>
+    <button
+      class="primary"
+      title="Salva come PDF · margini predefiniti · intestazioni disattivate"
+      onclick={() => window.print()}>Stampa PDF</button>
     <input
       class="hidden-input"
       type="file"
-      accept=".cho,.crd,.json,.txt,text/plain"
+      accept=".cho,.crd,.json,.txt,.pdf,text/plain,application/pdf"
       bind:this={fileInput}
       onchange={onImport}
     />
@@ -162,5 +223,8 @@
   <ImportDialog
     onApply={(text) => (source = text)}
     onClose={() => (importOpen = false)}
+    initialText={importSeed}
+    title={importTitle}
+    hint={importHint}
   />
 {/if}

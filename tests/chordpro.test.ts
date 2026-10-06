@@ -51,9 +51,10 @@ describe('parseChordPro', () => {
     expect(first.items[0].kind).toBe('comment');
   });
 
-  it('preserva le direttive sconosciute in ordine', () => {
+  it('preserva le direttive sconosciute in ordine e legge il capo', () => {
     const doc = parseChordPro(load('unknown.cho'));
-    expect(unknownRaws(doc)).toEqual(['{key: G}', '{x_custom: 42}', '{capo: 3}']);
+    expect(unknownRaws(doc)).toEqual(['{key: G}', '{x_custom: 42}']);
+    expect(doc.capo).toBe(3);
     const serialized = serializeChordPro(doc);
     expect(serialized).toContain('{key: G}');
     expect(serialized).toContain('{x_custom: 42}');

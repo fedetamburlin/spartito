@@ -7,6 +7,12 @@
   --ui-muted: #66707c;
   --ui-accent: #1a4f8a;
   --ui-warning: #b3261e;
+  --ui-import-bg: #e7f0fb;
+  --ui-import-border: #b6cdea;
+  --ui-import-text: #1a4f8a;
+  --ui-export-bg: #eaf4ec;
+  --ui-export-border: #b9d8c1;
+  --ui-export-text: #2e6b3e;
 }
 
 * {
@@ -87,6 +93,37 @@ body {
   cursor: pointer;
 }
 
+.stepper {
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.stepper button {
+  padding: 3px 8px;
+  border-radius: 0;
+}
+
+.stepper button:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.stepper button:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+.stepper .stepper-value {
+  min-width: 36px;
+  border-left: 0;
+  border-right: 0;
+  color: var(--ui-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.stepper button:disabled {
+  color: var(--ui-muted);
+  cursor: default;
+}
+
 .toolbar-actions {
   margin-left: auto;
 }
@@ -109,6 +146,26 @@ button.primary {
   background: var(--ui-accent);
   border-color: var(--ui-accent);
   color: #fff;
+}
+
+.btn-import {
+  background: var(--ui-import-bg);
+  border-color: var(--ui-import-border);
+  color: var(--ui-import-text);
+}
+
+.btn-import:hover {
+  border-color: var(--ui-import-text);
+}
+
+.btn-export {
+  background: var(--ui-export-bg);
+  border-color: var(--ui-export-border);
+  color: var(--ui-export-text);
+}
+
+.btn-export:hover {
+  border-color: var(--ui-export-text);
 }
 
 .hidden-input {
@@ -242,7 +299,6 @@ button.primary {
 .preview-meta {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
   align-items: center;
   gap: 8px 16px;
   padding: 8px 12px;
@@ -258,10 +314,6 @@ button.primary {
 .preview-meta.warning .badge {
   background: var(--ui-warning);
   color: #fff;
-}
-
-.preview-meta .hint {
-  color: var(--ui-muted);
 }
 
 .preview-scroll {
