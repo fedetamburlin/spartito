@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Spike misura overflow colonne</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  .page {
+    width: 210mm; height: 297mm; padding: 5mm;
+    background: #fff;
+    font-family: "DejaVu Sans", "Liberation Sans", sans-serif;
+    font-size: 11pt; line-height: 1.25; color: #111;
+    display: flex; flex-direction: column;
+  }
+  .content { flex: 1; min-height: 0; column-gap: 8mm; column-fill: auto; }
+  .content.c1 { columns: 1; }
+  .content.c2 { columns: 2; }
+  .section { break-inside: avoid; margin: 0 0 2.5mm; }
+  .line { break-inside: avoid; }
+  .pair { display: inline-block; text-align: left; }
+  .chord { display: block; font-size: 9pt; line-height: 1.15; color: #1a4f8a; font-weight: 600; }
+  .page.offscreen { position: fixed; left: -9999px; top: 0; }
+</style>
+</head>
+<body>
+<pre id="result">pending</pre>
+<script>
+  const SECTIONS = [
+    [
+      '[Am]Cammino lungo la strada di casa [F]con la chitarra legata alla schiena',
+      '[C]Le luci della sera si accendono piano [G]e il vento porta odore di terra bagnata',
+      '[Am]Conto i passi le pietre i ricordi [F]di un\'estate che non tornerà',
+      '[C]Ma la strada conosce il mio nome [G]e mi riporta dove il cuore sta'
+    ],
+    [
+      '[F]E cammina cammina verso casa [C]dove la luce resta accesa',
+      '[G]Ogni passo è una canzone [Am]ogni curva una promessa',
+      '[F]E cammina cammina verso casa [C]finché la notte si arrende',
+      '[G]Al mattino che ci troverà [Am]sulla porta di casa'
+    ],
+    [
+      '[Am]Ho lasciato le finestre aperte [F]per far entrare un po\' di primavera',
+      '[C]Sul tavolo una tazza e un giornale [G]e la radio che suona piano',
+      '[Am]Ogni cosa ha il colore del tempo [F]che non ho saputo trattenere',
+      '[C]Ma la strada continua a chiamarmi [G]e io non so dire di no'
+    ]
+  ];
+
+  function renderLine(el) {
+    const raw = el.textContent;
+    const nodes = [];
+    const re = /\[([^\]]*)\]/g;
+    let last = 0, chord = '', m;
+    const push = (text, ch) => {
+      const words = text.split(/\s+/).filter(w => w.length);
+      words.forEach((w, i) => {
+        const pair = document.createElement('span');
+        pair.className = 'pair';
+        const c = document.createElement('span');
+        c.className = 'chord';
+        c.textContent = i === 0 ? ch : '\u00a0';
+        const t = document.createElement('span');
+        t.textContent = w;
+        pair.append(c, t);
+        nodes.push(pair);
+        nodes.push(document.createTextNode(' '));
+      });
+    };
+    while ((m = re.exec(raw))) {
+      push(raw.slice(last, m.index), chord);
+      chord = m[1];
+      last = re.lastIndex;
+    }
+    push(raw.slice(last), chord);
+    el.textContent = '';
+    nodes.forEach(n => el.appendChild(n));
+  }
+
+  function buildPage(columns, repeats) {
+    const page = document.createElement('div');
+    page.className = 'page offscreen';
+    const content = document.createElement('div');
+    content.className = 'content ' + (columns === 1 ? 'c1' : 'c2');
+    content.innerHTML = '';
+    for (let r = 0; r < repeats; r++) {
+      for (const lines of SECTIONS) {
+        const section = document.createElement('div');
+        section.className = 'section';
+        for (const l of lines) {
+          const line = document.createElement('div');
+          line.className = 'line';
+          line.textContent = l;
+          renderLine(line);
+          section.appendChild(line);
+        }
+        content.appendChild(section);
+      }
+    }
+    page.appendChild(content);
+    document.body.appendChild(page);
+    return content;
+  }
+
+  const results = [];
+  const cases = [
+    { name: 'fit-1col', columns: 1, repeats: 1 },
+    { name: 'fit-2col', columns: 2, repeats: 1 },
+    { name: 'over-1col', columns: 1, repeats: 3 },
+    { name: 'over-2col', columns: 2, repeats: 6 }
+  ];
+  for (const c of cases) {
+    const el = buildPage(c.columns, c.repeats);
+    const overflowY = el.scrollHeight > el.clientHeight + 1;
+    const overflowX = el.scrollWidth > el.clientWidth + 1;
+    results.push({
+      name: c.name,
+      scrollH: el.scrollHeight, clientH: el.clientHeight,
+      scrollW: el.scrollWidth, clientW: el.clientWidth,
+      overflowY, overflowX,
+      overflow: overflowY || overflowX
+    });
+  }
+  document.getElementById('result').textContent = JSON.stringify(results, null, 1);
+</script>
+</body>
+</html>

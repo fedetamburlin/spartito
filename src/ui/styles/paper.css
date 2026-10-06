@@ -1,0 +1,151 @@
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/inter-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/inter-latin-700-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/inter-latin-400-italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/source-serif-4-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/source-serif-4-latin-700-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/source-serif-4-latin-400-italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-latin-700-normal.woff2') format('woff2');
+}
+
+.page {
+  width: 210mm;
+  height: 297mm;
+  padding: var(--page-margin, 5mm);
+  background: #fff;
+  color: var(--text-color, #111111);
+  font-family: var(--font-family, 'Inter', sans-serif);
+  font-size: var(--text-pt, 11pt);
+  line-height: var(--leading, 1.25);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.song-head {
+  margin-bottom: var(--section-gap, 0.5em);
+}
+
+.song-title {
+  margin: 0 0 0.1em;
+  font-size: 1.45em;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.song-subtitle {
+  margin: 0;
+  font-size: 0.9em;
+  color: var(--comment-color, #666666);
+}
+
+.content {
+  flex: 1;
+  min-height: 0;
+  column-gap: 8mm;
+  column-fill: auto;
+}
+
+.page.columns-1 .content {
+  columns: 1;
+}
+
+.page.columns-2 .content {
+  columns: 2;
+}
+
+.section {
+  break-inside: avoid;
+  margin: 0 0 var(--section-gap, 0.5em);
+}
+
+.section.chorus {
+  font-weight: 700;
+}
+
+.line {
+  break-inside: avoid;
+}
+
+.pair {
+  display: inline-block;
+  text-align: left;
+}
+
+.chords {
+  display: block;
+}
+
+.chord {
+  display: block;
+  font-size: var(--chord-pt, 10pt);
+  line-height: 1.15;
+  font-weight: 600;
+  color: var(--chord-color, #1a4f8a);
+}
+
+.word {
+  white-space: nowrap;
+}
+
+.comment {
+  break-inside: avoid;
+  margin: 0 0 var(--section-gap, 0.5em);
+  font-size: 0.9em;
+  font-style: italic;
+  color: var(--comment-color, #666666);
+}

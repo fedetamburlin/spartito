@@ -1,0 +1,244 @@
+:root {
+  color-scheme: light;
+  --ui-bg: #eef1f5;
+  --ui-panel: #ffffff;
+  --ui-border: #d3d9e0;
+  --ui-text: #1b2430;
+  --ui-muted: #66707c;
+  --ui-accent: #1a4f8a;
+  --ui-warning: #b3261e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14px;
+}
+
+#app,
+.app {
+  height: 100%;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--ui-panel);
+  border-bottom: 1px solid var(--ui-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toolbar-group label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--ui-muted);
+}
+
+.toolbar-group select,
+.toolbar-group input[type='number'] {
+  font: inherit;
+  padding: 3px 6px;
+  border: 1px solid var(--ui-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ui-text);
+}
+
+.toolbar-group input[type='number'] {
+  width: 64px;
+}
+
+.toolbar-group input[type='color'] {
+  width: 28px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--ui-border);
+  border-radius: 5px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.toolbar-actions {
+  margin-left: auto;
+}
+
+button {
+  font: inherit;
+  padding: 5px 10px;
+  border: 1px solid var(--ui-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ui-text);
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--ui-accent);
+}
+
+button.primary {
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+  color: #fff;
+}
+
+.hidden-input {
+  display: none;
+}
+
+.app-workspace {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(280px, 32%) 1fr;
+  min-height: 0;
+}
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--ui-panel);
+  border-right: 1px solid var(--ui-border);
+}
+
+.pane-title {
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ui-muted);
+  border-bottom: 1px solid var(--ui-border);
+}
+
+.editor-area {
+  flex: 1;
+  border: 0;
+  resize: none;
+  padding: 12px;
+  outline: none;
+  font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ui-text);
+}
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.preview-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.preview-meta .badge {
+  background: #dfe6ee;
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+.preview-meta.warning .badge {
+  background: var(--ui-warning);
+  color: #fff;
+}
+
+.preview-meta .hint {
+  color: var(--ui-muted);
+}
+
+.preview-scroll {
+  flex: 1;
+  overflow: auto;
+  padding: 24px;
+}
+
+.preview-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.page {
+  box-shadow: 0 2px 14px rgba(15, 25, 40, 0.18);
+}
+
+.measuring-clone {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  box-shadow: none;
+}
+
+@media print {
+  @page {
+    size: 210mm 297mm;
+    margin: 0;
+  }
+
+  html,
+  body {
+    background: #fff;
+  }
+
+  .app-toolbar,
+  .editor,
+  .preview-meta {
+    display: none !important;
+  }
+
+  .app-workspace,
+  .preview,
+  .preview-scroll,
+  .preview-wrap {
+    display: block;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+  }
+
+  .page {
+    box-shadow: none;
+    margin: 0;
+  }
+
+  .measuring-clone {
+    display: none !important;
+  }
+}
