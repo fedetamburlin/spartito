@@ -61,6 +61,8 @@ npm run mcp:build
 
 `opencode.json` in this repo already registers the server (`type: local`, autostart). Start opencode here, open the web app and click **opencode** in the toolbar: the status dot turns green (the bridge listens on `127.0.0.1:7331` only and accepts the app origin). Without a connected app the tools reply with an explanatory error.
 
+Browsers gate WebSocket connections from public pages to `localhost`: Chrome 147+ shows a **local network access** prompt the first time — click Allow. To skip the prompt, open the app locally instead (`npm run build && npm run preview -- --port 4173`, then `http://localhost:4173`), where no permission is needed.
+
 Requirements: Node 18+ and Google Chrome/Chromium for `export_pdf` (override the binary with `SPARTITO_CHROME_PATH`, the app URL with `SPARTITO_APP_URL`, the output folder with `SPARTITO_OUT_DIR`). The same process also exposes a Streamable HTTP MCP endpoint at `http://127.0.0.1:7331/mcp` for other MCP clients; `node packages/mcp/dist/index.js --serve` runs it without stdio.
 
 ## Structure
