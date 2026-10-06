@@ -35,6 +35,14 @@
     settings.columns === 'auto' ? 'auto' : String(settings.columns)
   );
 
+  const bridgeTitle = $derived(
+    bridgeStatus === 'connected'
+      ? 'Disconnect from the opencode MCP bridge'
+      : bridgeStatus === 'failed'
+        ? 'Connection failed: is the MCP server running? If the browser blocked local network access, allow it for this site.'
+        : 'Connect to the opencode MCP bridge (run node packages/mcp/dist/index.js)'
+  );
+
   function download(filename: string, content: string, type: string) {
     const blob = new Blob([content], { type });
     const url = URL.createObjectURL(blob);
@@ -216,9 +224,8 @@
       class="btn-bridge"
       class:connected={bridgeStatus === 'connected'}
       class:connecting={bridgeStatus === 'connecting'}
-      title={bridgeStatus === 'connected'
-        ? 'Disconnect from the opencode MCP bridge'
-        : 'Connect to the opencode MCP bridge (run node packages/mcp/dist/index.js)'}
+      class:failed={bridgeStatus === 'failed'}
+      title={bridgeTitle}
       onclick={onToggleBridge}>opencode</button>
     <button
       class="primary"

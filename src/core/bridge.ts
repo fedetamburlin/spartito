@@ -1,6 +1,6 @@
 import type { SongSettings } from './settings';
 
-export type BridgeStatus = 'disconnected' | 'connecting' | 'connected';
+export type BridgeStatus = 'disconnected' | 'connecting' | 'connected' | 'failed';
 
 export interface BridgeState {
   source: string;
@@ -17,6 +17,7 @@ export const DEFAULT_BRIDGE_URL = 'ws://127.0.0.1:7331/bridge';
 
 export function createBridge(handlers: BridgeHandlers, url: string = DEFAULT_BRIDGE_URL) {
   let socket: WebSocket | null = null;
+  let welcomed = false;
   let status: BridgeStatus = 'disconnected';
   const listeners = new Set<(status: BridgeStatus) => void>();
 
@@ -61,6 +62,7 @@ export function createBridge(handlers: BridgeHandlers, url: string = DEFAULT_BRI
     }
     switch (message.type) {
       case 'welcome':
+        welcomed = true;
         setStatus('connected');
         send({ type: 'state', ...handlers.getState() });
         break;
@@ -77,21 +79,25 @@ export function createBridge(handlers: BridgeHandlers, url: string = DEFAULT_BRI
 
   function connect(): void {
     if (socket) return;
+    welcomed = false;
     setStatus('connecting');
     const ws = new WebSocket(url);
     socket = ws;
     ws.onopen = () => ws.send(JSON.stringify({ type: 'hello', app: 'spartito-web', version: 1 }));
     ws.onmessage = (event) => handleMessage(String(event.data));
     ws.onclose = () => {
-      if (socket === ws) socket = null;
-      setStatus('disconnected');
+      if (socket === ws) {
+        socket = null;
+        setStatus(welcomed ? 'disconnected' : 'failed');
+      }
     };
     ws.onerror = () => {};
   }
 
   function disconnect(): void {
-    socket?.close();
+    const ws = socket;
     socket = null;
+    ws?.close();
     setStatus('disconnected');
   }
 

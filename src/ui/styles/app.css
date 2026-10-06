@@ -186,6 +186,10 @@ button.primary {
   background: #d9a441;
 }
 
+.btn-bridge.failed::before {
+  background: var(--ui-warning);
+}
+
 .btn-bridge.connected {
   border-color: var(--ui-export-border);
 }
