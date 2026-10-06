@@ -59,7 +59,11 @@ describe('importSong', () => {
     expect(result.chordpro).toContain('[Am]Walking down the empty road');
     expect(result.chordpro).toContain('[C]Sing it loud [G]sing it clear');
     expect(result.chordpro).toContain('{capo: 2}');
+    expect(result.chordpro).toContain('{start_of_tab}');
+    expect(result.chordpro).toContain('e|--0--1--0--|');
+    expect(result.chordpro).toContain('{end_of_tab}');
     expect(result.chordpro).not.toContain('[tab]');
+    expect(result.stats.tabs).toBe(1);
     expect(result.warnings.some((warning) => warning.includes('tab block'))).toBe(true);
   });
 

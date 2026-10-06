@@ -1,4 +1,6 @@
+import { isChordToken } from './chords';
 import type {
+  GridToken,
   Line,
   Section,
   SectionItem,
@@ -25,8 +27,15 @@ const SECTION_END = new Set([
   'eob'
 ]);
 
+const TAB_START = new Set(['start_of_tab', 'sot']);
+const TAB_END = new Set(['end_of_tab', 'eot']);
+const GRID_START = new Set(['start_of_grid', 'sog']);
+const GRID_END = new Set(['end_of_grid', 'eog']);
+const CHORUS_RECALL: Record<string, string> = { chorus: 'Chorus', refrain: 'Chorus', rit: 'Rit.' };
+
 const DIRECTIVE_RE = /^\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?::\s*(.*?))?\s*\}$/;
 const CHORD_RE = /\[([^\]]*)\]/g;
+const GRID_BAR_RE = /^[|:][|:.]*\d?\.?$/;
 const ROMAN_VALUES: Record<string, number> = {
   i: 1, ii: 2, iii: 3, iv: 4, v: 5, vi: 6, vii: 7, viii: 8, ix: 9, x: 10, xi: 11, xii: 12
 };
@@ -83,10 +92,51 @@ export function bracketChords(text: string): string[] {
   return chords;
 }
 
+function envLabel(value: string): string | undefined {
+  const attr = /label\s*=\s*(["'])(.*?)\1/i.exec(value);
+  if (attr) return attr[2].trim() || undefined;
+  const bare = value.replace(/shape\s*=\s*(["']).*?\1/i, '').replace(/\s+/g, ' ').trim();
+  if (!bare || /^\d+[+\dx]*$/i.test(bare)) return undefined;
+  return bare;
+}
+
+function gridTokens(line: string): GridToken[] {
+  const tokens: GridToken[] = [];
+  for (const part of line.split(/\s+/)) {
+    if (!part) continue;
+    if (part === '.' || /^%+$/.test(part)) {
+      tokens.push({ kind: 'empty', symbol: part });
+      continue;
+    }
+    if (GRID_BAR_RE.test(part)) {
+      tokens.push({ kind: 'bar', symbol: part });
+      continue;
+    }
+    for (const piece of part.split('~')) {
+      if (!piece) continue;
+      tokens.push(
+        isChordToken(piece) ? { kind: 'chord', chord: piece } : { kind: 'text', text: piece }
+      );
+    }
+  }
+  return tokens;
+}
+
+function serializeGridRow(row: GridToken[]): string {
+  return row
+    .map((token) => {
+      if (token.kind === 'chord') return token.chord;
+      if (token.kind === 'bar' || token.kind === 'empty') return token.symbol;
+      return token.text;
+    })
+    .join(' ');
+}
+
 export function parseChordPro(source: string): SongDocument {
   const doc: SongDocument = { title: '', subtitle: '', blocks: [] };
   let current: Section | null = null;
   let implicit: Section | null = null;
+  let env: { kind: 'tab' | 'grid'; label?: string; lines: string[] } | null = null;
 
   const closeImplicit = () => {
     if (implicit) {
@@ -113,10 +163,32 @@ export function parseChordPro(source: string): SongDocument {
     implicit.items.push(item);
   };
 
+  const flushEnv = () => {
+    if (!env) return;
+    if (env.kind === 'tab') {
+      pushItem({ kind: 'tab', label: env.label, lines: env.lines });
+    } else {
+      pushItem({ kind: 'grid-block', label: env.label, rows: env.lines.map(gridTokens) });
+    }
+    env = null;
+  };
+
   const lines = source.replace(/\r\n?/g, '\n').split('\n');
   for (const rawLine of lines) {
     const line = rawLine.trimEnd();
     const trimmed = line.trim();
+
+    if (env) {
+      const endName = env.kind === 'tab' ? TAB_END : GRID_END;
+      const closing = DIRECTIVE_RE.exec(trimmed);
+      if (closing && endName.has(closing[1].toLowerCase())) {
+        flushEnv();
+        continue;
+      }
+      env.lines.push(line);
+      continue;
+    }
+
     if (!trimmed) {
       closeImplicit();
       continue;
@@ -152,7 +224,15 @@ export function parseChordPro(source: string): SongDocument {
           break;
         }
         default:
-          if (name in SECTION_START) {
+          if (TAB_START.has(name) || GRID_START.has(name)) {
+            env = {
+              kind: TAB_START.has(name) ? 'tab' : 'grid',
+              label: envLabel(value),
+              lines: []
+            };
+          } else if (name in CHORUS_RECALL) {
+            pushItem({ kind: 'chorus-recall', label: envLabel(value) ?? CHORUS_RECALL[name] });
+          } else if (name in SECTION_START) {
             closeImplicit();
             closeCurrent();
             current = {
@@ -202,6 +282,16 @@ export function serializeChordPro(doc: SongDocument): string {
       out.push(item.chords.map((chord) => `[${chord}]`).join(' '));
     } else if (item.kind === 'comment') {
       out.push(`{comment: ${item.text}}`);
+    } else if (item.kind === 'tab') {
+      out.push(item.label ? `{start_of_tab: ${item.label}}` : '{start_of_tab}');
+      out.push(...item.lines);
+      out.push('{end_of_tab}');
+    } else if (item.kind === 'grid-block') {
+      out.push(item.label ? `{start_of_grid: ${item.label}}` : '{start_of_grid}');
+      item.rows.forEach((row) => out.push(serializeGridRow(row)));
+      out.push('{end_of_grid}');
+    } else if (item.kind === 'chorus-recall') {
+      out.push(item.label === 'Chorus' ? '{chorus}' : `{chorus: ${item.label}}`);
     } else {
       out.push(item.raw);
     }

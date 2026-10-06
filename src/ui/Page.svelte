@@ -55,6 +55,32 @@
               <div class="line grid">{#each item.chords as chord}<span class="gchord">{chord}</span>{/each}</div>
             {:else if item.kind === 'comment'}
               <div class="comment">{item.text}</div>
+            {:else if item.kind === 'tab'}
+              <div class="tab-block">
+                {#if item.label}<div class="section-label">{item.label}</div>{/if}
+                <pre class="tab">{item.lines.join('\n')}</pre>
+              </div>
+            {:else if item.kind === 'grid-block'}
+              <div class="grid-block">
+                {#if item.label}<div class="section-label">{item.label}</div>{/if}
+                {#each item.rows as row}
+                  <div class="grid-row">
+                    {#each row as token}
+                      {#if token.kind === 'chord'}
+                        <span class="gchord">{token.chord}</span>
+                      {:else if token.kind === 'bar'}
+                        <span class="gbar">{token.symbol}</span>
+                      {:else if token.kind === 'empty'}
+                        <span class="gempty">{token.symbol}</span>
+                      {:else}
+                        <span class="gtext">{token.text}</span>
+                      {/if}
+                    {/each}
+                  </div>
+                {/each}
+              </div>
+            {:else if item.kind === 'chorus-recall'}
+              <div class="chorus-recall">{item.label}</div>
             {/if}
           {/each}
         </section>

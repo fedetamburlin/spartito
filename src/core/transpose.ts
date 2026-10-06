@@ -76,6 +76,16 @@ function transposeItem(item: SectionItem, delta: number): SectionItem {
   if (item.kind === 'grid') {
     return { ...item, chords: item.chords.map((chord) => transposeChord(chord, delta)) };
   }
+  if (item.kind === 'grid-block') {
+    return {
+      ...item,
+      rows: item.rows.map((row) =>
+        row.map((token) =>
+          token.kind === 'chord' ? { ...token, chord: transposeChord(token.chord, delta) } : token
+        )
+      )
+    };
+  }
   return item;
 }
 

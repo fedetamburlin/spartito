@@ -110,6 +110,26 @@ describe('transposeDocument', () => {
     expect(lineAfter.words[0].chords).toEqual(['Cm']);
     expect(lineAfter.words[1].chords).toEqual(['D#']);
   });
+
+  it('transposes grid blocks but leaves tab and chorus recall untouched', () => {
+    const parsed = parseChordPro(
+      '{start_of_grid}\n| C . |\n{end_of_grid}\n{start_of_tab}\ne|--0--|\n{end_of_tab}\n{chorus: Rit.}\n'
+    );
+    const result = transposeDocument(parsed, 2);
+    const section = result.blocks[0];
+    if (section.kind !== 'section') throw new Error('section expected');
+    expect(section.items).toHaveLength(3);
+
+    const grid = section.items[0];
+    if (grid.kind !== 'grid-block') throw new Error('grid-block expected');
+    expect(grid.rows[0][1]).toEqual({ kind: 'chord', chord: 'D' });
+
+    const tab = section.items[1];
+    if (tab.kind !== 'tab') throw new Error('tab expected');
+    expect(tab.lines).toEqual(['e|--0--|']);
+
+    expect(section.items[2]).toEqual({ kind: 'chorus-recall', label: 'Rit.' });
+  });
 });
 
 describe('transposition in settings', () => {

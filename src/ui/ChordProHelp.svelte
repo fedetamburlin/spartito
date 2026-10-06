@@ -135,6 +135,27 @@
             </td>
           </tr>
           <tr>
+            <td><code>{'{chorus}'}</code> <code>{'{rit}'}</code></td>
+            <td class="help-effect">
+              Compact chorus recall (renders "Chorus"/"Rit."); custom label
+              <code>{'{chorus: Final}'}</code>
+            </td>
+          </tr>
+          <tr>
+            <td><code>{'{start_of_tab}'}</code> <code>{'{sot}'}</code></td>
+            <td class="help-effect">
+              Tab block: lines are kept exactly as typed; close with
+              <code>{'{end_of_tab}'}</code> / <code>{'{eot}'}</code>
+            </td>
+          </tr>
+          <tr>
+            <td><code>{'{start_of_grid}'}</code> <code>{'{sog}'}</code></td>
+            <td class="help-effect">
+              Chord grid (bars <code>|</code>, empty <code>.</code>, repeat <code>%</code>);
+              close with <code>{'{end_of_grid}'}</code> / <code>{'{eog}'}</code>
+            </td>
+          </tr>
+          <tr>
             <td><code>(blank line)</code></td>
             <td class="help-effect">Separates blocks</td>
           </tr>

@@ -95,10 +95,56 @@ describe('parseChordPro', () => {
     const roundtripped = parseChordPro(serializeChordPro(doc));
     expect(roundtripped).toEqual(doc);
   });
+
+  it('keeps tab content literal', () => {
+    const doc = parseChordPro(load('tab.cho'));
+    const section = doc.blocks[0] as Section;
+    const tab = section.items[0];
+    if (tab.kind !== 'tab') throw new Error('tab expected');
+    expect(tab.label).toBe('Intro');
+    expect(tab.lines).toEqual([
+      'e|--0--1--0--|',
+      'B|--1--1--1--|',
+      '[Am]literal chord'
+    ]);
+  });
+
+  it('tokenizes grid blocks', () => {
+    const doc = parseChordPro(load('grid.cho'));
+    const section = doc.blocks[0] as Section;
+    const grid = section.items[0];
+    if (grid.kind !== 'grid-block') throw new Error('grid-block expected');
+    expect(grid.label).toBe('Intro');
+    expect(grid.rows).toHaveLength(2);
+    expect(grid.rows[0][0]).toEqual({ kind: 'bar', symbol: '|' });
+    expect(grid.rows[0][1]).toEqual({ kind: 'chord', chord: 'C' });
+    expect(grid.rows[0][2]).toEqual({ kind: 'empty', symbol: '.' });
+    expect(grid.rows[1][grid.rows[1].length - 1]).toEqual({ kind: 'text', text: 'ripeti' });
+  });
+
+  it('reads compact chorus recalls with aliases', () => {
+    const doc = parseChordPro('{chorus}\n{rit}\n{refrain: Final}\n');
+    const section = doc.blocks[0] as Section;
+    expect(section.items).toEqual([
+      { kind: 'chorus-recall', label: 'Chorus' },
+      { kind: 'chorus-recall', label: 'Rit.' },
+      { kind: 'chorus-recall', label: 'Final' }
+    ]);
+    expect(serializeChordPro(doc)).toBe(
+      '{chorus}\n{chorus: Rit.}\n{chorus: Final}\n'
+    );
+  });
 });
 
 describe('roundtrip parse/serialize', () => {
-  for (const name of ['minimal.cho', 'complete.cho', 'edge.cho', 'unknown.cho']) {
+  for (const name of [
+    'minimal.cho',
+    'complete.cho',
+    'edge.cho',
+    'unknown.cho',
+    'tab.cho',
+    'grid.cho'
+  ]) {
     it(`preserves the model for ${name}`, () => {
       const doc = parseChordPro(load(name));
       const roundtripped = parseChordPro(serializeChordPro(doc));

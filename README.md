@@ -28,6 +28,9 @@ Source in **ChordPro (subset)** in the left editor, A4 preview on the right. A d
 - `{title: ...}`, `{subtitle: ...}`, `{comment: ...}` (or `{c: ...}`)
 - inline chords `[Am]word`, also multiple `[C][G]word`
 - sections: `{start_of_chorus}`/`{soc}` … `{end_of_chorus}`/`{eoc}`; `{start_of_verse}`/`{sov}` optional
+- compact chorus recall `{chorus}`/`{rit}` (label via `{chorus: Final}`)
+- tab blocks `{start_of_tab}`/`{sot}` … `{eot}` (kept literal, monospace) and chord grids `{start_of_grid}`/`{sog}` … `{eog}`
+- editor **Insert** menu: sections, comment, grid, tab and capo snippets at the cursor (selection gets wrapped)
 - unsupported directives are ignored in the preview but preserved on export
 - auto-fit: 1 column → 2 columns → font down to 6pt lyrics / 5pt chords (defaults 11/10); exported PDF stays on one page
 - **Print PDF**: Chrome/Chromium, "Save as PDF", default margins, headers off

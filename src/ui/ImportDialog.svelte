@@ -25,12 +25,13 @@
 
   const summary = $derived.by(() => {
     if (!result) return '';
-    const { merged, grids, sections, comments } = result.stats;
+    const { merged, grids, sections, comments, tabs } = result.stats;
     return [
       merged ? `${merged} merged rows` : '',
       grids ? `${grids} chord-only lines` : '',
       sections ? `${sections} sections` : '',
-      comments ? `${comments} comments` : ''
+      comments ? `${comments} comments` : '',
+      tabs ? `${tabs} tab blocks` : ''
     ]
       .filter(Boolean)
       .join(' · ');

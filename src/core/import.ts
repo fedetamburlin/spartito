@@ -22,7 +22,7 @@ export interface ImportStats {
   grids: number;
   sections: number;
   comments: number;
-  tabsRemoved: number;
+  tabs: number;
 }
 
 export interface ImportResult {
@@ -31,14 +31,21 @@ export interface ImportResult {
   stats: ImportStats;
 }
 
-function normalize(raw: string): { text: string; tabsRemoved: number } {
+function normalize(raw: string): { text: string; tabs: number } {
   let text = raw.replace(/\r\n?/g, '\n').replace(/\u00a0/g, ' ').replace(/\t/g, '    ');
-  const tabsRemoved = text.match(/\[tab\][\s\S]*?\[\/tab\]/gi)?.length ?? 0;
-  text = text.replace(/\[tab\][\s\S]*?\[\/tab\]/gi, '');
+  const blocks: string[] = [];
+  text = text.replace(/\[tab\]([\s\S]*?)\[\/tab\]/gi, (_, body: string) => {
+    blocks.push(body.replace(/^\n+|\n+$/g, ''));
+    return `\u0000${blocks.length - 1}\u0000`;
+  });
   text = text.replace(/\[ch\]([\s\S]*?)\[\/ch\]/gi, '[$1]');
-  text = text.replace(/\[\/?(?:ch|tab)\]/gi, '');
+  text = text.replace(/\[\/?ch\]/gi, '');
+  text = text.replace(/\[\/?tab\]/gi, '');
   text = text.replace(/<[^>]+>/g, '');
-  return { text, tabsRemoved };
+  text = text.replace(/\u0000(\d+)\u0000/g, (_, index: string) => {
+    return `{start_of_tab}\n${blocks[Number(index)]}\n{end_of_tab}`;
+  });
+  return { text, tabs: blocks.length };
 }
 
 function normalizeKey(label: string): string {
@@ -98,11 +105,11 @@ function capoFromLine(line: string): number | null {
 
 export function importSong(raw: string): ImportResult {
   const warnings: string[] = [];
-  const stats: ImportStats = { merged: 0, grids: 0, sections: 0, comments: 0, tabsRemoved: 0 };
+  const stats: ImportStats = { merged: 0, grids: 0, sections: 0, comments: 0, tabs: 0 };
 
-  const { text, tabsRemoved } = normalize(raw);
-  stats.tabsRemoved = tabsRemoved;
-  if (tabsRemoved > 0) warnings.push(`Removed ${tabsRemoved} tab block${tabsRemoved === 1 ? '' : 's'}`);
+  const { text, tabs } = normalize(raw);
+  stats.tabs = tabs;
+  if (tabs > 0) warnings.push(`Imported ${tabs} tab block${tabs === 1 ? '' : 's'}: check alignment`);
 
   const lines = text.split('\n').map((line) => line.trimEnd());
   const out: string[] = [];
@@ -110,6 +117,7 @@ export function importSong(raw: string): ImportResult {
   let titleFound = false;
   let subtitleFound = false;
   let bodyStarted = false;
+  let inTab = false;
 
   const beginBody = () => {
     if (bodyStarted) return;
@@ -127,6 +135,17 @@ export function importSong(raw: string): ImportResult {
   for (let i = 0; i < lines.length; i++) {
     const rawLine = lines[i];
     const trimmed = rawLine.trim();
+
+    if (inTab) {
+      if (/^\{\s*(?:end_of_tab|eot)\s*\}$/i.test(trimmed)) {
+        out.push(trimmed);
+        inTab = false;
+      } else {
+        out.push(rawLine);
+      }
+      continue;
+    }
+
     if (!trimmed) {
       if (out.length > 0 && out[out.length - 1] !== '') out.push('');
       continue;
@@ -170,6 +189,8 @@ export function importSong(raw: string): ImportResult {
     if (DIRECTIVE_RE.test(trimmed)) {
       closeSection();
       out.push(trimmed);
+      const directiveName = /^\{\s*([A-Za-z_][A-Za-z0-9_]*)/.exec(trimmed)?.[1].toLowerCase();
+      if (directiveName === 'start_of_tab' || directiveName === 'sot') inTab = true;
       continue;
     }
 
