@@ -2,6 +2,7 @@ import path from 'node:path';
 import { BridgeServer } from './bridge/server';
 import { createServer } from './server';
 import { startHttp, type HttpTransportHandle } from './transports/http';
+import { DEFAULT_APP_URL, isAllowedOrigin } from './transports/origin';
 import { startStdio } from './transports/stdio';
 
 const VERSION = '0.1.0';
@@ -14,16 +15,19 @@ function argValue(flag: string): string | undefined {
 
 const serveOnly = process.argv.includes('--serve');
 const port = Number(process.env.SPARTITO_BRIDGE_PORT ?? argValue('--port') ?? 7331);
-const appUrl = process.env.SPARTITO_APP_URL ?? 'https://fedetamburlin.github.io/spartito';
+const appUrl = process.env.SPARTITO_APP_URL ?? DEFAULT_APP_URL;
 const outDir = process.env.SPARTITO_OUT_DIR ?? path.resolve(process.cwd(), 'out');
 
-const bridge = new BridgeServer();
+const bridge = new BridgeServer((origin) => isAllowedOrigin(origin, appUrl));
 const create = () => createServer({ bridge, appUrl, outDir, version: VERSION });
 
 let httpHandle: HttpTransportHandle | undefined;
 try {
-  httpHandle = await startHttp(port, create, (req, socket, head) =>
-    bridge.handleUpgrade(req, socket, head)
+  httpHandle = await startHttp(
+    port,
+    create,
+    (req, socket, head) => bridge.handleUpgrade(req, socket, head),
+    appUrl
   );
   console.error(
     `[spartito-mcp] HTTP MCP: http://127.0.0.1:${httpHandle.port}/mcp · bridge: ws://127.0.0.1:${httpHandle.port}/bridge`

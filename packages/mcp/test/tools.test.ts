@@ -137,7 +137,14 @@ describe('pdf helpers', () => {
     expect(output).toBe('/tmp/out/perche-e-cosi.pdf');
   });
 
-  it('honors an explicit output path', () => {
-    expect(outputPathFor('/tmp/out', '{title: X}\n', '/tmp/custom.pdf')).toBe('/tmp/custom.pdf');
+  it('honors an explicit output path inside the output dir', () => {
+    expect(outputPathFor('/tmp/out', '{title: X}\n', 'custom.pdf')).toBe('/tmp/out/custom.pdf');
+  });
+
+  it('rejects an explicit output path outside the output dir', () => {
+    expect(() => outputPathFor('/tmp/out', '{title: X}\n', '/tmp/custom.pdf')).toThrow(
+      '/tmp/out'
+    );
+    expect(() => outputPathFor('/tmp/out', '{title: X}\n', '../escape.pdf')).toThrow('/tmp/out');
   });
 });

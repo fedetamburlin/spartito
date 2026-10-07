@@ -1,3 +1,4 @@
+import { request } from 'node:http';
 import { describe, expect, it } from 'vitest';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
@@ -33,7 +34,60 @@ class FakeBridge implements AppBridge {
   }
 }
 
+function postInitialize(port: number, headers: Record<string, string>): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const req = request(
+      {
+        hostname: '127.0.0.1',
+        port,
+        path: '/mcp',
+        method: 'POST',
+        headers: { 'content-type': 'application/json', ...headers }
+      },
+      (res) => {
+        res.resume();
+        res.on('end', () => resolve(res.statusCode ?? 0));
+      }
+    );
+    req.on('error', reject);
+    req.end(
+      JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'initialize',
+        params: {
+          protocolVersion: '2025-03-26',
+          capabilities: {},
+          clientInfo: { name: 'raw-test', version: '1.0.0' }
+        }
+      })
+    );
+  });
+}
+
 describe('streamable http transport', () => {
+  it('rejects requests with a non-local Host header', async () => {
+    const bridge = new FakeBridge();
+    const handle = await startHttp(
+      0,
+      () => createServer({ bridge, appUrl: 'https://app.test', outDir: '/tmp/out', version: 'test' }),
+      () => {}
+    );
+    expect(await postInitialize(handle.port, { host: 'evil.example' })).toBe(403);
+    await handle.close();
+  });
+
+  it('rejects browser requests from a disallowed Origin', async () => {
+    const bridge = new FakeBridge();
+    const handle = await startHttp(
+      0,
+      () => createServer({ bridge, appUrl: 'https://app.test', outDir: '/tmp/out', version: 'test' }),
+      () => {}
+    );
+    expect(await postInitialize(handle.port, { origin: 'https://evil.example' })).toBe(403);
+    await handle.close();
+  });
+
   it('serves MCP over POST /mcp', async () => {
     const bridge = new FakeBridge();
     const handle = await startHttp(

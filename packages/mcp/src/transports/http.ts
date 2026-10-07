@@ -9,6 +9,7 @@ import type { AddressInfo } from 'node:net';
 import type { Duplex } from 'node:stream';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import { DEFAULT_APP_URL, isAllowedHost, isAllowedOrigin } from './origin';
 
 export interface HttpTransportHandle {
   server: Server;
@@ -19,12 +20,20 @@ export interface HttpTransportHandle {
 export async function startHttp(
   port: number,
   create: () => McpServer,
-  onUpgrade: (req: IncomingMessage, socket: Duplex, head: Buffer) => void
+  onUpgrade: (req: IncomingMessage, socket: Duplex, head: Buffer) => void,
+  appUrl: string = DEFAULT_APP_URL
 ): Promise<HttpTransportHandle> {
   const server = createHttpServer((req, res) => {
-    void handleRequest(req, res, create);
+    void handleRequest(req, res, create, appUrl);
   });
-  server.on('upgrade', onUpgrade);
+  server.on('upgrade', (req, socket, head) => {
+    if (!isAllowedHost(req.headers.host)) {
+      socket.write('HTTP/1.1 403 Forbidden\r\n\r\n');
+      socket.destroy();
+      return;
+    }
+    onUpgrade(req, socket, head);
+  });
   await new Promise<void>((resolve, reject) => {
     server.once('error', reject);
     server.listen(port, '127.0.0.1', resolve);
@@ -42,8 +51,13 @@ export async function startHttp(
 async function handleRequest(
   req: IncomingMessage,
   res: ServerResponse,
-  create: () => McpServer
+  create: () => McpServer,
+  appUrl: string
 ): Promise<void> {
+  if (!isAllowedHost(req.headers.host)) {
+    res.writeHead(403, { 'content-type': 'text/plain' }).end('Forbidden');
+    return;
+  }
   const pathname = new URL(req.url ?? '/', 'http://127.0.0.1').pathname;
   if (pathname !== '/mcp') {
     res.writeHead(404, { 'content-type': 'text/plain' }).end('Not found');
@@ -51,6 +65,10 @@ async function handleRequest(
   }
   if (req.method !== 'POST') {
     res.writeHead(405, { 'content-type': 'text/plain', allow: 'POST' }).end('Method not allowed');
+    return;
+  }
+  if (req.headers.origin !== undefined && !isAllowedOrigin(req.headers.origin, appUrl)) {
+    res.writeHead(403, { 'content-type': 'text/plain' }).end('Forbidden');
     return;
   }
 

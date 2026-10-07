@@ -4,16 +4,11 @@ import type { Duplex } from 'node:stream';
 import { WebSocket, WebSocketServer } from 'ws';
 import { sanitizeSettings, type SongSettings } from '../../../../src/core/settings';
 import { APP_NOT_CONNECTED, type AppBridge, type AppState } from '../deps';
+import { isAllowedOrigin } from '../transports/origin';
 import { PROTOCOL_VERSION, parseClientMessage, type ServerMessage } from './protocol';
 
 const REQUEST_TIMEOUT_MS = 3000;
 const PING_INTERVAL_MS = 15_000;
-
-export function isAllowedOrigin(origin: string | undefined): boolean {
-  if (!origin) return true;
-  if (origin === 'https://fedetamburlin.github.io') return true;
-  return /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
-}
 
 interface PendingRequest {
   resolve: (value: unknown) => void;

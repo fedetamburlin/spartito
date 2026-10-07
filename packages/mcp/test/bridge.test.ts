@@ -27,6 +27,24 @@ async function waitFor(check: () => boolean, timeoutMs = 2000): Promise<void> {
 }
 
 describe('websocket bridge', () => {
+  it('rejects websockets without an origin', async () => {
+    const { handle, url } = await startBridge();
+    const outcome = await new Promise<string>((resolve, reject) => {
+      const ws = new WebSocket(url);
+      ws.on('open', () => {
+        ws.close();
+        resolve('open');
+      });
+      ws.on('unexpected-response', (_request, response) => {
+        response.resume();
+        resolve(`status:${response.statusCode}`);
+      });
+      ws.on('error', reject);
+    });
+    expect(outcome).toBe('status:403');
+    await handle.close();
+  });
+
   it('rejects websockets from unknown origins', async () => {
     const { handle, url } = await startBridge();
     const outcome = await new Promise<string>((resolve, reject) => {
