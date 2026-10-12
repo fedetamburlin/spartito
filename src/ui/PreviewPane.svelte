@@ -1,5 +1,6 @@
 <script lang="ts">
   import { config } from '../core/config';
+  import { unknownDirectives } from '../core/chordpro';
   import { decideLayout, type FitOutcome, type LayoutParams } from '../core/fit';
   import type { SongDocument } from '../core/model';
   import type { SongSettings } from '../core/settings';
@@ -87,12 +88,21 @@
         outcome.params.columns !== 1 ||
         outcome.params.textPt !== config.layout.textPtDefault)
   );
+
+  const unknowns = $derived(unknownDirectives(doc));
 </script>
 
 <div class="preview">
-  {#if showMeta}
+  {#if showMeta || unknowns.length > 0}
     <div class="preview-meta" class:warning={outcome?.status === 'overflow'}>
-      <span class="badge">{statusText}</span>
+      {#if showMeta}
+        <span class="badge">{statusText}</span>
+      {/if}
+      {#if unknowns.length > 0}
+        <span class="badge unknown" title={unknowns.join('\n')}>
+          ⚠ {unknowns.length} unknown directive{unknowns.length === 1 ? '' : 's'}
+        </span>
+      {/if}
     </div>
   {/if}
   <div class="preview-scroll" bind:this={scrollEl}>

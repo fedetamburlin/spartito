@@ -81,6 +81,8 @@
               </div>
             {:else if item.kind === 'chorus-recall'}
               <div class="chorus-recall">{item.label}</div>
+            {:else if item.kind === 'spacer'}
+              <div class="spacer"></div>
             {/if}
           {/each}
         </section>

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseChordPro, serializeChordPro } from '../src/core/chordpro';
+import { parseChordPro, serializeChordPro, unknownDirectives } from '../src/core/chordpro';
 import type { Section, UnknownItem } from '../src/core/model';
 
 const fixturesDir = join(dirname(fileURLToPath(import.meta.url)), 'fixtures');
@@ -122,8 +122,8 @@ describe('parseChordPro', () => {
     expect(grid.rows[1][grid.rows[1].length - 1]).toEqual({ kind: 'text', text: 'ripeti' });
   });
 
-  it('reads compact chorus recalls with aliases', () => {
-    const doc = parseChordPro('{chorus}\n{rit}\n{refrain: Final}\n');
+  it('reads compact chorus recalls', () => {
+    const doc = parseChordPro('{chorus}\n{rit}\n{chorus: Final}\n');
     const section = doc.blocks[0] as Section;
     expect(section.items).toEqual([
       { kind: 'chorus-recall', label: 'Chorus' },
@@ -133,6 +133,37 @@ describe('parseChordPro', () => {
     expect(serializeChordPro(doc)).toBe(
       '{chorus}\n{chorus: Rit.}\n{chorus: Final}\n'
     );
+  });
+
+  it('keeps blank lines as spacer gaps inside explicit sections', () => {
+    const doc = parseChordPro('{start_of_verse}\n[Am]uno\n\n\n[F]due\n{end_of_verse}\n');
+    const section = doc.blocks[0] as Section;
+    expect(section.items.map((item) => item.kind)).toEqual(['line', 'spacer', 'line']);
+    const roundtripped = parseChordPro(serializeChordPro(doc));
+    expect(roundtripped).toEqual(doc);
+    expect(serializeChordPro(roundtripped)).toBe(serializeChordPro(doc));
+  });
+
+  it('drops leading and trailing blank lines inside explicit sections', () => {
+    const doc = parseChordPro('{start_of_chorus}\n\n[Am]uno\n\n{end_of_chorus}\n');
+    const section = doc.blocks[0] as Section;
+    expect(section.items.map((item) => item.kind)).toEqual(['line']);
+  });
+
+  it('still splits implicit text blocks on blank lines', () => {
+    const doc = parseChordPro('prima\n\nseconda\n');
+    expect(doc.blocks).toHaveLength(2);
+  });
+
+  it('flushes an unterminated tab block instead of dropping it', () => {
+    const doc = parseChordPro('{start_of_tab}\ne|--0--|');
+    const section = doc.blocks[0] as Section;
+    expect(section.items[0]).toEqual({ kind: 'tab', label: undefined, lines: ['e|--0--|'] });
+  });
+
+  it('reports the unknown directives it preserved', () => {
+    const doc = parseChordPro('{soc}\n{key: G}\n');
+    expect(unknownDirectives(doc)).toEqual(['{soc}', '{key: G}']);
   });
 });
 

@@ -4,7 +4,7 @@
   import { importSong } from '../core/import';
   import type { SongDocument } from '../core/model';
   import { extractPdfText } from '../core/pdf';
-  import { buildJsonExport, fileBaseName, parseImported } from '../core/persistence';
+  import { fileBaseName, parseImported } from '../core/persistence';
   import { sanitizeSettings, withTranspose, type SongSettings } from '../core/settings';
   import { TRANSPOSE_MAX, TRANSPOSE_MIN } from '../core/transpose';
   import ImportDialog from './ImportDialog.svelte';
@@ -57,14 +57,6 @@
 
   function exportCho() {
     download(`${fileBaseName(doc.title)}.cho`, source, 'text/plain;charset=utf-8');
-  }
-
-  function exportJson() {
-    download(
-      `${fileBaseName(doc.title)}.json`,
-      buildJsonExport(source, settings),
-      'application/json'
-    );
   }
 
   function openPaste() {
@@ -218,22 +210,41 @@
       /></label>
   </div>
   <div class="toolbar-group toolbar-actions">
-    <button class="btn-import" onclick={openPaste}>Paste text</button>
-    <button class="btn-import" onclick={() => fileInput?.click()}>Import file</button>
-    <button class="btn-export" onclick={exportCho}>Export .cho</button>
-    <button class="btn-export" onclick={exportJson}>Export .json</button>
-    <button
-      class="btn-bridge"
-      class:connected={bridgeStatus === 'connected'}
-      class:connecting={bridgeStatus === 'connecting'}
-      class:failed={bridgeStatus === 'failed'}
-      title={bridgeTitle}
-      aria-label={bridgeAria}
-      onclick={onToggleBridge}>MCP</button>
-    <button
-      class="primary"
-      title="Save as PDF · default margins · headers off"
-      onclick={() => window.print()}>Print PDF</button>
+    <div class="toolbar-import">
+      <button
+        class="btn-import"
+        title="Paste chords copied from a site"
+        onclick={openPaste}>From text</button
+      >
+      <button
+        class="btn-import"
+        title="Import a .cho, .crd, .json or text PDF file"
+        onclick={() => fileInput?.click()}>From file</button
+      >
+    </div>
+    <div class="toolbar-mcp">
+      <button
+        class="btn-bridge"
+        class:connected={bridgeStatus === 'connected'}
+        class:connecting={bridgeStatus === 'connecting'}
+        class:failed={bridgeStatus === 'failed'}
+        title={bridgeTitle}
+        aria-label={bridgeAria}
+        onclick={onToggleBridge}>MCP</button
+      >
+    </div>
+    <div class="toolbar-export">
+      <button
+        class="btn-export"
+        title="Download the song as a .cho (ChordPro) file"
+        onclick={exportCho}>Export chords</button
+      >
+      <button
+        class="primary"
+        title="Save as PDF · default margins · headers off"
+        onclick={() => window.print()}>Print PDF</button
+      >
+    </div>
     <input
       class="hidden-input"
       type="file"

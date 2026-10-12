@@ -227,3 +227,7 @@
   font-weight: 700;
   color: var(--text-color, #111111);
 }
+
+.page .spacer {
+  height: var(--section-gap, 0.5em);
+}

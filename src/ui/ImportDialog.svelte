@@ -15,7 +15,7 @@
     onClose,
     initialText = '',
     title = 'Paste text',
-    hint = 'Paste chords and lyrics copied from a site (Ultimate Guitar, Accordi e Spartiti, …) or straight ChordPro: conversion is automatic.'
+    hint
   }: Props = $props();
 
   let raw = $state(untrack(() => initialText));
@@ -62,7 +62,15 @@
 <div class="modal-backdrop">
   <div class="modal" role="dialog" aria-modal="true" tabindex="-1">
     <h2>{title}</h2>
-    <p class="hint">{hint}</p>
+    <p class="hint">
+      {#if hint}
+        {hint}
+      {:else}
+        Paste from <a href="https://www.ultimate-guitar.com" target="_blank" rel="noopener"
+          >Ultimate Guitar</a
+        > or any chord site — chords, sections and metadata are converted automatically.
+      {/if}
+    </p>
     <textarea
       bind:value={raw}
       oninput={() => (result = null)}

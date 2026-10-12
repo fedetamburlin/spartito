@@ -1,6 +1,7 @@
 import importDefaults from '../../config/import.json';
 import { parseCapoValue } from './chordpro';
 import { chordLineTokens, isChordToken, mergeChordLine } from './chords';
+import { BLOCK_DIRECTIVES } from './directives';
 
 const SECTION_MAP = importDefaults.sections as Record<string, 'verse' | 'chorus' | 'bridge'>;
 const METADATA = new Set(importDefaults.metadata.map((label) => label.toLowerCase()));
@@ -190,7 +191,7 @@ export function importSong(raw: string): ImportResult {
       closeSection();
       out.push(trimmed);
       const directiveName = /^\{\s*([A-Za-z_][A-Za-z0-9_]*)/.exec(trimmed)?.[1].toLowerCase();
-      if (directiveName === 'start_of_tab' || directiveName === 'sot') inTab = true;
+      if (directiveName === BLOCK_DIRECTIVES.tab.start) inTab = true;
       continue;
     }
 

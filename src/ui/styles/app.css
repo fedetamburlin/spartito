@@ -125,7 +125,26 @@ body {
 }
 
 .toolbar-actions {
-  margin-left: auto;
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.toolbar-import,
+.toolbar-export {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toolbar-mcp {
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  border-left: 1px solid var(--ui-border);
+  border-right: 1px solid var(--ui-border);
 }
 
 button {
@@ -234,6 +253,10 @@ button.primary {
   margin: 0;
   font-size: 13px;
   color: var(--ui-muted);
+}
+
+.modal .hint a {
+  color: var(--ui-accent);
 }
 
 .modal textarea {
@@ -369,25 +392,46 @@ button.primary {
   z-index: 45;
   display: flex;
   flex-direction: column;
-  min-width: 170px;
-  padding: 4px;
+  gap: 4px;
+  min-width: 180px;
+  padding: 6px;
   background: var(--ui-panel);
   border: 1px solid var(--ui-border);
   border-radius: 8px;
   box-shadow: 0 10px 30px rgba(15, 25, 40, 0.22);
 }
 
+.insert-group {
+  padding: 3px;
+  border-radius: 6px;
+  background: var(--group-bg, transparent);
+}
+
+.insert-group-label,
+.help-group-label {
+  padding: 2px 7px 3px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ui-muted);
+}
+
 .insert-menu button {
+  display: block;
+  width: 100%;
   padding: 5px 8px;
   border: 0;
+  border-radius: 4px;
   background: transparent;
   font-size: 13px;
   text-align: left;
   color: var(--ui-text);
+  cursor: pointer;
 }
 
 .insert-menu button:hover {
-  background: #eef2f7;
+  background: rgba(15, 25, 40, 0.06);
 }
 
 .help {
@@ -425,7 +469,7 @@ button.primary {
   top: calc(100% + 6px);
   left: 0;
   z-index: 40;
-  width: min(380px, calc(100vw - 36px));
+  width: min(420px, calc(100vw - 36px));
   max-height: min(65vh, 460px);
   overflow: auto;
   padding: 10px 12px;
@@ -467,6 +511,16 @@ button.primary {
   color: var(--ui-accent);
 }
 
+.help-group {
+  padding: 3px 6px 5px;
+  border-radius: 6px;
+  background: var(--group-bg, transparent);
+}
+
+.help-group + .help-group {
+  margin-top: 6px;
+}
+
 .help-table {
   width: 100%;
   border-collapse: collapse;
@@ -491,12 +545,18 @@ button.primary {
   padding: 1px 4px;
 }
 
+.help-table code + code {
+  margin-left: 4px;
+}
+
 .help-effect {
   color: var(--ui-muted);
 }
 
 .help-note {
   margin: 8px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--ui-border);
   font-size: 11.5px;
   color: var(--ui-muted);
 }
@@ -538,6 +598,12 @@ button.primary {
 .preview-meta.warning .badge {
   background: var(--ui-warning);
   color: #fff;
+}
+
+.preview-meta .badge.unknown {
+  background: #fdeceb;
+  color: var(--ui-warning);
+  cursor: help;
 }
 
 .preview-scroll {

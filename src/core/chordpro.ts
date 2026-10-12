@@ -1,4 +1,13 @@
 import { isChordToken } from './chords';
+import {
+  BLOCK_DIRECTIVES,
+  CAPO_DIRECTIVE,
+  COMMENT_DIRECTIVE,
+  RECALL_DIRECTIVES,
+  SECTION_DIRECTIVES,
+  SUBTITLE_DIRECTIVE,
+  TITLE_DIRECTIVE
+} from './directives';
 import type {
   GridToken,
   Line,
@@ -9,29 +18,17 @@ import type {
   Word
 } from './model';
 
-const SECTION_START: Record<string, SectionType> = {
-  start_of_chorus: 'chorus',
-  soc: 'chorus',
-  start_of_verse: 'verse',
-  sov: 'verse',
-  start_of_bridge: 'bridge',
-  sob: 'bridge'
-};
+const SECTION_START: Record<string, SectionType> = Object.fromEntries(
+  (Object.entries(SECTION_DIRECTIVES) as [SectionType, { start: string; end: string }][]).map(
+    ([type, names]) => [names.start, type]
+  )
+);
 
-const SECTION_END = new Set([
-  'end_of_chorus',
-  'eoc',
-  'end_of_verse',
-  'eov',
-  'end_of_bridge',
-  'eob'
-]);
-
-const TAB_START = new Set(['start_of_tab', 'sot']);
-const TAB_END = new Set(['end_of_tab', 'eot']);
-const GRID_START = new Set(['start_of_grid', 'sog']);
-const GRID_END = new Set(['end_of_grid', 'eog']);
-const CHORUS_RECALL: Record<string, string> = { chorus: 'Chorus', refrain: 'Chorus', rit: 'Rit.' };
+const SECTION_END = new Set(Object.values(SECTION_DIRECTIVES).map((names) => names.end));
+const TAB_START = BLOCK_DIRECTIVES.tab.start;
+const TAB_END = BLOCK_DIRECTIVES.tab.end;
+const GRID_START = BLOCK_DIRECTIVES.grid.start;
+const GRID_END = BLOCK_DIRECTIVES.grid.end;
 
 const DIRECTIVE_RE = /^\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?::\s*(.*?))?\s*\}$/;
 const CHORD_RE = /\[([^\]]*)\]/g;
@@ -147,6 +144,9 @@ export function parseChordPro(source: string): SongDocument {
 
   const closeCurrent = () => {
     if (current) {
+      while (current.items.length > 0 && current.items[current.items.length - 1].kind === 'spacer') {
+        current.items.pop();
+      }
       doc.blocks.push(current);
       current = null;
     }
@@ -161,6 +161,16 @@ export function parseChordPro(source: string): SongDocument {
       implicit = { kind: 'section', type: 'verse', explicit: false, items: [] };
     }
     implicit.items.push(item);
+  };
+
+  const pushSpacer = () => {
+    if (!current) {
+      closeImplicit();
+      return;
+    }
+    const last = current.items[current.items.length - 1];
+    if (!last || last.kind === 'spacer') return;
+    current.items.push({ kind: 'spacer' });
   };
 
   const flushEnv = () => {
@@ -179,9 +189,9 @@ export function parseChordPro(source: string): SongDocument {
     const trimmed = line.trim();
 
     if (env) {
-      const endName = env.kind === 'tab' ? TAB_END : GRID_END;
       const closing = DIRECTIVE_RE.exec(trimmed);
-      if (closing && endName.has(closing[1].toLowerCase())) {
+      const endName = env.kind === 'tab' ? TAB_END : GRID_END;
+      if (closing && closing[1].toLowerCase() === endName) {
         flushEnv();
         continue;
       }
@@ -190,7 +200,7 @@ export function parseChordPro(source: string): SongDocument {
     }
 
     if (!trimmed) {
-      closeImplicit();
+      pushSpacer();
       continue;
     }
 
@@ -199,22 +209,18 @@ export function parseChordPro(source: string): SongDocument {
       const name = directive[1].toLowerCase();
       const value = (directive[2] ?? '').trim();
       switch (name) {
-        case 'title':
-        case 't':
+        case TITLE_DIRECTIVE:
           doc.title = value;
           closeImplicit();
           break;
-        case 'subtitle':
-        case 'st':
-        case 'artist':
+        case SUBTITLE_DIRECTIVE:
           doc.subtitle = value;
           closeImplicit();
           break;
-        case 'comment':
-        case 'c':
+        case COMMENT_DIRECTIVE:
           pushItem({ kind: 'comment', text: value });
           break;
-        case 'capo': {
+        case CAPO_DIRECTIVE: {
           const capo = parseCapoValue(value);
           if (capo !== null) {
             doc.capo = capo;
@@ -224,14 +230,14 @@ export function parseChordPro(source: string): SongDocument {
           break;
         }
         default:
-          if (TAB_START.has(name) || GRID_START.has(name)) {
+          if (name === TAB_START || name === GRID_START) {
             env = {
-              kind: TAB_START.has(name) ? 'tab' : 'grid',
+              kind: name === TAB_START ? 'tab' : 'grid',
               label: envLabel(value),
               lines: []
             };
-          } else if (name in CHORUS_RECALL) {
-            pushItem({ kind: 'chorus-recall', label: envLabel(value) ?? CHORUS_RECALL[name] });
+          } else if (name in RECALL_DIRECTIVES) {
+            pushItem({ kind: 'chorus-recall', label: envLabel(value) ?? RECALL_DIRECTIVES[name] });
           } else if (name in SECTION_START) {
             closeImplicit();
             closeCurrent();
@@ -242,6 +248,8 @@ export function parseChordPro(source: string): SongDocument {
               label: value || undefined,
               items: []
             };
+          } else if (name === TAB_END || name === GRID_END) {
+            // Stray closing directive outside its block: nothing to close.
           } else if (SECTION_END.has(name)) {
             closeCurrent();
           } else {
@@ -264,6 +272,7 @@ export function parseChordPro(source: string): SongDocument {
     pushItem(parsed);
   }
 
+  flushEnv();
   closeCurrent();
   closeImplicit();
   return doc;
@@ -271,9 +280,9 @@ export function parseChordPro(source: string): SongDocument {
 
 export function serializeChordPro(doc: SongDocument): string {
   const out: string[] = [];
-  if (doc.title) out.push(`{title: ${doc.title}}`);
-  if (doc.subtitle) out.push(`{subtitle: ${doc.subtitle}}`);
-  if (doc.capo !== undefined) out.push(`{capo: ${doc.capo}}`);
+  if (doc.title) out.push(`{${TITLE_DIRECTIVE}: ${doc.title}}`);
+  if (doc.subtitle) out.push(`{${SUBTITLE_DIRECTIVE}: ${doc.subtitle}}`);
+  if (doc.capo !== undefined) out.push(`{${CAPO_DIRECTIVE}: ${doc.capo}}`);
 
   const pushItem = (item: SectionItem) => {
     if (item.kind === 'line') {
@@ -281,17 +290,19 @@ export function serializeChordPro(doc: SongDocument): string {
     } else if (item.kind === 'grid') {
       out.push(item.chords.map((chord) => `[${chord}]`).join(' '));
     } else if (item.kind === 'comment') {
-      out.push(`{comment: ${item.text}}`);
+      out.push(`{${COMMENT_DIRECTIVE}: ${item.text}}`);
     } else if (item.kind === 'tab') {
-      out.push(item.label ? `{start_of_tab: ${item.label}}` : '{start_of_tab}');
+      out.push(`{${BLOCK_DIRECTIVES.tab.start}${item.label ? `: ${item.label}` : ''}}`);
       out.push(...item.lines);
-      out.push('{end_of_tab}');
+      out.push(`{${BLOCK_DIRECTIVES.tab.end}}`);
     } else if (item.kind === 'grid-block') {
-      out.push(item.label ? `{start_of_grid: ${item.label}}` : '{start_of_grid}');
+      out.push(`{${BLOCK_DIRECTIVES.grid.start}${item.label ? `: ${item.label}` : ''}}`);
       item.rows.forEach((row) => out.push(serializeGridRow(row)));
-      out.push('{end_of_grid}');
+      out.push(`{${BLOCK_DIRECTIVES.grid.end}}`);
     } else if (item.kind === 'chorus-recall') {
       out.push(item.label === 'Chorus' ? '{chorus}' : `{chorus: ${item.label}}`);
+    } else if (item.kind === 'spacer') {
+      out.push('');
     } else {
       out.push(item.raw);
     }
@@ -301,19 +312,33 @@ export function serializeChordPro(doc: SongDocument): string {
     if (out.length > 0) out.push('');
     if (block.kind === 'section') {
       if (block.explicit) {
-        const start = `start_of_${block.type}`;
-        out.push(block.label ? `{${start}: ${block.label}}` : `{${start}}`);
+        out.push(`{${SECTION_DIRECTIVES[block.type].start}${block.label ? `: ${block.label}` : ''}}`);
         block.items.forEach(pushItem);
-        out.push(`{end_of_${block.type}}`);
+        out.push(`{${SECTION_DIRECTIVES[block.type].end}}`);
       } else {
         block.items.forEach(pushItem);
       }
     } else if (block.kind === 'comment') {
-      out.push(`{comment: ${block.text}}`);
+      out.push(`{${COMMENT_DIRECTIVE}: ${block.text}}`);
     } else {
       out.push(block.raw);
     }
   }
 
   return out.join('\n') + '\n';
+}
+
+/** Raw sources of the directives the parser could not interpret. */
+export function unknownDirectives(doc: SongDocument): string[] {
+  const raws: string[] = [];
+  for (const block of doc.blocks) {
+    if (block.kind === 'section') {
+      for (const item of block.items) {
+        if (item.kind === 'unknown') raws.push(item.raw);
+      }
+    } else if (block.kind === 'unknown') {
+      raws.push(block.raw);
+    }
+  }
+  return raws;
 }

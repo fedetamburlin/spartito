@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { SNIPPETS, type SnippetId } from '../core/snippets';
+  import { DIRECTIVE_GROUPS, DIRECTIVES } from '../core/directives';
 
   interface Props {
-    onInsert: (id: SnippetId) => void;
+    onInsert: (id: string) => void;
   }
 
   let { onInsert }: Props = $props();
@@ -11,7 +11,12 @@
   let root = $state<HTMLElement | null>(null);
   let button = $state<HTMLButtonElement | null>(null);
 
-  function choose(id: SnippetId) {
+  const groups = DIRECTIVE_GROUPS.filter((group) => group.menu).map((group) => ({
+    ...group,
+    items: DIRECTIVES.filter((directive) => directive.group === group.id)
+  }));
+
+  function choose(id: string) {
     open = false;
     onInsert(id);
   }
@@ -50,13 +55,18 @@
 
   {#if open}
     <div class="insert-menu" role="menu">
-      {#each SNIPPETS as snippet}
-        <button
-          type="button"
-          role="menuitem"
-          title={snippet.title}
-          onclick={() => choose(snippet.id)}>{snippet.label}</button
-        >
+      {#each groups as group (group.id)}
+        <div class="insert-group" role="group" aria-label={group.label} style={`--group-bg: ${group.background}`}>
+          <div class="insert-group-label">{group.label}</div>
+          {#each group.items as directive (directive.id)}
+            <button
+              type="button"
+              role="menuitem"
+              title={directive.description}
+              onclick={() => choose(directive.id)}>{directive.label}</button
+            >
+          {/each}
+        </div>
       {/each}
     </div>
   {/if}

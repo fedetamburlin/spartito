@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { applySnippet, snippetById } from '../core/snippets';
+  import { applySnippet, directiveById } from '../core/directives';
   import ChordProHelp from './ChordProHelp.svelte';
   import InsertMenu from './InsertMenu.svelte';
 
@@ -12,7 +12,7 @@
   let textarea = $state<HTMLTextAreaElement | null>(null);
 
   function insertSnippet(id: string) {
-    const snippet = snippetById(id);
+    const snippet = directiveById(id);
     const el = textarea;
     if (!snippet || !el) return;
     const start = el.selectionStart;

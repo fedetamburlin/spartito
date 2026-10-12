@@ -1,4 +1,8 @@
 <script lang="ts">
+  import { DIRECTIVE_GROUPS, rowsForGroup } from '../core/directives';
+
+  const groups = DIRECTIVE_GROUPS.map((group) => ({ ...group, rows: rowsForGroup(group) }));
+
   let open = $state(false);
   let pinned = $state(false);
   let root = $state<HTMLElement | null>(null);
@@ -87,82 +91,26 @@
         <strong>ChordPro quick reference</strong>
         <button class="help-close" type="button" aria-label="Close" onclick={() => close(true)}>×</button>
       </div>
-      <table class="help-table">
-        <tbody>
-          <tr>
-            <td><code>{'{title: My song}'}</code></td>
-            <td class="help-effect">Song title</td>
-          </tr>
-          <tr>
-            <td><code>{'{subtitle: ...}'}</code> <code>{'{artist: ...}'}</code></td>
-            <td class="help-effect">Subtitle or artist (alias <code>{'{st: ...}'}</code>)</td>
-          </tr>
-          <tr>
-            <td><code>{'{comment: ...}'}</code> <code>{'{c: ...}'}</code></td>
-            <td class="help-effect">Comment line</td>
-          </tr>
-          <tr>
-            <td><code>{'{capo: 2}'}</code> <code>{'{capo: II}'}</code></td>
-            <td class="help-effect">Capo 0–12 (digits or Roman numerals), shown under the title</td>
-          </tr>
-          <tr>
-            <td><code>[Am]Hello [C]world</code></td>
-            <td class="help-effect">Chord above the word that follows it</td>
-          </tr>
-          <tr>
-            <td><code>[C][G]word</code></td>
-            <td class="help-effect">Several chords on one word</td>
-          </tr>
-          <tr>
-            <td><code>[Do] [Lam] [Sol]</code></td>
-            <td class="help-effect">Italian note names work too</td>
-          </tr>
-          <tr>
-            <td><code>[C] [G] [Am]</code></td>
-            <td class="help-effect">Chord-only line (on a line of its own)</td>
-          </tr>
-          <tr>
-            <td><code>{'{start_of_chorus}'}</code> <code>{'{soc}'}</code></td>
-            <td class="help-effect">
-              Chorus section, closed by <code>{'{end_of_chorus}'}</code> / <code>{'{eoc}'}</code>;
-              optional label <code>{'{soc: Chorus}'}</code>
-            </td>
-          </tr>
-          <tr>
-            <td><code>{'{start_of_verse}'}</code> <code>{'{sov}'}</code></td>
-            <td class="help-effect">
-              Verse section; bridge is <code>{'{start_of_bridge}'}</code> / <code>{'{sob}'}</code>
-            </td>
-          </tr>
-          <tr>
-            <td><code>{'{chorus}'}</code> <code>{'{rit}'}</code></td>
-            <td class="help-effect">
-              Compact chorus recall (renders "Chorus"/"Rit."); custom label
-              <code>{'{chorus: Final}'}</code>
-            </td>
-          </tr>
-          <tr>
-            <td><code>{'{start_of_tab}'}</code> <code>{'{sot}'}</code></td>
-            <td class="help-effect">
-              Tab block: lines are kept exactly as typed; close with
-              <code>{'{end_of_tab}'}</code> / <code>{'{eot}'}</code>
-            </td>
-          </tr>
-          <tr>
-            <td><code>{'{start_of_grid}'}</code> <code>{'{sog}'}</code></td>
-            <td class="help-effect">
-              Chord grid (bars <code>|</code>, empty <code>.</code>, repeat <code>%</code>);
-              close with <code>{'{end_of_grid}'}</code> / <code>{'{eog}'}</code>
-            </td>
-          </tr>
-          <tr>
-            <td><code>(blank line)</code></td>
-            <td class="help-effect">Separates blocks</td>
-          </tr>
-        </tbody>
-      </table>
+      {#each groups as group (group.id)}
+        <div class="help-group" style={`--group-bg: ${group.background}`}>
+          <div class="help-group-label">{group.label}</div>
+          <table class="help-table">
+            <tbody>
+              {#each group.rows as row (row.id)}
+                <tr>
+                  <td>
+                    {#each row.syntax as token}<code>{token}</code>{/each}
+                  </td>
+                  <td class="help-effect">{row.description}</td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        </div>
+      {/each}
       <p class="help-note">
-        Unknown directives are ignored in the preview but preserved on export.
+        Empty lines separate paragraphs, also inside explicit sections. Unknown directives are
+        ignored in the preview but preserved on export.
       </p>
     </div>
   {/if}

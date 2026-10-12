@@ -46,6 +46,11 @@ export interface UnknownItem {
   raw: string;
 }
 
+/** Blank line inside an explicit section: renders as a paragraph gap. */
+export interface SpacerItem {
+  kind: 'spacer';
+}
+
 export type SectionItem =
   | Line
   | GridLine
@@ -53,6 +58,7 @@ export type SectionItem =
   | TabItem
   | GridBlock
   | ChorusRecall
+  | SpacerItem
   | UnknownItem;
 
 export type SectionType = 'verse' | 'chorus' | 'bridge';
