@@ -90,7 +90,7 @@ Requirements: Node 18+ and Google Chrome/Chromium for `export_pdf` (override the
 
 ```
 config/        project defaults and import dictionaries
-public/fonts/  OFL fonts (Inter, Source Serif 4, JetBrains Mono) + licenses
+public/fonts/  OFL fonts (Inter, IBM Plex Sans Condensed, JetBrains Mono) + licenses
 src/core/      pure TS: config, model, chordpro, chords, transpose, import, pdf, fit, persistence, settings
 src/ui/        Svelte components, styles and measurement
 packages/mcp/  local MCP server: tools, websocket bridge, stdio/HTTP transports, PDF export
