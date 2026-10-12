@@ -13,4 +13,4 @@ export interface AppBridge {
 }
 
 export const APP_NOT_CONNECTED =
-  'Spartito web app is not connected. Open the app and click the "opencode" button in the toolbar.';
+  'Spartito web app is not connected. Open the app and click the "MCP" button in the toolbar.';

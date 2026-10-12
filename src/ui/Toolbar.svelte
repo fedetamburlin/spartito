@@ -37,11 +37,13 @@
 
   const bridgeTitle = $derived(
     bridgeStatus === 'connected'
-      ? 'Disconnect from the opencode MCP bridge'
+      ? 'Connected to the MCP server on 127.0.0.1:7331 · click to disconnect'
       : bridgeStatus === 'failed'
         ? 'Connection failed: is the MCP server running? If the browser blocked local network access, allow it for this site.'
-        : 'Connect to the opencode MCP bridge (run node packages/mcp/dist/index.js)'
+        : 'Connect to the local MCP server: lets opencode or any MCP client read and edit the open song'
   );
+
+  const bridgeAria = $derived(`MCP server: ${bridgeStatus}`);
 
   function download(filename: string, content: string, type: string) {
     const blob = new Blob([content], { type });
@@ -226,7 +228,8 @@
       class:connecting={bridgeStatus === 'connecting'}
       class:failed={bridgeStatus === 'failed'}
       title={bridgeTitle}
-      onclick={onToggleBridge}>opencode</button>
+      aria-label={bridgeAria}
+      onclick={onToggleBridge}>MCP</button>
     <button
       class="primary"
       title="Save as PDF · default margins · headers off"

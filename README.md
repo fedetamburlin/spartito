@@ -43,7 +43,7 @@ Source in **ChordPro (subset)** in the left editor, A4 preview on the right. A d
 - **Transpose** stepper (or `+`/`−` keys): changes preview and PDF only, not the source or `.cho` export
 - `{capo: N}` is shown under the title; transposition moves the capo and keeps the chord shapes
 
-## MCP server (opencode)
+## MCP server
 
 `packages/mcp` is a local MCP server that connects the opencode agent to the song open in the web app:
 
@@ -75,7 +75,7 @@ npm run mcp:build
 
 Restart opencode after adding or changing the config: MCP servers are loaded at startup. To verify, ask the agent *"which spartito tools do you have?"* (the four above) and then *"read the open song"*.
 
-Then open the web app and click **opencode** in the toolbar: the status dot turns green when connected. The bridge listens on `127.0.0.1:7331` only and accepts the app origin; without a connected app the tools reply with an explanatory error. If the dot turns red, hover it: the tooltip explains the likely cause (server not running or browser local network access blocked).
+Then open the web app and click **MCP** in the toolbar: the status dot turns green when connected. The bridge listens on `127.0.0.1:7331` only and accepts the app origin; without a connected app the tools reply with an explanatory error. If the dot turns red, hover it: the tooltip explains the likely cause (server not running or browser local network access blocked).
 
 Browser notes:
 
