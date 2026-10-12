@@ -2,17 +2,78 @@
   color-scheme: light;
   --ui-bg: #eef1f5;
   --ui-panel: #ffffff;
+  --ui-panel-soft: #f7f9fc;
   --ui-border: #d3d9e0;
   --ui-text: #1b2430;
   --ui-muted: #66707c;
   --ui-accent: #1a4f8a;
+  --ui-on-accent: #ffffff;
   --ui-warning: #b3261e;
+  --ui-on-warning: #ffffff;
+  --ui-ok: #2e6b3e;
+  --ui-control-bg: #ffffff;
+  --ui-hover: rgba(15, 25, 40, 0.06);
+  --ui-selected: #e7eef8;
+  --ui-badge-bg: #dfe6ee;
+  --ui-notice-bg: #fdeceb;
+  --ui-chip-bg: #f1f4f8;
+  --ui-chip-border: #e0e6ee;
+  --ui-shadow: rgba(15, 25, 40, 0.22);
+  --ui-shadow-soft: rgba(15, 25, 40, 0.15);
+  --ui-shadow-strong: rgba(15, 25, 40, 0.3);
+  --ui-page-shadow: rgba(15, 25, 40, 0.18);
+  --ui-backdrop: rgba(15, 25, 40, 0.45);
+  --ui-dot-idle: #9aa4b2;
+  --ui-dot-connecting: #d9a441;
   --ui-import-bg: #e7f0fb;
   --ui-import-border: #b6cdea;
   --ui-import-text: #1a4f8a;
   --ui-export-bg: #eaf4ec;
   --ui-export-border: #b9d8c1;
   --ui-export-text: #2e6b3e;
+  --group-song-bg: #edf3fa;
+  --group-sections-bg: #ecf5ef;
+  --group-blocks-bg: #f0f2f5;
+  --group-chords-bg: #f3f2f6;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --ui-bg: #12151b;
+  --ui-panel: #1b2028;
+  --ui-panel-soft: #161b22;
+  --ui-border: #333b47;
+  --ui-text: #e7eaf0;
+  --ui-muted: #98a2b1;
+  --ui-accent: #86b3e6;
+  --ui-on-accent: #10141a;
+  --ui-warning: #f0736c;
+  --ui-on-warning: #1a0f0e;
+  --ui-ok: #7fc08f;
+  --ui-control-bg: #232a34;
+  --ui-hover: rgba(255, 255, 255, 0.07);
+  --ui-selected: #253243;
+  --ui-badge-bg: #2a323d;
+  --ui-notice-bg: #3a2624;
+  --ui-chip-bg: #232a34;
+  --ui-chip-border: #333b47;
+  --ui-shadow: rgba(0, 0, 0, 0.5);
+  --ui-shadow-soft: rgba(0, 0, 0, 0.4);
+  --ui-shadow-strong: rgba(0, 0, 0, 0.6);
+  --ui-page-shadow: rgba(0, 0, 0, 0.55);
+  --ui-backdrop: rgba(0, 0, 0, 0.6);
+  --ui-dot-idle: #6b7684;
+  --ui-dot-connecting: #d9a441;
+  --ui-import-bg: #1d2a3a;
+  --ui-import-border: #33506e;
+  --ui-import-text: #a9cbf2;
+  --ui-export-bg: #1c2a22;
+  --ui-export-border: #375a44;
+  --ui-export-text: #9fd3ae;
+  --group-song-bg: #1d2735;
+  --group-sections-bg: #1c2a22;
+  --group-blocks-bg: #232930;
+  --group-chords-bg: #272433;
 }
 
 * {
@@ -40,6 +101,26 @@ body {
 .app {
   display: flex;
   flex-direction: column;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--ui-panel);
+  border-bottom: 1px solid var(--ui-border);
+}
+
+.app-logo {
+  display: block;
+  border-radius: 4px;
+}
+
+.app-name {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 .app-toolbar {
@@ -75,7 +156,7 @@ body {
   padding: 3px 6px;
   border: 1px solid var(--ui-border);
   border-radius: 6px;
-  background: #fff;
+  background: var(--ui-control-bg);
   color: var(--ui-text);
 }
 
@@ -89,7 +170,7 @@ body {
   padding: 0;
   border: 1px solid var(--ui-border);
   border-radius: 5px;
-  background: #fff;
+  background: var(--ui-control-bg);
   cursor: pointer;
 }
 
@@ -216,7 +297,7 @@ body {
 
 .icon-button:hover {
   color: var(--ui-accent);
-  background: rgba(15, 25, 40, 0.06);
+  background: var(--ui-hover);
 }
 
 .icon-button.danger:hover {
@@ -241,7 +322,7 @@ body {
 }
 
 .song-item.active {
-  background: #e7eef8;
+  background: var(--ui-selected);
 }
 
 .song-select {
@@ -290,7 +371,7 @@ button {
   padding: 5px 10px;
   border: 1px solid var(--ui-border);
   border-radius: 6px;
-  background: #fff;
+  background: var(--ui-control-bg);
   color: var(--ui-text);
   cursor: pointer;
 }
@@ -302,7 +383,7 @@ button:hover {
 button.primary {
   background: var(--ui-accent);
   border-color: var(--ui-accent);
-  color: #fff;
+  color: var(--ui-on-accent);
 }
 
 .btn-import {
@@ -336,11 +417,11 @@ button.primary {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #9aa4b2;
+  background: var(--ui-dot-idle);
 }
 
 .btn-bridge.connecting::before {
-  background: #d9a441;
+  background: var(--ui-dot-connecting);
 }
 
 .btn-bridge.failed::before {
@@ -352,7 +433,7 @@ button.primary {
 }
 
 .btn-bridge.connected::before {
-  background: #2e6b3e;
+  background: var(--ui-ok);
 }
 
 .hidden-input {
@@ -367,7 +448,7 @@ button.primary {
   align-items: center;
   justify-content: center;
   padding: 16px;
-  background: rgba(15, 25, 40, 0.45);
+  background: var(--ui-backdrop);
 }
 
 .modal {
@@ -379,7 +460,7 @@ button.primary {
   padding: 16px;
   background: var(--ui-panel);
   border-radius: 10px;
-  box-shadow: 0 12px 40px rgba(15, 25, 40, 0.3);
+  box-shadow: 0 12px 40px var(--ui-shadow-strong);
 }
 
 .modal h2 {
@@ -404,6 +485,7 @@ button.primary {
   resize: vertical;
   border: 1px solid var(--ui-border);
   border-radius: 6px;
+  background: var(--ui-control-bg);
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 12.5px;
   line-height: 1.45;
@@ -426,7 +508,7 @@ button.primary {
   padding: 8px;
   border: 1px solid var(--ui-border);
   border-radius: 6px;
-  background: #f7f9fc;
+  background: var(--ui-panel-soft);
   white-space: pre-wrap;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 12px;
@@ -536,13 +618,28 @@ button.primary {
   background: var(--ui-panel);
   border: 1px solid var(--ui-border);
   border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(15, 25, 40, 0.22);
+  box-shadow: 0 10px 30px var(--ui-shadow);
 }
 
 .insert-group {
   padding: 3px;
   border-radius: 6px;
-  background: var(--group-bg, transparent);
+}
+
+:is(.insert-group, .help-group)[data-group='song'] {
+  background: var(--group-song-bg);
+}
+
+:is(.insert-group, .help-group)[data-group='sections'] {
+  background: var(--group-sections-bg);
+}
+
+:is(.insert-group, .help-group)[data-group='blocks'] {
+  background: var(--group-blocks-bg);
+}
+
+:is(.insert-group, .help-group)[data-group='chords'] {
+  background: var(--group-chords-bg);
 }
 
 .insert-group-label,
@@ -569,7 +666,7 @@ button.primary {
 }
 
 .insert-menu button:hover {
-  background: rgba(15, 25, 40, 0.06);
+  background: var(--ui-hover);
 }
 
 .help {
@@ -614,7 +711,7 @@ button.primary {
   background: var(--ui-panel);
   border: 1px solid var(--ui-border);
   border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(15, 25, 40, 0.22);
+  box-shadow: 0 10px 30px var(--ui-shadow);
   text-transform: none;
   letter-spacing: normal;
   text-align: left;
@@ -652,7 +749,6 @@ button.primary {
 .help-group {
   padding: 3px 6px 5px;
   border-radius: 6px;
-  background: var(--group-bg, transparent);
 }
 
 .help-group + .help-group {
@@ -677,8 +773,8 @@ button.primary {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 11.5px;
   white-space: nowrap;
-  background: #f1f4f8;
-  border: 1px solid #e0e6ee;
+  background: var(--ui-chip-bg);
+  border: 1px solid var(--ui-chip-border);
   border-radius: 4px;
   padding: 1px 4px;
 }
@@ -728,18 +824,18 @@ button.primary {
 }
 
 .preview-meta .badge {
-  background: #dfe6ee;
+  background: var(--ui-badge-bg);
   border-radius: 999px;
   padding: 3px 10px;
 }
 
 .preview-meta.warning .badge {
   background: var(--ui-warning);
-  color: #fff;
+  color: var(--ui-on-warning);
 }
 
 .preview-meta .badge.unknown {
-  background: #fdeceb;
+  background: var(--ui-notice-bg);
   color: var(--ui-warning);
   cursor: help;
 }
@@ -775,7 +871,7 @@ button.primary {
   background: var(--ui-panel);
   border: 1px solid var(--ui-border);
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(15, 25, 40, 0.15);
+  box-shadow: 0 2px 10px var(--ui-shadow-soft);
 }
 
 .zoom-controls button {
@@ -787,7 +883,7 @@ button.primary {
 }
 
 .zoom-controls button:hover:not(:disabled) {
-  background: #eef2f7;
+  background: var(--ui-hover);
 }
 
 .zoom-controls button:disabled {
@@ -803,7 +899,7 @@ button.primary {
 }
 
 .page {
-  box-shadow: 0 2px 14px rgba(15, 25, 40, 0.18);
+  box-shadow: 0 2px 14px var(--ui-page-shadow);
 }
 
 .measuring-clone {
@@ -824,7 +920,10 @@ button.primary {
     background: #fff;
   }
 
+  .app-header,
   .app-toolbar,
+  .app-loading,
+  .sidebar,
   .editor,
   .splitter,
   .preview-meta,

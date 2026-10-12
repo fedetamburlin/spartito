@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { LibraryStore, SongEntry } from '../src/core/db';
 import {
+  contentMatches,
   createSong,
   duplicateSong,
   initLibrary,
   NEW_SONG_SOURCE,
   nextActiveId,
+  removeSong,
   songTitle,
   sortSongs,
   withTitle
@@ -60,6 +62,7 @@ describe('library operations', () => {
     const a = createSong(NEW_SONG_SOURCE, defaultSettings(), 1, 'a');
     const b = createSong(NEW_SONG_SOURCE, defaultSettings(), 2, 'b');
     expect(a.id).not.toBe(b.id);
+    expect(a.createdAt).toBe(1);
     expect(a.updatedAt).toBe(1);
     expect(a.settings.textPt).toBe(defaultSettings().textPt);
   });
@@ -69,13 +72,26 @@ describe('library operations', () => {
     const copy = duplicateSong(song);
     expect(songTitle(copy.source)).toBe('Test (2)');
     expect(copy.id).not.toBe(song.id);
+    expect(copy.createdAt).toBeGreaterThan(song.createdAt);
     expect(copy.settings).toEqual(song.settings);
   });
 
-  it('orders by most recently edited', () => {
+  it('orders by creation, newest first, and never reorders on edit', () => {
     const older = createSong('{title: A}\n', defaultSettings(), 1, 'a');
     const newer = createSong('{title: B}\n', defaultSettings(), 2, 'b');
-    expect(sortSongs([older, newer]).map((song) => song.id)).toEqual(['b', 'a']);
+    const edited = { ...older, updatedAt: 99 };
+    expect(sortSongs([edited, newer]).map((song) => song.id)).toEqual(['b', 'a']);
+    expect(sortSongs([newer, older]).map((song) => song.id)).toEqual(['b', 'a']);
+  });
+
+  it('knows when the stored content already matches', () => {
+    const settings = defaultSettings();
+    const song = createSong('{title: A}\n', settings, 1, 'a');
+    expect(contentMatches(song, song.source, settings)).toBe(true);
+    expect(contentMatches(song, '{title: A}\n[Am]x\n', settings)).toBe(false);
+    expect(contentMatches(song, song.source, { ...settings, textPt: settings.textPt + 1 })).toBe(
+      false
+    );
   });
 
   it('picks a neighbour when deleting the active song', () => {
@@ -137,5 +153,74 @@ describe('initLibrary', () => {
     await store.putMeta('sidebarOpen', false);
     const state = await initLibrary(store, null, demo);
     expect(state.sidebarOpen).toBe(false);
+  });
+
+  it('backfills createdAt for legacy entries', async () => {
+    const store = new FakeStore();
+    const legacySong = {
+      id: 'old',
+      source: '{title: Old}\n',
+      settings: defaultSettings(),
+      updatedAt: 42
+    } as SongEntry;
+    await store.putSong(legacySong);
+
+    const state = await initLibrary(store, null, demo);
+    expect(state.songs[0].createdAt).toBe(42);
+  });
+});
+
+describe('removeSong', () => {
+  const settings = defaultSettings();
+
+  it('deletes from the store and selects the neighbour', async () => {
+    const store = new FakeStore();
+    const a = createSong('{title: A}\n', settings, 3, 'a');
+    const b = createSong('{title: B}\n', settings, 2, 'b');
+    const c = createSong('{title: C}\n', settings, 1, 'c');
+    for (const song of [a, b, c]) await store.putSong(song);
+
+    const result = await removeSong(store, [a, b, c], 'b', 'b', settings);
+    expect(store.songs.has('b')).toBe(false);
+    expect(result.songs.map((song) => song.id)).toEqual(['a', 'c']);
+    expect(result.removedActive).toBe(true);
+    expect(result.activeId).toBe('c');
+  });
+
+  it('keeps the active song when deleting another one', async () => {
+    const store = new FakeStore();
+    const a = createSong('{title: A}\n', settings, 2, 'a');
+    const b = createSong('{title: B}\n', settings, 1, 'b');
+    await store.putSong(a);
+    await store.putSong(b);
+
+    const result = await removeSong(store, [a, b], 'a', 'b', settings);
+    expect(store.songs.has('a')).toBe(false);
+    expect(result.removedActive).toBe(false);
+    expect(result.activeId).toBe('b');
+    expect(result.songs.map((song) => song.id)).toEqual(['b']);
+  });
+
+  it('seeds a fresh song when deleting the last one', async () => {
+    const store = new FakeStore();
+    const only = createSong('{title: Only}\n', settings, 1, 'only');
+    await store.putSong(only);
+
+    const result = await removeSong(store, [only], 'only', 'only', settings);
+    expect(store.songs.has('only')).toBe(false);
+    expect(result.songs).toHaveLength(1);
+    expect(store.songs.has(result.activeId)).toBe(true);
+    expect(result.removedActive).toBe(true);
+  });
+
+  it('ignores unknown ids', async () => {
+    const store = new FakeStore();
+    const a = createSong('{title: A}\n', settings, 1, 'a');
+    await store.putSong(a);
+
+    const result = await removeSong(store, [a], 'nope', 'a', settings);
+    expect(result.songs.map((song) => song.id)).toEqual(['a']);
+    expect(result.activeId).toBe('a');
+    expect(result.removedActive).toBe(false);
   });
 });

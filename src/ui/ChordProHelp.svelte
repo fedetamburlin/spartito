@@ -92,7 +92,7 @@
         <button class="help-close" type="button" aria-label="Close" onclick={() => close(true)}>×</button>
       </div>
       {#each groups as group (group.id)}
-        <div class="help-group" style={`--group-bg: ${group.background}`}>
+        <div class="help-group" data-group={group.id}>
           <div class="help-group-label">{group.label}</div>
           <table class="help-table">
             <tbody>

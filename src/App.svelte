@@ -6,11 +6,12 @@
   import { parseChordPro } from './core/chordpro';
   import { DEMO_SONG } from './core/demo';
   import {
+    contentMatches,
     createSong,
     duplicateSong,
     initLibrary,
     NEW_SONG_SOURCE,
-    nextActiveId,
+    removeSong,
     songTitle,
     sortSongs,
     withTitle
@@ -60,29 +61,39 @@
           source = active.source;
           settings = active.settings;
         }
+      } catch (error) {
+        console.error('[spartito] library unavailable, changes will not be saved:', error);
       } finally {
         ready = true;
       }
     })();
   }
 
-  function persistNow() {
-    if (!store || !activeId) return;
+  function saveSong(id: string, nextSource: string, nextSettings: SongSettings) {
+    if (!store) return;
+    const entry = songs.find((song) => song.id === id);
+    if (!entry || contentMatches(entry, nextSource, nextSettings)) return;
     const updated: SongEntry = {
-      id: activeId,
-      source,
-      settings: { ...settings },
+      ...entry,
+      source: nextSource,
+      settings: { ...nextSettings },
       updatedAt: Date.now()
     };
-    songs = songs.map((song) => (song.id === activeId ? updated : song));
+    songs = songs.map((song) => (song.id === id ? updated : song));
     void store.putSong(updated);
+  }
+
+  function flushActive() {
+    if (!store || !activeId) return;
+    saveSong(activeId, source, settings);
   }
 
   function selectSong(id: string) {
     if (id === activeId) return;
     const target = songs.find((song) => song.id === id);
     if (!target) return;
-    persistNow();
+    flushActive();
+    clearTimeout(saveTimer);
     activeId = id;
     source = target.source;
     settings = target.settings;
@@ -94,9 +105,10 @@
       ? sanitizeSettings({ ...settings, ...initial.settings })
       : { ...settings, transpose: 0 };
     const song = createSong(initial?.source ?? NEW_SONG_SOURCE, merged);
-    songs = [...songs, song];
     if (store && activeId) {
-      persistNow();
+      flushActive();
+      clearTimeout(saveTimer);
+      songs = [...songs, song];
       void store.putSong(song);
       activeId = song.id;
       source = song.source;
@@ -104,7 +116,7 @@
       void store.putMeta('activeId', song.id);
       return;
     }
-    // No library yet (shared document): just load the content.
+    // No library (shared document): just load the content.
     source = song.source;
     settings = song.settings;
   }
@@ -129,24 +141,24 @@
     if (id === activeId) source = nextSource;
   }
 
-  function remove(id: string) {
+  async function remove(id: string) {
     const target = songs.find((song) => song.id === id);
     if (!target) return;
     if (!confirm(`Delete "${songTitle(target.source)}"?`)) return;
+    if (!store) return;
 
-    // A pending autosave must not resurrect the deleted song.
+    // Flush the active song first, then drop any pending autosave so it
+    // cannot rewrite (or resurrect) the deleted one.
+    flushActive();
     clearTimeout(saveTimer);
-    let remaining = songs.filter((song) => song.id !== id);
-    if (remaining.length === 0) {
-      const fresh = createSong(NEW_SONG_SOURCE, { ...settings, transpose: 0 });
-      remaining = [fresh];
-      void store?.putSong(fresh);
-    }
-    const wasActive = id === activeId;
-    const nextId = wasActive ? nextActiveId(songs, id) : activeId;
-    songs = remaining;
-    if (store && wasActive) {
-      const next = remaining.find((song) => song.id === nextId) ?? remaining[0];
+
+    const result = await removeSong(store, songs, id, activeId, {
+      ...settings,
+      transpose: 0
+    });
+    songs = result.songs;
+    if (result.removedActive) {
+      const next = result.songs.find((song) => song.id === result.activeId) ?? result.songs[0];
       activeId = next.id;
       source = next.source;
       settings = next.settings;
@@ -268,18 +280,12 @@
   $effect(() => {
     const currentSource = source;
     const currentSettings = { ...settings };
+    const currentId = activeId;
     document.title = doc.title ? doc.title : 'Spartito';
-    if (ephemeral || !ready || !store || !activeId) return;
+    if (ephemeral || !ready || !store || !currentId) return;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
-      const updated: SongEntry = {
-        id: activeId,
-        source: currentSource,
-        settings: currentSettings,
-        updatedAt: Date.now()
-      };
-      songs = songs.map((song) => (song.id === updated.id ? updated : song));
-      void store?.putSong(updated);
+      saveSong(currentId, currentSource, currentSettings);
     }, config.storage.autosaveDebounceMs);
   });
 
@@ -291,6 +297,10 @@
 <svelte:window onkeydown={onKeydown} />
 
 <div class="app">
+  <header class="app-header">
+    <img class="app-logo" src="favicon.svg" alt="" width="18" height="18" />
+    <span class="app-name">Spartito</span>
+  </header>
   {#if ready}
     <Toolbar
       {doc}

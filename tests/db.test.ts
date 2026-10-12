@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { describe, expect, it } from 'vitest';
 import { openLibraryDb } from '../src/core/db';
-import { createSong, initLibrary } from '../src/core/library';
+import { createSong, initLibrary, removeSong } from '../src/core/library';
 import { defaultSettings } from '../src/core/settings';
 
 const uniqueName = () => `spartito-test-${Math.random().toString(36).slice(2)}`;
@@ -35,5 +35,21 @@ describe('IndexedDB library store', () => {
     const state = await initLibrary(store, null, '{title: Demo}\n');
     expect(state.songs.map((song) => song.id)).toEqual([state.activeId]);
     expect(state.songs[0].source).toContain('Demo');
+  });
+
+  it('deletion survives a reopen', async () => {
+    const name = uniqueName();
+    const store = await openLibraryDb(name);
+    const a = createSong('{title: A}\n', defaultSettings(), 3, 'a');
+    const b = createSong('{title: B}\n', defaultSettings(), 2, 'b');
+    const c = createSong('{title: C}\n', defaultSettings(), 1, 'c');
+    for (const song of [a, b, c]) await store.putSong(song);
+
+    const result = await removeSong(store, [a, b, c], 'b', 'b', defaultSettings());
+    expect(result.activeId).toBe('c');
+
+    const reopened = await openLibraryDb(name);
+    const ids = (await reopened.getSongs()).map((song) => song.id).sort();
+    expect(ids).toEqual(['a', 'c']);
   });
 });

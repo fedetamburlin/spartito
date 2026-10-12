@@ -107,7 +107,7 @@ describe('directives registry', () => {
     ]);
     for (const group of DIRECTIVE_GROUPS) {
       expect(rowsForGroup(group).length).toBeGreaterThan(0);
-      expect(group.background).toMatch(/^#[0-9a-f]{6}$/i);
+      expect(group.label.length).toBeGreaterThan(0);
     }
     expect(DIRECTIVE_GROUPS.filter((group) => group.menu).map((group) => group.id)).toEqual([
       'song',

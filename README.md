@@ -25,6 +25,7 @@ Source in **ChordPro (subset)** in the left editor, live A4 preview on the right
 
 - **Insert** menu (grouped snippets) and **?** syntax reference in the editor header — every command shown there is verified by the test suite
 - **Songs sidebar** on the left (collapsible to an icon rail): keep many songs, one active at a time, each with its own source, settings and transposition; rename, duplicate and delete from the list. Songs live in IndexedDB; the old single-song autosave is migrated automatically
+- **Dark theme** for the app chrome (the A4 sheet stays white): follows the system by default, sun/moon toggle at the end of the settings row
 - chords `[Am]word`, `[C][G]word`, Italian note names `[Do]`; blank lines separate paragraphs, also inside sections
 - canonical directive names only (`{title}`, `{start_of_chorus}`, …), with `{chorus}`/`{rit}` as compact chorus recall; unsupported directives are ignored in the preview (a badge reports how many) and preserved on export
 - auto-fit: 1 column → 2 columns → font down to 6pt lyrics / 5pt chords (defaults 11/10); the PDF stays on one page, with a warning when the song does not fit

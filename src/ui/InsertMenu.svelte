@@ -56,7 +56,7 @@
   {#if open}
     <div class="insert-menu" role="menu">
       {#each groups as group (group.id)}
-        <div class="insert-group" role="group" aria-label={group.label} style={`--group-bg: ${group.background}`}>
+        <div class="insert-group" role="group" aria-label={group.label} data-group={group.id}>
           <div class="insert-group-label">{group.label}</div>
           {#each group.items as directive (directive.id)}
             <button

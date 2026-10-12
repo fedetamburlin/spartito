@@ -44,16 +44,31 @@ export function createSong(
   now = Date.now(),
   id = newId()
 ): SongEntry {
-  return { id, source, settings, updatedAt: now };
+  return { id, source, settings, createdAt: now, updatedAt: now };
 }
 
 export function duplicateSong(song: SongEntry): SongEntry {
   return createSong(withTitle(song.source, `${songTitle(song.source)} (2)`), song.settings);
 }
 
-/** Most recently edited first, like a chat list. */
+/** Newest created first; positions never change while editing. */
 export function sortSongs(songs: SongEntry[]): SongEntry[] {
-  return [...songs].sort((a, b) => b.updatedAt - a.updatedAt);
+  return [...songs].sort(
+    (a, b) => (b.createdAt ?? b.updatedAt) - (a.createdAt ?? a.updatedAt)
+  );
+}
+
+/** True when the entry already holds exactly this content (no save needed). */
+export function contentMatches(
+  entry: SongEntry,
+  source: string,
+  settings: SongSettings
+): boolean {
+  if (entry.source !== source) return false;
+  const keys = Object.keys(entry.settings) as (keyof SongSettings)[];
+  const otherKeys = Object.keys(settings) as (keyof SongSettings)[];
+  if (keys.length !== otherKeys.length) return false;
+  return keys.every((key) => entry.settings[key] === settings[key]);
 }
 
 /** Neighbour to select when the song at `removingId` is deleted. */
@@ -69,7 +84,11 @@ export async function initLibrary(
   legacy: LegacyState | null,
   demoSource: string
 ): Promise<LibraryState> {
-  const songs = await store.getSongs();
+  // Legacy entries have no createdAt: inherit updatedAt, nothing to migrate.
+  const songs = (await store.getSongs()).map((song) => ({
+    ...song,
+    createdAt: song.createdAt ?? song.updatedAt
+  }));
   const sidebarOpen = (await store.getMeta<boolean>('sidebarOpen')) ?? true;
 
   if (songs.length > 0) {
@@ -89,4 +108,39 @@ export async function initLibrary(
   await store.putMeta('activeId', song.id);
   await store.putMeta('migratedFromLegacy', true);
   return { songs: [song], activeId: song.id, sidebarOpen };
+}
+
+export interface LibraryDeletion {
+  songs: SongEntry[];
+  activeId: string;
+  removedActive: boolean;
+}
+
+/**
+ * Deletes a song from the store and returns the next library state.
+ * The library never stays empty: deleting the last song seeds a fresh one.
+ */
+export async function removeSong(
+  store: LibraryStore,
+  songs: SongEntry[],
+  id: string,
+  activeId: string,
+  freshSettings: SongSettings,
+  now = Date.now()
+): Promise<LibraryDeletion> {
+  const target = songs.find((song) => song.id === id);
+  if (!target) return { songs, activeId, removedActive: false };
+
+  await store.deleteSong(id);
+
+  const remaining = songs.filter((song) => song.id !== id);
+  if (remaining.length === 0) {
+    const fresh = createSong(NEW_SONG_SOURCE, freshSettings, now);
+    await store.putSong(fresh);
+    return { songs: [fresh], activeId: fresh.id, removedActive: true };
+  }
+
+  const removedActive = id === activeId;
+  const nextId = removedActive ? (nextActiveId(songs, id) ?? remaining[0].id) : activeId;
+  return { songs: remaining, activeId: nextId, removedActive };
 }

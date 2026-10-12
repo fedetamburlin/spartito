@@ -33,16 +33,15 @@ export type DirectiveGroupId = 'song' | 'sections' | 'blocks' | 'chords';
 export interface DirectiveGroup {
   id: DirectiveGroupId;
   label: string;
-  background: string;
   /** Groups with menu: true appear in the Insert menu. */
   menu: boolean;
 }
 
 export const DIRECTIVE_GROUPS: DirectiveGroup[] = [
-  { id: 'song', label: 'Song', background: '#edf3fa', menu: true },
-  { id: 'sections', label: 'Sections', background: '#ecf5ef', menu: true },
-  { id: 'blocks', label: 'Blocks', background: '#f0f2f5', menu: true },
-  { id: 'chords', label: 'Chords', background: '#f3f2f6', menu: false }
+  { id: 'song', label: 'Song', menu: true },
+  { id: 'sections', label: 'Sections', menu: true },
+  { id: 'blocks', label: 'Blocks', menu: true },
+  { id: 'chords', label: 'Chords', menu: false }
 ];
 
 export interface SnippetBuild {

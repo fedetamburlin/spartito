@@ -9,6 +9,7 @@ export interface SongEntry {
   id: string;
   source: string;
   settings: SongSettings;
+  createdAt: number;
   updatedAt: number;
 }
 

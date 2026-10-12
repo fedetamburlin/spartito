@@ -6,6 +6,7 @@
   import { extractPdfText } from '../core/pdf';
   import { fileBaseName, parseImported } from '../core/persistence';
   import { sanitizeSettings, withTranspose, type SongSettings } from '../core/settings';
+  import { applyTheme, loadThemePref, saveThemePref, type Theme, type ThemePref } from '../core/theme';
   import { TRANSPOSE_MAX, TRANSPOSE_MIN } from '../core/transpose';
   import ImportDialog from './ImportDialog.svelte';
 
@@ -133,6 +134,31 @@
   function setColor(key: 'textColor' | 'chordColor' | 'commentColor', event: Event) {
     settings = { ...settings, [key]: (event.currentTarget as HTMLInputElement).value };
   }
+
+  const initialPref = loadThemePref();
+  let themePref = $state<ThemePref>(initialPref);
+  let theme = $state<Theme>(applyTheme(initialPref));
+
+  const themeTitle = $derived(
+    `Switch to ${theme === 'dark' ? 'light' : 'dark'} theme${
+      themePref === 'auto' ? ' (currently following the system)' : ''
+    }`
+  );
+
+  function toggleTheme() {
+    themePref = theme === 'dark' ? 'light' : 'dark';
+    saveThemePref(themePref);
+    theme = applyTheme(themePref);
+  }
+
+  $effect(() => {
+    const media = matchMedia('(prefers-color-scheme: dark)');
+    const onChange = () => {
+      if (themePref === 'auto') theme = applyTheme('auto');
+    };
+    media.addEventListener('change', onChange);
+    return () => media.removeEventListener('change', onChange);
+  });
 </script>
 
 <header class="app-toolbar">
@@ -209,6 +235,37 @@
         value={settings.commentColor}
         oninput={(event) => setColor('commentColor', event)}
       /></label>
+  </div>
+  <div class="toolbar-group">
+    <button
+      class="icon-button"
+      type="button"
+      title={themeTitle}
+      aria-label={themeTitle}
+      onclick={toggleTheme}
+    >
+      {#if theme === 'dark'}
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+          <circle cx="8" cy="8" r="3.1" fill="none" stroke="currentColor" stroke-width="1.3" />
+          <path
+            d="M8 1.4v1.7M8 12.9v1.7M1.4 8h1.7M12.9 8h1.7M3.4 3.4l1.2 1.2M11.4 11.4l1.2 1.2M12.6 3.4l-1.2 1.2M4.6 11.4l-1.2 1.2"
+            stroke="currentColor"
+            stroke-width="1.3"
+            stroke-linecap="round"
+          />
+        </svg>
+      {:else}
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+          <path
+            d="M13.2 9.6A5.6 5.6 0 0 1 6.4 2.8a5.6 5.6 0 1 0 6.8 6.8z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.3"
+            stroke-linejoin="round"
+          />
+        </svg>
+      {/if}
+    </button>
   </div>
   <div class="toolbar-group toolbar-actions">
     <div class="toolbar-import">
