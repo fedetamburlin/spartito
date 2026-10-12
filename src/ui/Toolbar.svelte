@@ -15,6 +15,7 @@
     settings: SongSettings;
     bridgeStatus: BridgeStatus;
     onToggleBridge: () => void;
+    onImportSong: (text: string, settings?: Partial<SongSettings>) => void;
   }
 
   let {
@@ -22,7 +23,8 @@
     source = $bindable(),
     settings = $bindable(),
     bridgeStatus,
-    onToggleBridge
+    onToggleBridge,
+    onImportSong
   }: Props = $props();
 
   let fileInput = $state<HTMLInputElement | null>(null);
@@ -97,10 +99,9 @@
     reader.onload = () => {
       const imported = parseImported(String(reader.result ?? ''), file.name);
       if (imported.settings) {
-        source = imported.source;
-        settings = sanitizeSettings({ ...settings, ...imported.settings });
+        onImportSong(imported.source, imported.settings);
       } else {
-        source = importSong(imported.source).chordpro;
+        onImportSong(importSong(imported.source).chordpro);
       }
       input.value = '';
     };
@@ -257,7 +258,7 @@
 
 {#if importOpen}
   <ImportDialog
-    onApply={(text) => (source = text)}
+    onApply={(text) => onImportSong(text)}
     onClose={() => (importOpen = false)}
     initialText={importSeed}
     title={importTitle}

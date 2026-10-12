@@ -14,7 +14,11 @@ export interface ImportedSong {
   settings?: Partial<SongSettings>;
 }
 
-export function loadState(): StoredState | null {
+/**
+ * Reads the single-song state stored by older versions.
+ * Used once, to seed the library; the legacy key is kept as a backup.
+ */
+export function loadLegacyState(): StoredState | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
@@ -27,14 +31,6 @@ export function loadState(): StoredState | null {
     };
   } catch {
     return null;
-  }
-}
-
-export function saveState(state: StoredState): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {
-    // storage unavailable: the app stays usable without autosave
   }
 }
 

@@ -147,6 +147,144 @@ body {
   border-right: 1px solid var(--ui-border);
 }
 
+.app-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.app-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ui-muted);
+}
+
+.sidebar {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  width: 230px;
+  background: var(--ui-panel);
+  border-right: 1px solid var(--ui-border);
+  transition: width 0.15s ease;
+  overflow: hidden;
+}
+
+.sidebar.rail {
+  width: 40px;
+}
+
+.sidebar-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  border-bottom: 1px solid var(--ui-border);
+}
+
+.sidebar.rail .sidebar-head {
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-title {
+  flex: 1;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ui-muted);
+  white-space: nowrap;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--ui-muted);
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  color: var(--ui-accent);
+  background: rgba(15, 25, 40, 0.06);
+}
+
+.icon-button.danger:hover {
+  color: var(--ui-warning);
+}
+
+.song-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  overflow: auto;
+}
+
+.song-item {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 2px;
+  border-radius: 6px;
+}
+
+.song-item.active {
+  background: #e7eef8;
+}
+
+.song-select {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 13px;
+  text-align: left;
+  color: var(--ui-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.song-item.active .song-select {
+  font-weight: 600;
+}
+
+.song-actions {
+  display: none;
+  align-items: center;
+}
+
+.song-item:hover .song-actions,
+.song-item.active .song-actions {
+  display: inline-flex;
+}
+
+.song-rename {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 6px;
+  border: 1px solid var(--ui-accent);
+  border-radius: 6px;
+  outline: none;
+  font: inherit;
+  font-size: 13px;
+}
+
 button {
   font: inherit;
   padding: 5px 10px;

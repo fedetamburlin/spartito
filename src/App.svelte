@@ -1,25 +1,172 @@
 <script lang="ts">
   import { createBridge, type BridgeStatus } from './core/bridge';
+  import { openLibraryDb, type LibraryStore, type SongEntry } from './core/db';
   import { config } from './core/config';
   import { clearDocumentHash, readDocumentFromHash } from './core/deeplink';
   import { parseChordPro } from './core/chordpro';
   import { DEMO_SONG } from './core/demo';
-  import { loadState, saveState } from './core/persistence';
+  import {
+    createSong,
+    duplicateSong,
+    initLibrary,
+    NEW_SONG_SOURCE,
+    nextActiveId,
+    songTitle,
+    sortSongs,
+    withTitle
+  } from './core/library';
+  import { loadLegacyState } from './core/persistence';
   import { sanitizeSettings, withTranspose, type SongSettings } from './core/settings';
   import { transposedForDisplay } from './core/transpose';
   import EditorPane from './ui/EditorPane.svelte';
   import PreviewPane from './ui/PreviewPane.svelte';
+  import Sidebar from './ui/Sidebar.svelte';
   import Toolbar from './ui/Toolbar.svelte';
 
   const shared = readDocumentFromHash(location.hash);
   if (shared) clearDocumentHash();
   const ephemeral = shared !== null;
 
-  const stored = loadState();
-  let source = $state(shared?.source ?? stored?.source ?? DEMO_SONG);
-  let settings = $state<SongSettings>(sanitizeSettings(shared?.settings ?? stored?.settings));
+  let ready = $state(ephemeral);
+  let store: LibraryStore | null = null;
+  let songs = $state<SongEntry[]>([]);
+  let activeId = $state('');
+  let sidebarOpen = $state(true);
+
+  let source = $state(shared?.source ?? DEMO_SONG);
+  let settings = $state<SongSettings>(sanitizeSettings(shared?.settings));
   let doc = $derived(parseChordPro(source));
   let display = $derived(transposedForDisplay(doc, settings.transpose));
+
+  const orderedSongs = $derived(sortSongs(songs));
+  const listItems = $derived(
+    orderedSongs.map((song) => ({
+      id: song.id,
+      title: songTitle(song.source),
+      active: song.id === activeId
+    }))
+  );
+
+  if (!ephemeral) {
+    void (async () => {
+      try {
+        store = await openLibraryDb();
+        const state = await initLibrary(store, loadLegacyState(), DEMO_SONG);
+        songs = state.songs;
+        activeId = state.activeId;
+        sidebarOpen = state.sidebarOpen;
+        const active = state.songs.find((song) => song.id === state.activeId);
+        if (active) {
+          source = active.source;
+          settings = active.settings;
+        }
+      } finally {
+        ready = true;
+      }
+    })();
+  }
+
+  function persistNow() {
+    if (!store || !activeId) return;
+    const updated: SongEntry = {
+      id: activeId,
+      source,
+      settings: { ...settings },
+      updatedAt: Date.now()
+    };
+    songs = songs.map((song) => (song.id === activeId ? updated : song));
+    void store.putSong(updated);
+  }
+
+  function selectSong(id: string) {
+    if (id === activeId) return;
+    const target = songs.find((song) => song.id === id);
+    if (!target) return;
+    persistNow();
+    activeId = id;
+    source = target.source;
+    settings = target.settings;
+    void store?.putMeta('activeId', id);
+  }
+
+  function addSong(initial?: { source: string; settings?: Partial<SongSettings> }) {
+    const merged = initial?.settings
+      ? sanitizeSettings({ ...settings, ...initial.settings })
+      : { ...settings, transpose: 0 };
+    const song = createSong(initial?.source ?? NEW_SONG_SOURCE, merged);
+    songs = [...songs, song];
+    if (store && activeId) {
+      persistNow();
+      void store.putSong(song);
+      activeId = song.id;
+      source = song.source;
+      settings = song.settings;
+      void store.putMeta('activeId', song.id);
+      return;
+    }
+    // No library yet (shared document): just load the content.
+    source = song.source;
+    settings = song.settings;
+  }
+
+  function duplicate(id: string) {
+    const target = songs.find((song) => song.id === id);
+    if (!target) return;
+    const copy = duplicateSong(target);
+    songs = [...songs, copy];
+    void store?.putSong(copy);
+    if (store) selectSong(copy.id);
+  }
+
+  function rename(id: string, title: string) {
+    const clean = title.trim();
+    const target = songs.find((song) => song.id === id);
+    if (!target || !clean) return;
+    const nextSource = withTitle(target.source, clean);
+    const updated: SongEntry = { ...target, source: nextSource, updatedAt: Date.now() };
+    songs = songs.map((song) => (song.id === id ? updated : song));
+    void store?.putSong(updated);
+    if (id === activeId) source = nextSource;
+  }
+
+  function remove(id: string) {
+    const target = songs.find((song) => song.id === id);
+    if (!target) return;
+    if (!confirm(`Delete "${songTitle(target.source)}"?`)) return;
+
+    // A pending autosave must not resurrect the deleted song.
+    clearTimeout(saveTimer);
+    let remaining = songs.filter((song) => song.id !== id);
+    if (remaining.length === 0) {
+      const fresh = createSong(NEW_SONG_SOURCE, { ...settings, transpose: 0 });
+      remaining = [fresh];
+      void store?.putSong(fresh);
+    }
+    const wasActive = id === activeId;
+    const nextId = wasActive ? nextActiveId(songs, id) : activeId;
+    songs = remaining;
+    if (store && wasActive) {
+      const next = remaining.find((song) => song.id === nextId) ?? remaining[0];
+      activeId = next.id;
+      source = next.source;
+      settings = next.settings;
+      void store.putMeta('activeId', next.id);
+    }
+  }
+
+  function toggleSidebar() {
+    sidebarOpen = !sidebarOpen;
+    void store?.putMeta('sidebarOpen', sidebarOpen);
+  }
+
+  function importAsSong(text: string, importedSettings?: Partial<SongSettings>) {
+    if (ephemeral || !store) {
+      source = text;
+      if (importedSettings) settings = sanitizeSettings({ ...settings, ...importedSettings });
+      return;
+    }
+    addSong({ source: text, settings: importedSettings });
+  }
 
   let bridgeStatus = $state<BridgeStatus>('disconnected');
   const bridge = createBridge({
@@ -119,15 +266,21 @@
 
   let saveTimer: ReturnType<typeof setTimeout> | undefined;
   $effect(() => {
-    const payload = {
-      schemaVersion: 1,
-      source,
-      settings: { ...settings }
-    };
+    const currentSource = source;
+    const currentSettings = { ...settings };
     document.title = doc.title ? doc.title : 'Spartito';
-    if (ephemeral) return;
+    if (ephemeral || !ready || !store || !activeId) return;
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => saveState(payload), config.storage.autosaveDebounceMs);
+    saveTimer = setTimeout(() => {
+      const updated: SongEntry = {
+        id: activeId,
+        source: currentSource,
+        settings: currentSettings,
+        updatedAt: Date.now()
+      };
+      songs = songs.map((song) => (song.id === updated.id ? updated : song));
+      void store?.putSong(updated);
+    }, config.storage.autosaveDebounceMs);
   });
 
   $effect(() => {
@@ -138,29 +291,54 @@
 <svelte:window onkeydown={onKeydown} />
 
 <div class="app">
-  <Toolbar {doc} bind:source bind:settings {bridgeStatus} onToggleBridge={toggleBridge} />
-  <main
-    class="app-workspace"
-    class:dragging
-    bind:this={workspaceEl}
-    style={`--editor-pct: ${editorPct}%`}
-  >
-    <EditorPane bind:source />
-    <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-    <div
-      class="splitter"
-      role="separator"
-      aria-orientation="vertical"
-      aria-label="Resize editor and preview"
-      tabindex="0"
-      onpointerdown={startDrag}
-      onpointermove={moveDrag}
-      onpointerup={endDrag}
-      onpointercancel={endDrag}
-      ondblclick={resetSplit}
-      onkeydown={onSplitKeydown}
-    ></div>
-    <PreviewPane doc={display.doc} capo={display.capo} {settings} />
-  </main>
+  {#if ready}
+    <Toolbar
+      {doc}
+      bind:source
+      bind:settings
+      {bridgeStatus}
+      onToggleBridge={toggleBridge}
+      onImportSong={importAsSong}
+    />
+    <div class="app-body">
+      {#if !ephemeral}
+        <Sidebar
+          songs={listItems}
+          open={sidebarOpen}
+          onToggle={toggleSidebar}
+          onSelect={selectSong}
+          onNew={() => addSong()}
+          onRename={rename}
+          onDuplicate={duplicate}
+          onDelete={remove}
+        />
+      {/if}
+      <main
+        class="app-workspace"
+        class:dragging
+        bind:this={workspaceEl}
+        style={`--editor-pct: ${editorPct}%`}
+      >
+        <EditorPane bind:source />
+        <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+        <div
+          class="splitter"
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Resize editor and preview"
+          tabindex="0"
+          onpointerdown={startDrag}
+          onpointermove={moveDrag}
+          onpointerup={endDrag}
+          onpointercancel={endDrag}
+          ondblclick={resetSplit}
+          onkeydown={onSplitKeydown}
+        ></div>
+        <PreviewPane doc={display.doc} capo={display.capo} {settings} />
+      </main>
+    </div>
+  {:else}
+    <div class="app-loading">Loading library…</div>
+  {/if}
 </div>
