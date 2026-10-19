@@ -8,7 +8,7 @@ Minimal editor for **A4 portrait song sheets** (lyrics + chords), made to be rea
 
 ## Quick start
 
-Node.js 18.19+ (20/22/24 LTS recommended) and npm:
+Node.js 20.19+ (22 LTS recommended; see `.nvmrc`) and npm:
 
 | Command                                        | Description                                                                           |
 | ---------------------------------------------- | ------------------------------------------------------------------------------------- |
@@ -16,8 +16,10 @@ Node.js 18.19+ (20/22/24 LTS recommended) and npm:
 | `npm run build`                                | static build into `dist/`                                                             |
 | `npm run preview`                              | serve the build                                                                       |
 | `npm run check`                                | svelte-check (TypeScript + Svelte)                                                    |
+| `npm run lint` · `format` · `format:check`     | ESLint and Prettier                                                                   |
 | `npm test`                                     | unit tests (Vitest)                                                                   |
 | `npm run test:e2e`                             | browser smoke tests (Playwright/Chromium; run `npx playwright install chromium` once) |
+| `npm run fixtures:sync` · `fixtures:check`     | download / verify the local-only real-world corpus                                    |
 | `npm run mcp:build` · `mcp:check` · `mcp:test` | build, type-check, test the MCP server                                                |
 
 ## Using the app
@@ -68,8 +70,12 @@ src/core/      pure TS: config, model, db, library, directives, chordpro, chords
 src/ui/        Svelte components, styles and measurement
 packages/mcp/  local MCP server: tools, websocket bridge, stdio/HTTP transports, PDF export
 tests/         unit/integration tests, fixtures, Playwright E2E (see tests/README.md)
-tools/         fixture downloaders (local-only real-world corpus)
+scripts/       fixture downloaders and PDF fixture generator
+docs/adr/      architecture decision records
 ```
+
+Architecture and decision records: [`ARCHITECTURE.md`](ARCHITECTURE.md),
+[`docs/adr`](docs/adr). How to contribute: [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Status and license
 
