@@ -7,12 +7,12 @@ maintainer can afford.
 
 ## Running
 
-| Command | What it does | Time |
-|---|---|---|
-| `npm test` | Unit + integration (Vitest) | ~3 s |
-| `npm run test:e2e` | Build, then browser smoke tests (Playwright, Chromium) | ~20 s |
-| `npm run mcp:test` | MCP server tests | ~1 s |
-| `npm run check` / `mcp:check` | TypeScript + Svelte diagnostics | ~5 s |
+| Command                       | What it does                                           | Time  |
+| ----------------------------- | ------------------------------------------------------ | ----- |
+| `npm test`                    | Unit + integration (Vitest)                            | ~3 s  |
+| `npm run test:e2e`            | Build, then browser smoke tests (Playwright, Chromium) | ~20 s |
+| `npm run mcp:test`            | MCP server tests                                       | ~1 s  |
+| `npm run check` / `mcp:check` | TypeScript + Svelte diagnostics                        | ~5 s  |
 
 First local E2E run: `npx playwright install chromium`.
 
@@ -32,36 +32,36 @@ tests/
 Each layer has a different job. Redundancy is intentional, but it is not the
 same test copied five times.
 
-| Layer | Files | Catches | Does not catch |
-|---|---|---|---|
-| 1. Pure unit | `chordpro`, `chords` (in `import.test`), `transpose`, `capo`, `fit`, `zoom`, `theme`, `highlight`, `settings` (in `invariants`) | Local logic errors | Errors between modules |
-| 2. Invariants + stress | `invariants`, `config`, `timeout`, `deeplink`, `stress` (300 seeded songs + adversarial inputs) | Contract errors, config drift, async edge cases, crash safety | UI errors |
-| 3. Data fixtures | `import`, `pdf`, `pdf-fixtures`, `local-import`, `local-pdf` | Real-world input shapes (UG markup, PDF coordinates) | User flows |
-| 4. Browser E2E | `e2e/*.spec.ts` | Svelte ↔ CodeMirror ↔ IndexedDB ↔ print glue | Algorithm details |
-| 5. MCP | `../packages/mcp/test` | Protocol, bridge, HTTP, tools | UI |
+| Layer                  | Files                                                                                                                           | Catches                                                       | Does not catch         |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ---------------------- |
+| 1. Pure unit           | `chordpro`, `chords` (in `import.test`), `transpose`, `capo`, `fit`, `zoom`, `theme`, `highlight`, `settings` (in `invariants`) | Local logic errors                                            | Errors between modules |
+| 2. Invariants + stress | `invariants`, `config`, `timeout`, `deeplink`, `stress` (300 seeded songs + adversarial inputs)                                 | Contract errors, config drift, async edge cases, crash safety | UI errors              |
+| 3. Data fixtures       | `import`, `pdf`, `pdf-fixtures`, `local-import`, `local-pdf`                                                                    | Real-world input shapes (UG markup, PDF coordinates)          | User flows             |
+| 4. Browser E2E         | `e2e/*.spec.ts`                                                                                                                 | Svelte ↔ CodeMirror ↔ IndexedDB ↔ print glue                  | Algorithm details      |
+| 5. MCP                 | `../packages/mcp/test`                                                                                                          | Protocol, bridge, HTTP, tools                                 | UI                     |
 
 ## Test map
 
-| Feature | Where |
-|---|---|
-| Chord grammar, chord-above-lyrics merge | `import.test.ts` |
-| ChordPro parser, directives, capo, chorus recall | `chordpro.test.ts`, `directives.test.ts` |
-| Transposition, capo display | `transpose.test.ts`, `capo.test.ts`, `invariants.test.ts` |
-| Layout, auto-fit, auto-grow | `fit.test.ts`, `invariants.test.ts`, `e2e/boot.spec.ts` |
-| Import from text/UG/PDF | `import.test.ts`, `pdf.test.ts`, `pdf-fixtures.test.ts`, `local-import.test.ts`, `local-pdf.test.ts`, `e2e/import.spec.ts` |
-| Library, IndexedDB, legacy migration | `library.test.ts`, `db.test.ts` |
-| Persistence, export filename | `persistence.test.ts`, `invariants.test.ts` |
-| Settings sanitization | `invariants.test.ts`, `persistence.test.ts` |
-| Theme, zoom | `theme.test.ts`, `zoom.test.ts` |
-| Editor highlighting | `highlight.test.ts` |
-| Bridge (app side) | `bridge.test.ts` |
-| Share links | `deeplink.test.ts` |
-| Library open timeout / blocked storage | `timeout.test.ts`, `e2e/fallback.spec.ts` |
-| Print/PDF export | `e2e/pdf.spec.ts` |
-| Editing, Insert menu, transpose shortcut, undo boundary | `e2e/editing.spec.ts` |
-| Config coherence | `config.test.ts` |
-| Robustness: seeded songs, malformed input | `stress.test.ts` |
-| MCP tools/bridge/HTTP | `packages/mcp/test/*` |
+| Feature                                                 | Where                                                                                                                      |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Chord grammar, chord-above-lyrics merge                 | `import.test.ts`                                                                                                           |
+| ChordPro parser, directives, capo, chorus recall        | `chordpro.test.ts`, `directives.test.ts`                                                                                   |
+| Transposition, capo display                             | `transpose.test.ts`, `capo.test.ts`, `invariants.test.ts`                                                                  |
+| Layout, auto-fit, auto-grow                             | `fit.test.ts`, `invariants.test.ts`, `e2e/boot.spec.ts`                                                                    |
+| Import from text/UG/PDF                                 | `import.test.ts`, `pdf.test.ts`, `pdf-fixtures.test.ts`, `local-import.test.ts`, `local-pdf.test.ts`, `e2e/import.spec.ts` |
+| Library, IndexedDB, legacy migration                    | `library.test.ts`, `db.test.ts`                                                                                            |
+| Persistence, export filename                            | `persistence.test.ts`, `invariants.test.ts`                                                                                |
+| Settings sanitization                                   | `invariants.test.ts`, `persistence.test.ts`                                                                                |
+| Theme, zoom                                             | `theme.test.ts`, `zoom.test.ts`                                                                                            |
+| Editor highlighting                                     | `highlight.test.ts`                                                                                                        |
+| Bridge (app side)                                       | `bridge.test.ts`                                                                                                           |
+| Share links                                             | `deeplink.test.ts`                                                                                                         |
+| Library open timeout / blocked storage                  | `timeout.test.ts`, `e2e/fallback.spec.ts`                                                                                  |
+| Print/PDF export                                        | `e2e/pdf.spec.ts`                                                                                                          |
+| Editing, Insert menu, transpose shortcut, undo boundary | `e2e/editing.spec.ts`                                                                                                      |
+| Config coherence                                        | `config.test.ts`                                                                                                           |
+| Robustness: seeded songs, malformed input               | `stress.test.ts`                                                                                                           |
+| MCP tools/bridge/HTTP                                   | `packages/mcp/test/*`                                                                                                      |
 
 ## Conventions
 

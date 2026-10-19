@@ -8,9 +8,28 @@ import { loadFixture } from '../helpers/fixtures';
 describe('chord grammar', () => {
   it('recognizes international and Italian chords', () => {
     const chords = [
-      'C', 'Cm', 'C7', 'Cmaj7', 'Cm7b5', 'C/G', 'F#m', 'Bb',
-      'G7+', 'Dsus4', 'A7sus4', 'Cadd9', 'E5', 'N.C.',
-      'DO', 'MIm', 'LAm7', 'DO7+', 'MIm/RE', 'SI7', 'SOL', 'LAm6'
+      'C',
+      'Cm',
+      'C7',
+      'Cmaj7',
+      'Cm7b5',
+      'C/G',
+      'F#m',
+      'Bb',
+      'G7+',
+      'Dsus4',
+      'A7sus4',
+      'Cadd9',
+      'E5',
+      'N.C.',
+      'DO',
+      'MIm',
+      'LAm7',
+      'DO7+',
+      'MIm/RE',
+      'SI7',
+      'SOL',
+      'LAm6'
     ];
     for (const chord of chords) {
       expect(isChordToken(chord), chord).toBe(true);
@@ -37,9 +56,7 @@ describe('chord grammar', () => {
   });
 
   it('aligns chords to the right word', () => {
-    expect(mergeChordLine('C        G', 'Walking home tonight')).toBe(
-      '[C]Walking [G]home tonight'
-    );
+    expect(mergeChordLine('C        G', 'Walking home tonight')).toBe('[C]Walking [G]home tonight');
     expect(mergeChordLine('      LAm6       SI7        MIm', 'il ricordo di una estate')).toBe(
       'il [LAm6]ricordo di una [SI7][MIm]estate'
     );

@@ -37,11 +37,7 @@ describe('decideLayout', () => {
   });
 
   it('shrinks the font when two columns overflow too', () => {
-    const result = decideLayout(
-      (params) => params.textPt > 10.5,
-      config,
-      baseOptions()
-    );
+    const result = decideLayout((params) => params.textPt > 10.5, config, baseOptions());
     expect(result.status).toBe('shrunk');
     expect(result.params.textPt).toBe(10.5);
     expect(result.params.columns).toBe(2);
@@ -107,7 +103,7 @@ describe('decideLayout allowGrow', () => {
     expect(result.params.textPt).toBe(config.layout.textPtMax);
     expect(result.params.columns).toBe(1);
     // 11 -> 14 in 0.5pt steps: 1 initial + 6 grow attempts
-    expect(result.attempts).toBe(1 + ((config.layout.textPtMax - config.layout.textPtDefault) / 0.5));
+    expect(result.attempts).toBe(1 + (config.layout.textPtMax - config.layout.textPtDefault) / 0.5);
   });
 
   it('grows in two columns when the song needed them', () => {

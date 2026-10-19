@@ -16,8 +16,7 @@
     onDelete: (id: string) => void;
   }
 
-  let { songs, open, onToggle, onSelect, onNew, onRename, onDuplicate, onDelete }: Props =
-    $props();
+  let { songs, open, onToggle, onSelect, onNew, onRename, onDuplicate, onDelete }: Props = $props();
 
   let editingId = $state<string | null>(null);
   let draft = $state('');

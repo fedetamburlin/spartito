@@ -24,7 +24,9 @@ interface PdfSource {
   expect: { pages: number; hasText: boolean; minMerged: number };
 }
 
-const sources: PdfSource[] = JSON.parse(readFileSync(join(fixturesDir, 'pdf-sources.json'), 'utf8'));
+const sources: PdfSource[] = JSON.parse(
+  readFileSync(join(fixturesDir, 'pdf-sources.json'), 'utf8')
+);
 const files = existsSync(pdfDir) ? readdirSync(pdfDir).filter((file) => file.endsWith('.pdf')) : [];
 
 describe.skipIf(files.length === 0)('local PDF corpus (downloaded, not in git)', () => {

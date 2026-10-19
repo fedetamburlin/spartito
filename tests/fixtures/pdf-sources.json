@@ -6,11 +6,7 @@
     "origin": "IMSLP",
     "license": "CC0 / public domain",
     "fetched": "2026-10-19",
-    "features": [
-      "3 pages",
-      "chords above lyrics",
-      "text layer"
-    ],
+    "features": ["3 pages", "chords above lyrics", "text layer"],
     "expect": {
       "pages": 3,
       "hasText": true,
@@ -24,11 +20,7 @@
     "origin": "Wikimedia Commons",
     "license": "public domain / Commons",
     "fetched": "2026-10-19",
-    "features": [
-      "1 page",
-      "lead sheet",
-      "text layer"
-    ],
+    "features": ["1 page", "lead sheet", "text layer"],
     "expect": {
       "pages": 1,
       "hasText": true,
@@ -42,11 +34,7 @@
     "origin": "Wikimedia Commons / IMSLP",
     "license": "public domain",
     "fetched": "2026-10-19",
-    "features": [
-      "11 pages",
-      "multi-page score",
-      "partial text layer"
-    ],
+    "features": ["11 pages", "multi-page score", "partial text layer"],
     "expect": {
       "pages": 11,
       "hasText": true,
@@ -60,11 +48,7 @@
     "origin": "FaChords",
     "license": "free ebook, local test only",
     "fetched": "2026-10-19",
-    "features": [
-      "24 pages",
-      "chord diagrams",
-      "text layer"
-    ],
+    "features": ["24 pages", "chord diagrams", "text layer"],
     "expect": {
       "pages": 24,
       "hasText": true,
@@ -78,11 +62,7 @@
     "origin": "Learn & Master Guitar",
     "license": "free resource, local test only",
     "fetched": "2026-10-19",
-    "features": [
-      "1 page",
-      "chord diagrams",
-      "short text layer"
-    ],
+    "features": ["1 page", "chord diagrams", "short text layer"],
     "expect": {
       "pages": 1,
       "hasText": true,

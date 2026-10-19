@@ -9,8 +9,34 @@ const ITALIAN_PC: Record<string, number> = { DO: 0, RE: 2, MI: 4, FA: 5, SOL: 7,
 
 const SHARP_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const FLAT_NAMES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
-const SHARP_ITALIAN = ['DO', 'DO#', 'RE', 'RE#', 'MI', 'FA', 'FA#', 'SOL', 'SOL#', 'LA', 'LA#', 'SI'];
-const FLAT_ITALIAN = ['DO', 'REb', 'RE', 'MIb', 'MI', 'FA', 'SOLb', 'SOL', 'LAb', 'LA', 'SIb', 'SI'];
+const SHARP_ITALIAN = [
+  'DO',
+  'DO#',
+  'RE',
+  'RE#',
+  'MI',
+  'FA',
+  'FA#',
+  'SOL',
+  'SOL#',
+  'LA',
+  'LA#',
+  'SI'
+];
+const FLAT_ITALIAN = [
+  'DO',
+  'REb',
+  'RE',
+  'MIb',
+  'MI',
+  'FA',
+  'SOLb',
+  'SOL',
+  'LAb',
+  'LA',
+  'SIb',
+  'SI'
+];
 
 function parseNote(note: string): { system: 'intl' | 'it'; pc: number } | null {
   const intl = /^([A-G])([#b]?)$/.exec(note);
@@ -31,9 +57,14 @@ function parseNote(note: string): { system: 'intl' | 'it'; pc: number } | null {
 function transposeNote(note: string, delta: number, useFlats: boolean): string | null {
   const parsed = parseNote(note);
   if (!parsed) return null;
-  const names = parsed.system === 'it'
-    ? (useFlats ? FLAT_ITALIAN : SHARP_ITALIAN)
-    : (useFlats ? FLAT_NAMES : SHARP_NAMES);
+  const names =
+    parsed.system === 'it'
+      ? useFlats
+        ? FLAT_ITALIAN
+        : SHARP_ITALIAN
+      : useFlats
+        ? FLAT_NAMES
+        : SHARP_NAMES;
   const rendered = names[(((parsed.pc + delta) % 12) + 12) % 12];
   return note[0] === note[0].toLowerCase() ? rendered.toLowerCase() : rendered;
 }

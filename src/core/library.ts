@@ -53,17 +53,11 @@ export function duplicateSong(song: SongEntry): SongEntry {
 
 /** Newest created first; positions never change while editing. */
 export function sortSongs(songs: SongEntry[]): SongEntry[] {
-  return [...songs].sort(
-    (a, b) => (b.createdAt ?? b.updatedAt) - (a.createdAt ?? a.updatedAt)
-  );
+  return [...songs].sort((a, b) => (b.createdAt ?? b.updatedAt) - (a.createdAt ?? a.updatedAt));
 }
 
 /** True when the entry already holds exactly this content (no save needed). */
-export function contentMatches(
-  entry: SongEntry,
-  source: string,
-  settings: SongSettings
-): boolean {
+export function contentMatches(entry: SongEntry, source: string, settings: SongSettings): boolean {
   if (entry.source !== source) return false;
   const keys = Object.keys(entry.settings) as (keyof SongSettings)[];
   const otherKeys = Object.keys(settings) as (keyof SongSettings)[];
@@ -93,7 +87,8 @@ export async function initLibrary(
 
   if (songs.length > 0) {
     const stored = await store.getMeta<string>('activeId');
-    const activeId = stored && songs.some((song) => song.id === stored) ? stored : sortSongs(songs)[0].id;
+    const activeId =
+      stored && songs.some((song) => song.id === stored) ? stored : sortSongs(songs)[0].id;
     return { songs, activeId, sidebarOpen };
   }
 

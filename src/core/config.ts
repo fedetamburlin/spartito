@@ -62,7 +62,9 @@ export interface AppConfig {
 export const config = defaults as AppConfig;
 
 export function fontStack(fontId: string): string {
-  const font = config.typography.fonts.find((item) => item.id === fontId) ?? config.typography.fonts[0];
-  const fallback = font.role === 'serif' ? 'serif' : font.role === 'mono' ? 'monospace' : 'sans-serif';
+  const font =
+    config.typography.fonts.find((item) => item.id === fontId) ?? config.typography.fonts[0];
+  const fallback =
+    font.role === 'serif' ? 'serif' : font.role === 'mono' ? 'monospace' : 'sans-serif';
   return `"${font.family}", ${fallback}`;
 }

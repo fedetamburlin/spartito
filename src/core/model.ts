@@ -52,14 +52,7 @@ export interface SpacerItem {
 }
 
 export type SectionItem =
-  | Line
-  | GridLine
-  | CommentItem
-  | TabItem
-  | GridBlock
-  | ChorusRecall
-  | SpacerItem
-  | UnknownItem;
+  Line | GridLine | CommentItem | TabItem | GridBlock | ChorusRecall | SpacerItem | UnknownItem;
 
 export type SectionType = 'verse' | 'chorus' | 'bridge';
 

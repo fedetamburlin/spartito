@@ -12,7 +12,6 @@ import { squeeze } from '../helpers/text';
 
 const readPdf = async (name: string) => extractPdfText(loadFixtureBuffer(`generated/${name}`));
 
-
 describe('generated PDF fixtures', () => {
   it('extracts a single-column chord sheet and imports it', async () => {
     const extracted = await readPdf('generated-single-column.pdf');

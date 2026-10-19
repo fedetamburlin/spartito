@@ -27,7 +27,12 @@
     "editorFont": "jetbrains-mono",
     "fonts": [
       { "id": "inter", "family": "Inter", "role": "sans", "license": "OFL-1.1" },
-      { "id": "plex-condensed", "family": "IBM Plex Sans Condensed", "role": "sans", "license": "OFL-1.1" },
+      {
+        "id": "plex-condensed",
+        "family": "IBM Plex Sans Condensed",
+        "role": "sans",
+        "license": "OFL-1.1"
+      },
       { "id": "jetbrains-mono", "family": "JetBrains Mono", "role": "mono", "license": "OFL-1.1" }
     ],
     "boldItalicByRole": {

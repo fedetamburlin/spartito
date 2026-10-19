@@ -42,7 +42,12 @@ class FakeBridge implements AppBridge {
 }
 
 async function connectClient(bridge: AppBridge) {
-  const server = createServer({ bridge, appUrl: 'https://app.test', outDir: '/tmp/out', version: 'test' });
+  const server = createServer({
+    bridge,
+    appUrl: 'https://app.test',
+    outDir: '/tmp/out',
+    version: 'test'
+  });
   const client = new Client({ name: 'test-client', version: '1.0.0' });
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   await server.connect(serverTransport);
@@ -142,9 +147,7 @@ describe('pdf helpers', () => {
   });
 
   it('rejects an explicit output path outside the output dir', () => {
-    expect(() => outputPathFor('/tmp/out', '{title: X}\n', '/tmp/custom.pdf')).toThrow(
-      '/tmp/out'
-    );
+    expect(() => outputPathFor('/tmp/out', '{title: X}\n', '/tmp/custom.pdf')).toThrow('/tmp/out');
     expect(() => outputPathFor('/tmp/out', '{title: X}\n', '../escape.pdf')).toThrow('/tmp/out');
   });
 });

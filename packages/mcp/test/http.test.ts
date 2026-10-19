@@ -70,7 +70,8 @@ describe('streamable http transport', () => {
     const bridge = new FakeBridge();
     const handle = await startHttp(
       0,
-      () => createServer({ bridge, appUrl: 'https://app.test', outDir: '/tmp/out', version: 'test' }),
+      () =>
+        createServer({ bridge, appUrl: 'https://app.test', outDir: '/tmp/out', version: 'test' }),
       () => {}
     );
     expect(await postInitialize(handle.port, { host: 'evil.example' })).toBe(403);
@@ -81,7 +82,8 @@ describe('streamable http transport', () => {
     const bridge = new FakeBridge();
     const handle = await startHttp(
       0,
-      () => createServer({ bridge, appUrl: 'https://app.test', outDir: '/tmp/out', version: 'test' }),
+      () =>
+        createServer({ bridge, appUrl: 'https://app.test', outDir: '/tmp/out', version: 'test' }),
       () => {}
     );
     expect(await postInitialize(handle.port, { origin: 'https://evil.example' })).toBe(403);
@@ -92,7 +94,8 @@ describe('streamable http transport', () => {
     const bridge = new FakeBridge();
     const handle = await startHttp(
       0,
-      () => createServer({ bridge, appUrl: 'https://app.test', outDir: '/tmp/out', version: 'test' }),
+      () =>
+        createServer({ bridge, appUrl: 'https://app.test', outDir: '/tmp/out', version: 'test' }),
       () => {}
     );
     const transport = new StreamableHTTPClientTransport(

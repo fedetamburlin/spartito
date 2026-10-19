@@ -94,10 +94,7 @@ function sectionBuild(type: SectionType, selection: string): SnippetBuild {
 function templateBuild(template: string): SnippetBuild {
   const firstLineEnd = template.indexOf('\n');
   const labelStart = template.indexOf(': ') + 2;
-  const labelText = template
-    .slice(labelStart, firstLineEnd)
-    .replace(/\}+$/, '')
-    .trimEnd();
+  const labelText = template.slice(labelStart, firstLineEnd).replace(/\}+$/, '').trimEnd();
   return { text: template, selection: [labelStart, labelStart + labelText.length] };
 }
 

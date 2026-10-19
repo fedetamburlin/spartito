@@ -9,7 +9,8 @@
       try {
         var pref = localStorage.getItem('spartito-theme');
         var dark =
-          pref === 'dark' || (pref !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+          pref === 'dark' ||
+          (pref !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
         document.documentElement.dataset.theme = dark ? 'dark' : 'light';
       } catch (error) {
         document.documentElement.dataset.theme = 'light';

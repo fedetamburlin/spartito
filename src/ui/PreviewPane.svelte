@@ -125,17 +125,17 @@
       aria-label="Zoom out"
       title="Zoom out"
       disabled={zoom <= ZOOM_MIN}
-      onclick={() => (zoom = stepZoom(zoom, -1))}>−</button>
-    <button
-      type="button"
-      class="zoom-value"
-      title="Reset zoom to 100%"
-      onclick={() => (zoom = 1)}>{zoomPct}%</button>
+      onclick={() => (zoom = stepZoom(zoom, -1))}>−</button
+    >
+    <button type="button" class="zoom-value" title="Reset zoom to 100%" onclick={() => (zoom = 1)}
+      >{zoomPct}%</button
+    >
     <button
       type="button"
       aria-label="Zoom in"
       title="Zoom in"
       disabled={zoom >= ZOOM_MAX}
-      onclick={() => (zoom = stepZoom(zoom, 1))}>+</button>
+      onclick={() => (zoom = stepZoom(zoom, 1))}>+</button
+    >
   </div>
 </div>

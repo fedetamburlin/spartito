@@ -6,7 +6,13 @@
   import { extractPdfText } from '../core/pdf';
   import { fileBaseName, parseImported } from '../core/persistence';
   import { sanitizeSettings, withTranspose, type SongSettings } from '../core/settings';
-  import { applyTheme, loadThemePref, saveThemePref, type Theme, type ThemePref } from '../core/theme';
+  import {
+    applyTheme,
+    loadThemePref,
+    saveThemePref,
+    type Theme,
+    type ThemePref
+  } from '../core/theme';
   import { TRANSPOSE_MAX, TRANSPOSE_MIN } from '../core/transpose';
   import ImportDialog from './ImportDialog.svelte';
 
@@ -34,9 +40,7 @@
   let importTitle = $state<string | undefined>(undefined);
   let importHint = $state<string | undefined>(undefined);
 
-  const columnValue = $derived(
-    settings.columns === 'auto' ? 'auto' : String(settings.columns)
-  );
+  const columnValue = $derived(settings.columns === 'auto' ? 'auto' : String(settings.columns));
 
   const bridgeTitle = $derived(
     bridgeStatus === 'connected'
@@ -163,14 +167,16 @@
 
 <header class="app-toolbar">
   <div class="toolbar-group">
-    <label>Font
+    <label
+      >Font
       <select value={settings.fontId} onchange={setFont}>
         {#each config.typography.fonts as font}
           <option value={font.id}>{font.family}</option>
         {/each}
       </select>
     </label>
-    <label>Text
+    <label
+      >Text
       <input
         type="number"
         min={config.layout.textPtMin}
@@ -180,14 +186,16 @@
         onchange={setTextPt}
       /> pt
     </label>
-    <label>Columns
+    <label
+      >Columns
       <select value={columnValue} onchange={setColumns}>
         <option value="auto">auto</option>
         <option value="1">1</option>
         <option value="2">2</option>
       </select>
     </label>
-    <label>Margins
+    <label
+      >Margins
       <input
         type="number"
         min={config.page.marginsMinMm}
@@ -197,44 +205,54 @@
         onchange={setMargins}
       /> mm
     </label>
-    <label>Transpose
+    <label
+      >Transpose
       <span class="stepper">
         <button
           type="button"
           title="One semitone down"
           disabled={settings.transpose <= TRANSPOSE_MIN}
-          onclick={() => (settings = withTranspose(settings, -1))}>−</button>
+          onclick={() => (settings = withTranspose(settings, -1))}>−</button
+        >
         <button
           type="button"
           class="stepper-value"
           title="Reset transposition"
           disabled={settings.transpose === 0}
           onclick={() => (settings = sanitizeSettings({ ...settings, transpose: 0 }))}
-        >{settings.transpose > 0 ? `+${settings.transpose}` : settings.transpose}</button>
+          >{settings.transpose > 0 ? `+${settings.transpose}` : settings.transpose}</button
+        >
         <button
           type="button"
           title="One semitone up"
           disabled={settings.transpose >= TRANSPOSE_MAX}
-          onclick={() => (settings = withTranspose(settings, 1))}>+</button>
+          onclick={() => (settings = withTranspose(settings, 1))}>+</button
+        >
       </span>
     </label>
   </div>
   <div class="toolbar-group">
-    <label>Chords <input
+    <label
+      >Chords <input
         type="color"
         value={settings.chordColor}
         oninput={(event) => setColor('chordColor', event)}
-      /></label>
-    <label>Text <input
+      /></label
+    >
+    <label
+      >Text <input
         type="color"
         value={settings.textColor}
         oninput={(event) => setColor('textColor', event)}
-      /></label>
-    <label>Comments <input
+      /></label
+    >
+    <label
+      >Comments <input
         type="color"
         value={settings.commentColor}
         oninput={(event) => setColor('commentColor', event)}
-      /></label>
+      /></label
+    >
   </div>
   <div class="toolbar-group">
     <button
@@ -269,10 +287,8 @@
   </div>
   <div class="toolbar-group toolbar-actions">
     <div class="toolbar-import">
-      <button
-        class="btn-import"
-        title="Paste chords copied from a site"
-        onclick={openPaste}>From text</button
+      <button class="btn-import" title="Paste chords copied from a site" onclick={openPaste}
+        >From text</button
       >
       <button
         class="btn-import"

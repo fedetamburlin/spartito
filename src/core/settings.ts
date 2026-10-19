@@ -52,7 +52,8 @@ export function sanitizeSettings(partial?: Partial<SongSettings> | null): SongSe
         : base.transpose,
     textColor: typeof partial.textColor === 'string' ? partial.textColor : base.textColor,
     chordColor: typeof partial.chordColor === 'string' ? partial.chordColor : base.chordColor,
-    commentColor: typeof partial.commentColor === 'string' ? partial.commentColor : base.commentColor
+    commentColor:
+      typeof partial.commentColor === 'string' ? partial.commentColor : base.commentColor
   };
 }
 

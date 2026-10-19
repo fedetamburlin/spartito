@@ -10,15 +10,15 @@ Minimal editor for **A4 portrait song sheets** (lyrics + chords), made to be rea
 
 Node.js 18.19+ (20/22/24 LTS recommended) and npm:
 
-| Command | Description |
-|---|---|
-| `npm run dev` | Vite dev server |
-| `npm run build` | static build into `dist/` |
-| `npm run preview` | serve the build |
-| `npm run check` | svelte-check (TypeScript + Svelte) |
-| `npm test` | unit tests (Vitest) |
-| `npm run test:e2e` | browser smoke tests (Playwright/Chromium; run `npx playwright install chromium` once) |
-| `npm run mcp:build` · `mcp:check` · `mcp:test` | build, type-check, test the MCP server |
+| Command                                        | Description                                                                           |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `npm run dev`                                  | Vite dev server                                                                       |
+| `npm run build`                                | static build into `dist/`                                                             |
+| `npm run preview`                              | serve the build                                                                       |
+| `npm run check`                                | svelte-check (TypeScript + Svelte)                                                    |
+| `npm test`                                     | unit tests (Vitest)                                                                   |
+| `npm run test:e2e`                             | browser smoke tests (Playwright/Chromium; run `npx playwright install chromium` once) |
+| `npm run mcp:build` · `mcp:check` · `mcp:test` | build, type-check, test the MCP server                                                |
 
 ## Using the app
 
@@ -55,7 +55,7 @@ Setup: `npm install && npm run mcp:build`, then restart opencode (MCP servers lo
 { "mcp": { "spartito": { "type": "local", "command": ["node", "packages/mcp/dist/index.js"] } } }
 ```
 
-Click **MCP** in the toolbar: the dot turns green when connected (bridge on `127.0.0.1:7331` only; hover a red dot for the cause). Keep the app open while using the tools — without a connection they reply with an explanatory error. To verify, ask the agent *"which spartito tools do you have?"*, then *"read the open song"*. Chrome/Edge may ask for local network access the first time; Safari blocks `ws://localhost` from an HTTPS page, so run the app locally (`npm run build && npm run preview -- --port 4173`).
+Click **MCP** in the toolbar: the dot turns green when connected (bridge on `127.0.0.1:7331` only; hover a red dot for the cause). Keep the app open while using the tools — without a connection they reply with an explanatory error. To verify, ask the agent _"which spartito tools do you have?"_, then _"read the open song"_. Chrome/Edge may ask for local network access the first time; Safari blocks `ws://localhost` from an HTTPS page, so run the app locally (`npm run build && npm run preview -- --port 4173`).
 
 `export_pdf` needs Google Chrome/Chromium (override with `SPARTITO_CHROME_PATH`) and renders `SPARTITO_APP_URL` — the live site by default; set it to your local app (e.g. `http://localhost:4175`) to export the code you are developing. Output folder: `SPARTITO_OUT_DIR` (default `out/`). Only one opencode session can own port `7331`; the same process exposes a Streamable HTTP endpoint at `http://127.0.0.1:7331/mcp`.
 

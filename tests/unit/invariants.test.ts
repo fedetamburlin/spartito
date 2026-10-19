@@ -23,9 +23,32 @@ describe('transpose invariants', () => {
   });
 
   const CHORDS = [
-    'C', 'Cm', 'C7', 'Cmaj7', 'Cm7b5', 'C/G', 'F#m', 'Bb', 'G7+', 'Dsus4',
-    'A7sus4', 'Cadd9', 'E5', 'N.C.', 'DO', 'MIm', 'LAm7', 'DO7+', 'MIm/RE',
-    'SI7', 'SOL', 'LAm6', 'AMaj7', 'CSus4', 'Dadd4/F#', 'G#dim'
+    'C',
+    'Cm',
+    'C7',
+    'Cmaj7',
+    'Cm7b5',
+    'C/G',
+    'F#m',
+    'Bb',
+    'G7+',
+    'Dsus4',
+    'A7sus4',
+    'Cadd9',
+    'E5',
+    'N.C.',
+    'DO',
+    'MIm',
+    'LAm7',
+    'DO7+',
+    'MIm/RE',
+    'SI7',
+    'SOL',
+    'LAm6',
+    'AMaj7',
+    'CSus4',
+    'Dadd4/F#',
+    'G#dim'
   ];
 
   it.each(CHORDS)('%s keeps its sounding pitch across +n / -n', (chord) => {
@@ -122,7 +145,10 @@ describe('fit invariants', () => {
   });
 
   it('keeps the old behaviour when growth is disabled', () => {
-    const result = decideLayout(() => false, config, { columns: 1, textPt: config.layout.textPtDefault });
+    const result = decideLayout(() => false, config, {
+      columns: 1,
+      textPt: config.layout.textPtDefault
+    });
     expect(result.status).toBe('fits');
     expect(result.params.textPt).toBe(config.layout.textPtDefault);
     expect(result.attempts).toBe(1);

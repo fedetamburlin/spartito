@@ -97,11 +97,7 @@ describe('parseChordPro', () => {
     const tab = section.items[0];
     if (tab.kind !== 'tab') throw new Error('tab expected');
     expect(tab.label).toBe('Intro');
-    expect(tab.lines).toEqual([
-      'e|--0--1--0--|',
-      'B|--1--1--1--|',
-      '[Am]literal chord'
-    ]);
+    expect(tab.lines).toEqual(['e|--0--1--0--|', 'B|--1--1--1--|', '[Am]literal chord']);
   });
 
   it('tokenizes grid blocks', () => {
@@ -125,9 +121,7 @@ describe('parseChordPro', () => {
       { kind: 'chorus-recall', label: 'Rit.' },
       { kind: 'chorus-recall', label: 'Final' }
     ]);
-    expect(serializeChordPro(doc)).toBe(
-      '{chorus}\n{chorus: Rit.}\n{chorus: Final}\n'
-    );
+    expect(serializeChordPro(doc)).toBe('{chorus}\n{chorus: Rit.}\n{chorus: Final}\n');
   });
 
   it('keeps blank lines as spacer gaps inside explicit sections', () => {

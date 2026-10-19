@@ -5,12 +5,7 @@
     "artist": "The Association",
     "url": "https://tabs.ultimate-guitar.com/tab/the-association/windy-chords-1708482",
     "fetched": "2026-10-19",
-    "features": [
-      "capo text",
-      "song header",
-      "tab",
-      "N.C."
-    ],
+    "features": ["capo text", "song header", "tab", "N.C."],
     "expect": {
       "title": "Windy",
       "subtitle": "The Association",
@@ -26,11 +21,7 @@
     "artist": "The Axis of Awesome",
     "url": "https://tabs.ultimate-guitar.com/tab/the-axis-of-awesome/4-chords-chords-965337",
     "fetched": "2026-10-19",
-    "features": [
-      "capo recommendation",
-      "very long",
-      "many sections"
-    ],
+    "features": ["capo recommendation", "very long", "many sections"],
     "expect": {
       "capo": 2,
       "minMerged": 50
@@ -42,11 +33,7 @@
     "artist": "The Chords",
     "url": "https://tabs.ultimate-guitar.com/tab/the-chords/sh-boom-chords-1833332",
     "fetched": "2026-10-19",
-    "features": [
-      "[ch]/[tab] markup",
-      "no header",
-      "tuning + capo line"
-    ],
+    "features": ["[ch]/[tab] markup", "no header", "tuning + capo line"],
     "expect": {
       "minMerged": 20
     }
@@ -57,10 +44,7 @@
     "artist": "The Weakerthans",
     "url": "https://tabs.ultimate-guitar.com/tab/the-weakerthans/my-favourite-chords-chords-1855417",
     "fetched": "2026-10-19",
-    "features": [
-      "[ch] markup",
-      "chord list at the top"
-    ],
+    "features": ["[ch] markup", "chord list at the top"],
     "expect": {
       "minMerged": 30,
       "minSections": 5
@@ -72,11 +56,7 @@
     "artist": "Bob Dylan",
     "url": "https://tabs.ultimate-guitar.com/tab/bob-dylan/knockin-on-heavens-door-chords-66587",
     "fetched": "2026-10-19",
-    "features": [
-      "no capo",
-      "tuning + key",
-      "chord diagrams as text"
-    ],
+    "features": ["no capo", "tuning + key", "chord diagrams as text"],
     "expect": {
       "minMerged": 15,
       "minSections": 4
@@ -88,11 +68,7 @@
     "artist": "Oasis",
     "url": "https://tabs.ultimate-guitar.com/tab/oasis/wonderwall-chords-1340333",
     "fetched": "2026-10-19",
-    "features": [
-      "[Intro]/[Verse]/[Chorus]/[Outro]",
-      "capo 2nd fret",
-      "solo tab"
-    ],
+    "features": ["[Intro]/[Verse]/[Chorus]/[Outro]", "capo 2nd fret", "solo tab"],
     "expect": {
       "capo": 2,
       "minMerged": 30,
@@ -105,12 +81,7 @@
     "artist": "Vasco Rossi",
     "url": "https://tabs.ultimate-guitar.com/tab/vasco-rossi/albachiara-chords-2304215",
     "fetched": "2026-10-19",
-    "features": [
-      "Italian lyrics",
-      "UTF-8 accents",
-      "chorus-first",
-      "G7"
-    ],
+    "features": ["Italian lyrics", "UTF-8 accents", "chorus-first", "G7"],
     "expect": {
       "minMerged": 20,
       "minSections": 3,
@@ -123,11 +94,7 @@
     "artist": "Bob Dylan",
     "url": "https://tabs.ultimate-guitar.com/tab/bob-dylan/moonlight-chords-2846006",
     "fetched": "2026-10-19",
-    "features": [
-      "capo III (Roman)",
-      "diminished chords",
-      "odd alignment"
-    ],
+    "features": ["capo III (Roman)", "diminished chords", "odd alignment"],
     "expect": {
       "capo": 3,
       "minMerged": 20,
@@ -141,11 +108,7 @@
     "artist": "Sting",
     "url": "https://tabs.ultimate-guitar.com/tab/sting/the-bridge-chords-5867888",
     "fetched": "2026-10-19",
-    "features": [
-      "author/date header",
-      "no capo",
-      "long"
-    ],
+    "features": ["author/date header", "no capo", "long"],
     "expect": {
       "minMerged": 20,
       "minSections": 4
@@ -173,9 +136,7 @@
     "artist": "Gharama",
     "url": "https://tabs.ultimate-guitar.com/tab/gharama/i-know-chords-4842050",
     "fetched": "2026-10-19",
-    "features": [
-      "Spanish [Estrofa] section"
-    ],
+    "features": ["Spanish [Estrofa] section"],
     "expect": {
       "minMerged": 20,
       "minSections": 2
@@ -187,10 +148,7 @@
     "artist": "Toups and Laudi",
     "url": "https://tabs.ultimate-guitar.com/tab/misc-originals/toups-and-laudi-eu-quero-rockar-chords-5778839",
     "fetched": "2026-10-19",
-    "features": [
-      "Portuguese [Refrão] section",
-      "x2 marker"
-    ],
+    "features": ["Portuguese [Refrão] section", "x2 marker"],
     "expect": {
       "minMerged": 25,
       "minSections": 2
@@ -202,11 +160,7 @@
     "artist": "Queen",
     "url": "https://tabs.ultimate-guitar.com/tab/queen/bohemian-rhapsody-chords-213409",
     "fetched": "2026-10-19",
-    "features": [
-      "very long",
-      "instrumental sections",
-      "capo"
-    ],
+    "features": ["very long", "instrumental sections", "capo"],
     "expect": {
       "capo": 3,
       "minMerged": 30,
@@ -220,11 +174,7 @@
     "artist": "Guns N' Roses",
     "url": "https://tabs.ultimate-guitar.com/tab/guns-n-roses/sweet-child-o-mine-chords-1719104",
     "fetched": "2026-10-19",
-    "features": [
-      "Eb tuning",
-      "no capo",
-      "long"
-    ],
+    "features": ["Eb tuning", "no capo", "long"],
     "expect": {
       "capo": 0,
       "minMerged": 30,
@@ -237,10 +187,7 @@
     "artist": "Misc Traditional",
     "url": "https://tabs.ultimate-guitar.com/tab/misc-traditional/happy-birthday-chords-2435107",
     "fetched": "2026-10-19",
-    "features": [
-      "very short",
-      "chords above lyrics"
-    ],
+    "features": ["very short", "chords above lyrics"],
     "expect": {
       "minMerged": 10,
       "minSections": 2
@@ -252,10 +199,7 @@
     "artist": "Guns N' Roses",
     "url": "https://tabs.ultimate-guitar.com/tab/guns-n-roses/sweet-child-o-mine-tabs-39188",
     "fetched": "2026-10-19",
-    "features": [
-      "tab-only page",
-      "tablature markers"
-    ],
+    "features": ["tab-only page", "tablature markers"],
     "expect": {
       "minMerged": 0,
       "minTabs": 5
@@ -267,10 +211,7 @@
     "artist": "Los Cantores de Quilla Huasi",
     "url": "https://tabs.ultimate-guitar.com/tab/los-cantores-de-quilla-huasi/estrofas-de-amor-chords-1655152",
     "fetched": "2026-10-19",
-    "features": [
-      "Spanish lyrics",
-      "chord list at top"
-    ],
+    "features": ["Spanish lyrics", "chord list at top"],
     "expect": {
       "minMerged": 10
     }
@@ -281,10 +222,7 @@
     "artist": "Fernandinho",
     "url": "https://tabs.ultimate-guitar.com/tab/fernandinho/rude-cruz-chords-6208961",
     "fetched": "2026-10-19",
-    "features": [
-      "Portuguese [Refrão] section",
-      "minor chords"
-    ],
+    "features": ["Portuguese [Refrão] section", "minor chords"],
     "expect": {
       "minMerged": 25,
       "minSections": 4
@@ -296,11 +234,7 @@
     "artist": "Eagles",
     "url": "https://tabs.ultimate-guitar.com/tab/eagles/hotel-california-chords-1092238",
     "fetched": "2026-10-19",
-    "features": [
-      "long",
-      "many sections",
-      "solo"
-    ],
+    "features": ["long", "many sections", "solo"],
     "expect": {
       "capo": 2,
       "minMerged": 40,
@@ -313,11 +247,7 @@
     "artist": "Leonard Cohen",
     "url": "https://tabs.ultimate-guitar.com/tab/leonard-cohen/hallelujah-chords-97663",
     "fetched": "2026-10-19",
-    "features": [
-      "long",
-      "chorus repeats",
-      "chord line after each verse"
-    ],
+    "features": ["long", "chorus repeats", "chord line after each verse"],
     "expect": {
       "minMerged": 45,
       "minSections": 6

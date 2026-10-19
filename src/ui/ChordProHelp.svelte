@@ -89,7 +89,9 @@
     >
       <div class="help-head">
         <strong>ChordPro quick reference</strong>
-        <button class="help-close" type="button" aria-label="Close" onclick={() => close(true)}>×</button>
+        <button class="help-close" type="button" aria-label="Close" onclick={() => close(true)}
+          >×</button
+        >
       </div>
       {#each groups as group (group.id)}
         <div class="help-group" data-group={group.id}>

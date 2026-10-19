@@ -11,5 +11,11 @@
     "types": ["vite/client", "svelte", "node"],
     "baseUrl": "."
   },
-  "include": ["src/**/*.ts", "src/**/*.svelte", "tests/**/*.ts", "config/**/*.json", "vite.config.ts"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.svelte",
+    "tests/**/*.ts",
+    "config/**/*.json",
+    "vite.config.ts"
+  ]
 }

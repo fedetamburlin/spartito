@@ -22,15 +22,11 @@ describe('scanChordProLine', () => {
   });
 
   it('finds directives', () => {
-    expect(scanChordProLine('{start_of_chorus}')).toEqual([
-      { from: 0, to: 17, kind: 'directive' }
-    ]);
+    expect(scanChordProLine('{start_of_chorus}')).toEqual([{ from: 0, to: 17, kind: 'directive' }]);
   });
 
   it('labels comment directives separately', () => {
-    expect(scanChordProLine('{comment: dal vivo}')).toEqual([
-      { from: 0, to: 19, kind: 'comment' }
-    ]);
+    expect(scanChordProLine('{comment: dal vivo}')).toEqual([{ from: 0, to: 19, kind: 'comment' }]);
   });
 
   it('mixes chords and directives on one line', () => {
@@ -50,9 +46,7 @@ describe('scanChordProLine', () => {
   });
 
   it('does not treat a later directive as part of an unclosed chord', () => {
-    expect(scanChordProLine('[Am {title: x}')).toEqual([
-      { from: 4, to: 14, kind: 'directive' }
-    ]);
+    expect(scanChordProLine('[Am {title: x}')).toEqual([{ from: 4, to: 14, kind: 'directive' }]);
   });
 
   it('handles chord-only lines and grid bars', () => {

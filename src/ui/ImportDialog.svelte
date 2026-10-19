@@ -10,13 +10,7 @@
     hint?: string;
   }
 
-  let {
-    onApply,
-    onClose,
-    initialText = '',
-    title = 'Paste text',
-    hint
-  }: Props = $props();
+  let { onApply, onClose, initialText = '', title = 'Paste text', hint }: Props = $props();
 
   let raw = $state(untrack(() => initialText));
   let result = $state<ImportResult | null>(
@@ -75,8 +69,7 @@
       bind:value={raw}
       oninput={() => (result = null)}
       spellcheck="false"
-      placeholder="Paste the copied text here…"
-    ></textarea>
+      placeholder="Paste the copied text here…"></textarea>
     {#if result}
       <div class="summary">
         {#if summary}<div>{summary}</div>{/if}

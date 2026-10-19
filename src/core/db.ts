@@ -47,15 +47,16 @@ function forStorage<T>(value: T): T {
 }
 
 function wrap(db: IDBDatabase): LibraryStore {
-  const run = <T>(store: string, mode: IDBTransactionMode, job: (s: IDBObjectStore) => IDBRequest<T>) =>
-    request(job(db.transaction(store, mode).objectStore(store)));
+  const run = <T>(
+    store: string,
+    mode: IDBTransactionMode,
+    job: (s: IDBObjectStore) => IDBRequest<T>
+  ) => request(job(db.transaction(store, mode).objectStore(store)));
 
   return {
     getSongs: () => run<SongEntry[]>(SONGS, 'readonly', (s) => s.getAll()),
     putSong: (song) =>
-      run<IDBValidKey>(SONGS, 'readwrite', (s) => s.put(forStorage(song))).then(
-        () => undefined
-      ),
+      run<IDBValidKey>(SONGS, 'readwrite', (s) => s.put(forStorage(song))).then(() => undefined),
     deleteSong: (id) => run<undefined>(SONGS, 'readwrite', (s) => s.delete(id)),
     getMeta: <T>(key: string) => run<T | undefined>(META, 'readonly', (s) => s.get(key)),
     putMeta: (key, value) =>

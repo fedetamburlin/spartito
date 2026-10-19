@@ -95,7 +95,11 @@ body {
 body {
   background: var(--ui-bg);
   color: var(--ui-text);
-  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
   font-size: 14px;
 }
 

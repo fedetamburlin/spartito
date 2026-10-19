@@ -1,11 +1,5 @@
 import { expect, test } from '@playwright/test';
-import {
-  editorContent,
-  openLibrary,
-  openShared,
-  previewPage,
-  typeInEditor
-} from './helpers';
+import { editorContent, openLibrary, openShared, previewPage, typeInEditor } from './helpers';
 
 const SONG = `{title: Edit Song}
 {start_of_verse}

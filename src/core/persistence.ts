@@ -25,7 +25,8 @@ export function loadLegacyState(): StoredState | null {
     const parsed = JSON.parse(raw) as Partial<StoredState>;
     if (typeof parsed.source !== 'string') return null;
     return {
-      schemaVersion: typeof parsed.schemaVersion === 'number' ? parsed.schemaVersion : SCHEMA_VERSION,
+      schemaVersion:
+        typeof parsed.schemaVersion === 'number' ? parsed.schemaVersion : SCHEMA_VERSION,
       source: parsed.source,
       settings: parsed.settings ?? {}
     };
@@ -43,7 +44,8 @@ export function buildJsonExport(source: string, settings: SongSettings): string 
 }
 
 export function parseImported(text: string, filename: string): ImportedSong {
-  const looksLikeJson = filename.toLowerCase().endsWith('.json') || text.trimStart().startsWith('{');
+  const looksLikeJson =
+    filename.toLowerCase().endsWith('.json') || text.trimStart().startsWith('{');
   if (looksLikeJson) {
     try {
       const parsed = JSON.parse(text) as { source?: unknown; settings?: unknown };

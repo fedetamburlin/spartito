@@ -17,7 +17,6 @@ const item = (str: string, x: number, y: number, width?: number, height = 10): P
   height
 });
 
-
 describe('itemsToLines', () => {
   it('rebuilds a chord line above the lyrics', () => {
     const lines = itemsToLines([

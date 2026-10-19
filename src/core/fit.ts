@@ -33,10 +33,7 @@ function paramsFor(columns: 1 | 2, textPt: number, cfg: AppConfig): LayoutParams
 }
 
 export function decideLayout(measure: Measure, cfg: AppConfig, options: FitOptions): FitOutcome {
-  const target = Math.min(
-    cfg.layout.textPtMax,
-    Math.max(cfg.layout.textPtMin, options.textPt)
-  );
+  const target = Math.min(cfg.layout.textPtMax, Math.max(cfg.layout.textPtMin, options.textPt));
   const maxColumns = cfg.layout.columnsMax >= 2 ? 2 : 1;
   let attempts = 0;
 
@@ -60,7 +57,8 @@ export function decideLayout(measure: Measure, cfg: AppConfig, options: FitOptio
     return best;
   };
 
-  const firstColumns: 1 | 2 = options.columns === 'auto' ? cfg.layout.columnsDefault : options.columns;
+  const firstColumns: 1 | 2 =
+    options.columns === 'auto' ? cfg.layout.columnsDefault : options.columns;
   const autoColumns = options.columns === 'auto' && cfg.layout.autoColumns && maxColumns === 2;
 
   let params = tryParams(firstColumns, target);

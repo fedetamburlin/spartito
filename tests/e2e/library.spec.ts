@@ -24,7 +24,10 @@ test.describe('song library', () => {
     await expect(page.locator('.song-item')).toHaveCount(3);
     await expect(page.locator('.song-item.active .song-select')).toHaveText('Test Song (2)');
 
-    await page.locator('.song-select').filter({ hasText: /^Test Song$/ }).click();
+    await page
+      .locator('.song-select')
+      .filter({ hasText: /^Test Song$/ })
+      .click();
     await expect(page.locator('.song-item.active .song-select')).toHaveText('Test Song');
     await expect(editorContent(page)).toContainText('{title: Test Song}');
   });

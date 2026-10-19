@@ -45,9 +45,10 @@ function lyricLine(random: () => number): string {
 }
 
 function chordLine(random: () => number): string {
-  return Array.from({ length: 2 + Math.floor(random() * 3) }, () => `[${pick(random, CHORDS)}]`).join(
-    ' '
-  );
+  return Array.from(
+    { length: 2 + Math.floor(random() * 3) },
+    () => `[${pick(random, CHORDS)}]`
+  ).join(' ');
 }
 
 export function randomSong(random: () => number): string {

@@ -5,44 +5,44 @@ never enter this repository (see the project note in `doc/market.md`).
 
 ## ChordPro documents (`*.cho`)
 
-| File | What it covers |
-|---|---|
-| `minimal.cho` | Title + one verse, the smallest valid document |
-| `complete.cho` | All supported constructs in one song |
-| `edge.cho` | Empty sections, long lines, unusual spacing |
-| `grid.cho` | Chord grid block, bars, empty beats, repeats |
-| `tab.cho` | Tab block, literal lines |
-| `unknown.cho` | Unsupported directives preserved on export |
+| File           | What it covers                                 |
+| -------------- | ---------------------------------------------- |
+| `minimal.cho`  | Title + one verse, the smallest valid document |
+| `complete.cho` | All supported constructs in one song           |
+| `edge.cho`     | Empty sections, long lines, unusual spacing    |
+| `grid.cho`     | Chord grid block, bars, empty beats, repeats   |
+| `tab.cho`      | Tab block, literal lines                       |
+| `unknown.cho`  | Unsupported directives preserved on export     |
 
 ## Import fixtures (`import-*.txt`)
 
 All use invented or placeholder lyrics (`My Fake Song`, `Walking down the
 empty road`, `La la la`).
 
-| File | What it covers |
-|---|---|
-| `import-ug.txt` | Ultimate Guitar `[ch]`/`[tab]` markup, sections, capo |
-| `import-ug-header.txt` | `Song Chords` / artist / album header, roman capo |
-| `import-above.txt` | Chords above lyrics, international notation, grid intro |
-| `import-it-above.txt` | Chords above lyrics, Italian notation |
-| `import-real-shape.txt` | Realistic alignment, `Page 1/2` noise, outro |
-| `import-annotations.txt` | `(2x)`, `(instrumental)` annotations, tuning |
+| File                     | What it covers                                          |
+| ------------------------ | ------------------------------------------------------- |
+| `import-ug.txt`          | Ultimate Guitar `[ch]`/`[tab]` markup, sections, capo   |
+| `import-ug-header.txt`   | `Song Chords` / artist / album header, roman capo       |
+| `import-above.txt`       | Chords above lyrics, international notation, grid intro |
+| `import-it-above.txt`    | Chords above lyrics, Italian notation                   |
+| `import-real-shape.txt`  | Realistic alignment, `Page 1/2` noise, outro            |
+| `import-annotations.txt` | `(2x)`, `(instrumental)` annotations, tuning            |
 
 ## PDFs
 
-| File | Origin | What it covers |
-|---|---|---|
-| `mini.pdf` | Synthetic, hand-made | Coordinate reconstruction: chord line above lyrics |
-| `generated/generated-single-column.pdf` | `scripts/make-pdf-fixtures.mjs` | One column, metadata, capo, merge |
-| `generated/generated-two-columns.pdf` | `scripts/make-pdf-fixtures.mjs` | Two-column reading order (left → right) |
-| `generated/generated-noise.pdf` | `scripts/make-pdf-fixtures.mjs` | `Page 1/2`, decorative lines |
-| `generated/generated-misaligned.pdf` | `scripts/make-pdf-fixtures.mjs` | Odd chord alignment, `(2x)` annotation |
-| `generated/generated-multipage-columns.pdf` | `scripts/make-pdf-fixtures.mjs` | 3 pages, 2 columns, running header/footer |
-| `generated/generated-rotated.pdf` | `scripts/make-pdf-fixtures.mjs` | Vertical/rotated text flow |
-| `generated/generated-mixed.pdf` | `scripts/make-pdf-fixtures.mjs` | Text plus image |
-| `generated/generated-hyphenated.pdf` | `scripts/make-pdf-fixtures.mjs` | Soft hyphens and proportional font |
-| `generated/generated-scan.pdf` | `scripts/make-pdf-fixtures.mjs` | Image-only PDF, no text layer |
-| `generated/generated-encrypted.pdf` | `scripts/make-pdf-fixtures.mjs` + Ghostscript | Password-protected PDF, clean rejection |
+| File                                        | Origin                                        | What it covers                                     |
+| ------------------------------------------- | --------------------------------------------- | -------------------------------------------------- |
+| `mini.pdf`                                  | Synthetic, hand-made                          | Coordinate reconstruction: chord line above lyrics |
+| `generated/generated-single-column.pdf`     | `scripts/make-pdf-fixtures.mjs`               | One column, metadata, capo, merge                  |
+| `generated/generated-two-columns.pdf`       | `scripts/make-pdf-fixtures.mjs`               | Two-column reading order (left → right)            |
+| `generated/generated-noise.pdf`             | `scripts/make-pdf-fixtures.mjs`               | `Page 1/2`, decorative lines                       |
+| `generated/generated-misaligned.pdf`        | `scripts/make-pdf-fixtures.mjs`               | Odd chord alignment, `(2x)` annotation             |
+| `generated/generated-multipage-columns.pdf` | `scripts/make-pdf-fixtures.mjs`               | 3 pages, 2 columns, running header/footer          |
+| `generated/generated-rotated.pdf`           | `scripts/make-pdf-fixtures.mjs`               | Vertical/rotated text flow                         |
+| `generated/generated-mixed.pdf`             | `scripts/make-pdf-fixtures.mjs`               | Text plus image                                    |
+| `generated/generated-hyphenated.pdf`        | `scripts/make-pdf-fixtures.mjs`               | Soft hyphens and proportional font                 |
+| `generated/generated-scan.pdf`              | `scripts/make-pdf-fixtures.mjs`               | Image-only PDF, no text layer                      |
+| `generated/generated-encrypted.pdf`         | `scripts/make-pdf-fixtures.mjs` + Ghostscript | Password-protected PDF, clean rejection            |
 
 Regenerate the generated PDFs with
 `node scripts/make-pdf-fixtures.mjs` (Chrome required; Ghostscript for the

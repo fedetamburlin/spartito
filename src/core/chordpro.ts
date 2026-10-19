@@ -34,7 +34,18 @@ const DIRECTIVE_RE = /^\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?::\s*(.*?))?\s*\}$/;
 const CHORD_RE = /\[([^\]]*)\]/g;
 const GRID_BAR_RE = /^[|:][|:.]*\d?\.?$/;
 const ROMAN_VALUES: Record<string, number> = {
-  i: 1, ii: 2, iii: 3, iv: 4, v: 5, vi: 6, vii: 7, viii: 8, ix: 9, x: 10, xi: 11, xii: 12
+  i: 1,
+  ii: 2,
+  iii: 3,
+  iv: 4,
+  v: 5,
+  vi: 6,
+  vii: 7,
+  viii: 8,
+  ix: 9,
+  x: 10,
+  xi: 11,
+  xii: 12
 };
 
 export function parseCapoValue(value: string): number | null {
@@ -92,7 +103,10 @@ export function bracketChords(text: string): string[] {
 function envLabel(value: string): string | undefined {
   const attr = /label\s*=\s*(["'])(.*?)\1/i.exec(value);
   if (attr) return attr[2].trim() || undefined;
-  const bare = value.replace(/shape\s*=\s*(["']).*?\1/i, '').replace(/\s+/g, ' ').trim();
+  const bare = value
+    .replace(/shape\s*=\s*(["']).*?\1/i, '')
+    .replace(/\s+/g, ' ')
+    .trim();
   if (!bare || /^\d+[+\dx]*$/i.test(bare)) return undefined;
   return bare;
 }
@@ -144,7 +158,10 @@ export function parseChordPro(source: string): SongDocument {
 
   const closeCurrent = () => {
     if (current) {
-      while (current.items.length > 0 && current.items[current.items.length - 1].kind === 'spacer') {
+      while (
+        current.items.length > 0 &&
+        current.items[current.items.length - 1].kind === 'spacer'
+      ) {
         current.items.pop();
       }
       doc.blocks.push(current);
@@ -312,7 +329,9 @@ export function serializeChordPro(doc: SongDocument): string {
     if (out.length > 0) out.push('');
     if (block.kind === 'section') {
       if (block.explicit) {
-        out.push(`{${SECTION_DIRECTIVES[block.type].start}${block.label ? `: ${block.label}` : ''}}`);
+        out.push(
+          `{${SECTION_DIRECTIVES[block.type].start}${block.label ? `: ${block.label}` : ''}}`
+        );
         block.items.forEach(pushItem);
         out.push(`{${SECTION_DIRECTIVES[block.type].end}}`);
       } else {

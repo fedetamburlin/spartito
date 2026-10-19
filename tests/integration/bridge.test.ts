@@ -177,7 +177,12 @@ describe('bridge protocol', () => {
     const { bridge, socket, calls } = setup();
     bridge.connect();
     socket().open();
-    socket().message({ type: 'request', id: 'r2', method: 'set_source', params: { source: '[C]new' } });
+    socket().message({
+      type: 'request',
+      id: 'r2',
+      method: 'set_source',
+      params: { source: '[C]new' }
+    });
 
     expect(calls.setSource).toEqual(['[C]new']);
     expect(socket().sentJson().at(-1)).toMatchObject({ type: 'response', id: 'r2', ok: true });

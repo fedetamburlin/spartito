@@ -3,7 +3,8 @@ const INTL_ROOT = /^[A-G][#b]?/;
 const IT_ROOT = /^(?:DO|RE|MI|FA|SOL|LA|SI)[#b]?/;
 const BASS = /^(?:[A-G][#b]?|DO|RE|MI|FA|SOL|LA|SI|do|re|mi|fa|sol|la|si)(?:[#b])?$|^\d+$/;
 const NO_CHORD = /^(?:N\.?C\.?|N\/C)$/i;
-const SEPARATOR = /^(?:\|+|\|?[:.]\|?|:|%|x\d+|\d+x|[（(]\s*\d+\s*[x×]\s*[)）]|\/|,|;|\.{2,}|–|—|-)$/i;
+const SEPARATOR =
+  /^(?:\|+|\|?[:.]\|?|:|%|x\d+|\d+x|[（(]\s*\d+\s*[x×]\s*[)）]|\/|,|;|\.{2,}|–|—|-)$/i;
 
 export type ChordSystem = 'intl' | 'it';
 
@@ -85,7 +86,12 @@ export function mergeChordLine(chordLine: string, lyricLine: string): string {
   const re = /\S+/g;
   let match: RegExpExecArray | null;
   while ((match = re.exec(lyricLine))) {
-    words.push({ text: match[0], start: match.index, end: match.index + match[0].length - 1, chords: [] });
+    words.push({
+      text: match[0],
+      start: match.index,
+      end: match.index + match[0].length - 1,
+      chords: []
+    });
   }
   if (words.length === 0) return lyricLine;
 

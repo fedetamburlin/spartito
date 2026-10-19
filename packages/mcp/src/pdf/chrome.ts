@@ -57,9 +57,7 @@ export async function printToPdf(
 ): Promise<PdfExportResult> {
   const chrome = findChrome();
   if (!chrome) {
-    throw new Error(
-      'Google Chrome or Chromium not found. Install it or set SPARTITO_CHROME_PATH.'
-    );
+    throw new Error('Google Chrome or Chromium not found. Install it or set SPARTITO_CHROME_PATH.');
   }
   mkdirSync(path.dirname(outPath), { recursive: true });
   const profile = mkdtempSync(path.join(tmpdir(), 'spartito-chrome-'));

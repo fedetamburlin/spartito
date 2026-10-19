@@ -134,8 +134,7 @@ export class BridgeServer implements AppBridge {
 
   async updateSettings(patch: Partial<SongSettings>): Promise<SongSettings> {
     const result = (await this.request('update_settings', { patch })) as
-      | { settings?: SongSettings }
-      | undefined;
+      { settings?: SongSettings } | undefined;
     const settings = sanitizeSettings(result?.settings ?? { ...this.state?.settings, ...patch });
     if (this.state) this.state = { ...this.state, settings };
     return settings;

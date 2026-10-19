@@ -7,8 +7,12 @@ const SECTION_MAP = importDefaults.sections as Record<string, 'verse' | 'chorus'
 const METADATA = new Set(importDefaults.metadata.map((label) => label.toLowerCase()));
 const NOISE = ((importDefaults.noise ?? []) as string[]).map((pattern) => new RegExp(pattern, 'i'));
 const METADATA_RE = new RegExp(`^(${[...METADATA].join('|')})\\b\\s*[:=]\\s*(.+)`, 'i');
-const TITLE_MARKERS = ((importDefaults.titleMarkers ?? []) as string[]).map((marker) => marker.toLowerCase());
-const LOOSE_METADATA = ((importDefaults.metadataLoose ?? []) as string[]).map((label) => label.toLowerCase());
+const TITLE_MARKERS = ((importDefaults.titleMarkers ?? []) as string[]).map((marker) =>
+  marker.toLowerCase()
+);
+const LOOSE_METADATA = ((importDefaults.metadataLoose ?? []) as string[]).map((label) =>
+  label.toLowerCase()
+);
 const LOOSE_METADATA_RE = LOOSE_METADATA.length
   ? new RegExp(`^(?:${LOOSE_METADATA.join('|')})\\b`, 'i')
   : /$^/;
@@ -42,7 +46,10 @@ function looksLikeTablature(lines: string[]): boolean {
 }
 
 function normalize(raw: string): { text: string; tabs: number } {
-  let text = raw.replace(/\r\n?/g, '\n').replace(/\u00a0/g, ' ').replace(/\t/g, '    ');
+  let text = raw
+    .replace(/\r\n?/g, '\n')
+    .replace(/\u00a0/g, ' ')
+    .replace(/\t/g, '    ');
 
   // The current Ultimate Guitar copy format wraps each line in
   // [tab]...[/tab] and chords in [ch]...[/ch]. Unwrap single-line
@@ -114,7 +121,10 @@ function headerLabel(line: string): string | null {
     const label = bracket[1].trim();
     return isChordToken(label) ? null : label;
   }
-  const cleaned = line.replace(/^[\s[(]+/, '').replace(/[\s\])]+$/, '').trim();
+  const cleaned = line
+    .replace(/^[\s[(]+/, '')
+    .replace(/[\s\])]+$/, '')
+    .trim();
   if (cleaned && cleaned.split(/\s+/).length <= 3 && sectionType(cleaned)) return cleaned;
   return null;
 }
@@ -146,7 +156,10 @@ function titleFromMarker(line: string): string | null {
   const lower = line.toLowerCase();
   for (const marker of TITLE_MARKERS) {
     if (lower.endsWith(marker) && line.length > marker.length) {
-      const title = line.slice(0, line.length - marker.length).replace(/[\s\-–—|]+$/, '').trim();
+      const title = line
+        .slice(0, line.length - marker.length)
+        .replace(/[\s\-–—|]+$/, '')
+        .trim();
       return title || null;
     }
   }
@@ -176,7 +189,8 @@ export function importSong(raw: string): ImportResult {
 
   const { text, tabs } = normalize(raw);
   stats.tabs = tabs;
-  if (tabs > 0) warnings.push(`Imported ${tabs} tab block${tabs === 1 ? '' : 's'}: check alignment`);
+  if (tabs > 0)
+    warnings.push(`Imported ${tabs} tab block${tabs === 1 ? '' : 's'}: check alignment`);
 
   const lines = text.split('\n').map((line) => line.trimEnd());
   const out: string[] = [];
@@ -284,7 +298,22 @@ export function importSong(raw: string): ImportResult {
       closeSection();
       if (type) {
         const key = normalizeKey(clean);
-        const plain = ['verse', 'verso', 'strofa', 'estrofe', 'parte', 'primeira parte', 'chorus', 'coro', 'ritornello', 'refrao', 'refrão', 'bridge', 'ponte', 'puente'].includes(key);
+        const plain = [
+          'verse',
+          'verso',
+          'strofa',
+          'estrofe',
+          'parte',
+          'primeira parte',
+          'chorus',
+          'coro',
+          'ritornello',
+          'refrao',
+          'refrão',
+          'bridge',
+          'ponte',
+          'puente'
+        ].includes(key);
         const needsLabel = /[0-9]/.test(clean) || !plain;
         out.push(`{start_of_${type}${needsLabel ? `: ${clean}` : ''}}`);
         openSection = type;
