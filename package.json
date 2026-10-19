@@ -30,6 +30,7 @@
     "test:e2e": "npm run build && playwright test",
     "test:e2e:ui": "npm run build && playwright test --ui",
     "fixtures:sync": "node scripts/fetch-fixtures.mjs",
+    "fixtures:check": "node scripts/fetch-fixtures.mjs --check",
     "fixtures:pdf": "node scripts/make-pdf-fixtures.mjs",
     "verify": "npm run check && npm test && npm run test:e2e && npm run mcp:check && npm run mcp:test",
     "mcp:build": "npm run build -w spartito-mcp",

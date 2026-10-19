@@ -1,0 +1,92 @@
+[
+  {
+    "slug": "imslp-amazing-grace",
+    "title": "Amazing Grace (Stith)",
+    "url": "https://s9.imslp.org/files/imglnks/usimg/5/5c/IMSLP685821-PMLP461016-amazinggrace.pdf",
+    "origin": "IMSLP",
+    "license": "CC0 / public domain",
+    "fetched": "2026-10-19",
+    "features": [
+      "3 pages",
+      "chords above lyrics",
+      "text layer"
+    ],
+    "expect": {
+      "pages": 3,
+      "hasText": true,
+      "minMerged": 5
+    }
+  },
+  {
+    "slug": "commons-amazing-grace-lead",
+    "title": "Amazing Grace (lead sheet)",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Amazing_Grace_Cmaj_Lead_Sheet.pdf",
+    "origin": "Wikimedia Commons",
+    "license": "public domain / Commons",
+    "fetched": "2026-10-19",
+    "features": [
+      "1 page",
+      "lead sheet",
+      "text layer"
+    ],
+    "expect": {
+      "pages": 1,
+      "hasText": true,
+      "minMerged": 0
+    }
+  },
+  {
+    "slug": "commons-amazing-grace-score",
+    "title": "Amazing Grace (full score scan)",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/73/Amazing_Grace_%28IA_imslp-grace-anonymous%29.pdf",
+    "origin": "Wikimedia Commons / IMSLP",
+    "license": "public domain",
+    "fetched": "2026-10-19",
+    "features": [
+      "11 pages",
+      "multi-page score",
+      "partial text layer"
+    ],
+    "expect": {
+      "pages": 11,
+      "hasText": true,
+      "minMerged": 10
+    }
+  },
+  {
+    "slug": "fachords-chords-ebook",
+    "title": "FaChords guitar chords ebook",
+    "url": "https://www.fachords.com/static/download/ebooks/fachords-chords-ebook.pdf",
+    "origin": "FaChords",
+    "license": "free ebook, local test only",
+    "fetched": "2026-10-19",
+    "features": [
+      "24 pages",
+      "chord diagrams",
+      "text layer"
+    ],
+    "expect": {
+      "pages": 24,
+      "hasText": true,
+      "minMerged": 1
+    }
+  },
+  {
+    "slug": "learnmaster-basic-chords",
+    "title": "Learn & Master basic chord charts",
+    "url": "https://www.learnandmaster.com/resources/Basic%20Chords%20REVISED.pdf",
+    "origin": "Learn & Master Guitar",
+    "license": "free resource, local test only",
+    "fetched": "2026-10-19",
+    "features": [
+      "1 page",
+      "chord diagrams",
+      "short text layer"
+    ],
+    "expect": {
+      "pages": 1,
+      "hasText": true,
+      "minMerged": 0
+    }
+  }
+]

@@ -166,5 +166,161 @@
     "expect": {
       "minMerged": 10
     }
+  },
+  {
+    "slug": "i-know-spanish",
+    "title": "I Know",
+    "artist": "Gharama",
+    "url": "https://tabs.ultimate-guitar.com/tab/gharama/i-know-chords-4842050",
+    "fetched": "2026-10-19",
+    "features": [
+      "Spanish [Estrofa] section"
+    ],
+    "expect": {
+      "minMerged": 20,
+      "minSections": 2
+    }
+  },
+  {
+    "slug": "eu-quero-rockar",
+    "title": "Eu Quero Rockar",
+    "artist": "Toups and Laudi",
+    "url": "https://tabs.ultimate-guitar.com/tab/misc-originals/toups-and-laudi-eu-quero-rockar-chords-5778839",
+    "fetched": "2026-10-19",
+    "features": [
+      "Portuguese [Refrão] section",
+      "x2 marker"
+    ],
+    "expect": {
+      "minMerged": 25,
+      "minSections": 2
+    }
+  },
+  {
+    "slug": "bohemian-rhapsody",
+    "title": "Bohemian Rhapsody",
+    "artist": "Queen",
+    "url": "https://tabs.ultimate-guitar.com/tab/queen/bohemian-rhapsody-chords-213409",
+    "fetched": "2026-10-19",
+    "features": [
+      "very long",
+      "instrumental sections",
+      "capo"
+    ],
+    "expect": {
+      "capo": 3,
+      "minMerged": 30,
+      "minSections": 12,
+      "minTabs": 5
+    }
+  },
+  {
+    "slug": "sweet-child-eb",
+    "title": "Sweet Child O' Mine",
+    "artist": "Guns N' Roses",
+    "url": "https://tabs.ultimate-guitar.com/tab/guns-n-roses/sweet-child-o-mine-chords-1719104",
+    "fetched": "2026-10-19",
+    "features": [
+      "Eb tuning",
+      "no capo",
+      "long"
+    ],
+    "expect": {
+      "capo": 0,
+      "minMerged": 30,
+      "minSections": 7
+    }
+  },
+  {
+    "slug": "happy-birthday",
+    "title": "Happy Birthday",
+    "artist": "Misc Traditional",
+    "url": "https://tabs.ultimate-guitar.com/tab/misc-traditional/happy-birthday-chords-2435107",
+    "fetched": "2026-10-19",
+    "features": [
+      "very short",
+      "chords above lyrics"
+    ],
+    "expect": {
+      "minMerged": 10,
+      "minSections": 2
+    }
+  },
+  {
+    "slug": "sweet-child-tab",
+    "title": "Sweet Child O' Mine (tab)",
+    "artist": "Guns N' Roses",
+    "url": "https://tabs.ultimate-guitar.com/tab/guns-n-roses/sweet-child-o-mine-tabs-39188",
+    "fetched": "2026-10-19",
+    "features": [
+      "tab-only page",
+      "tablature markers"
+    ],
+    "expect": {
+      "minMerged": 0,
+      "minTabs": 5
+    }
+  },
+  {
+    "slug": "estrofas-de-amor",
+    "title": "Estrofas de Amor",
+    "artist": "Los Cantores de Quilla Huasi",
+    "url": "https://tabs.ultimate-guitar.com/tab/los-cantores-de-quilla-huasi/estrofas-de-amor-chords-1655152",
+    "fetched": "2026-10-19",
+    "features": [
+      "Spanish lyrics",
+      "chord list at top"
+    ],
+    "expect": {
+      "minMerged": 10
+    }
+  },
+  {
+    "slug": "rude-cruz",
+    "title": "Rude Cruz",
+    "artist": "Fernandinho",
+    "url": "https://tabs.ultimate-guitar.com/tab/fernandinho/rude-cruz-chords-6208961",
+    "fetched": "2026-10-19",
+    "features": [
+      "Portuguese [Refrão] section",
+      "minor chords"
+    ],
+    "expect": {
+      "minMerged": 25,
+      "minSections": 4
+    }
+  },
+  {
+    "slug": "hotel-california",
+    "title": "Hotel California",
+    "artist": "Eagles",
+    "url": "https://tabs.ultimate-guitar.com/tab/eagles/hotel-california-chords-1092238",
+    "fetched": "2026-10-19",
+    "features": [
+      "long",
+      "many sections",
+      "solo"
+    ],
+    "expect": {
+      "capo": 2,
+      "minMerged": 40,
+      "minSections": 5
+    }
+  },
+  {
+    "slug": "hallelujah",
+    "title": "Hallelujah",
+    "artist": "Leonard Cohen",
+    "url": "https://tabs.ultimate-guitar.com/tab/leonard-cohen/hallelujah-chords-97663",
+    "fetched": "2026-10-19",
+    "features": [
+      "long",
+      "chorus repeats",
+      "chord line after each verse"
+    ],
+    "expect": {
+      "minMerged": 45,
+      "minSections": 6
+    }
   }
 ]

@@ -36,7 +36,7 @@ same test copied five times.
 |---|---|---|---|
 | 1. Pure unit | `chordpro`, `chords` (in `import.test`), `transpose`, `capo`, `fit`, `zoom`, `theme`, `highlight`, `settings` (in `invariants`) | Local logic errors | Errors between modules |
 | 2. Invariants | `invariants`, `config`, `timeout`, `deeplink` | Contract errors, config drift, async edge cases | UI errors |
-| 3. Data fixtures | `import`, `pdf`, `pdf-fixtures`, `local-import` | Real-world input shapes (UG markup, PDF coordinates) | User flows |
+| 3. Data fixtures | `import`, `pdf`, `pdf-fixtures`, `local-import`, `local-pdf` | Real-world input shapes (UG markup, PDF coordinates) | User flows |
 | 4. Browser E2E | `e2e/*.spec.ts` | Svelte ↔ CodeMirror ↔ IndexedDB ↔ print glue | Algorithm details |
 | 5. MCP | `../packages/mcp/test` | Protocol, bridge, HTTP, tools | UI |
 
@@ -48,7 +48,7 @@ same test copied five times.
 | ChordPro parser, directives, capo, chorus recall | `chordpro.test.ts`, `directives.test.ts` |
 | Transposition, capo display | `transpose.test.ts`, `capo.test.ts`, `invariants.test.ts` |
 | Layout, auto-fit, auto-grow | `fit.test.ts`, `invariants.test.ts`, `e2e/boot.spec.ts` |
-| Import from text/UG/PDF | `import.test.ts`, `pdf.test.ts`, `pdf-fixtures.test.ts`, `local-import.test.ts`, `e2e/import.spec.ts` |
+| Import from text/UG/PDF | `import.test.ts`, `pdf.test.ts`, `pdf-fixtures.test.ts`, `local-import.test.ts`, `local-pdf.test.ts`, `e2e/import.spec.ts` |
 | Library, IndexedDB, legacy migration | `library.test.ts`, `db.test.ts` |
 | Persistence, export filename | `persistence.test.ts`, `invariants.test.ts` |
 | Settings sanitization | `invariants.test.ts`, `persistence.test.ts` |
@@ -92,21 +92,26 @@ lyrics. See [`fixtures/README.md`](fixtures/README.md) for the catalogue.
    result.
 4. Add a table-driven case in the owning spec.
 
-### Real Ultimate Guitar corpus (local only)
+### Real-world corpus (local only)
 
-The ten real pages live in `fixtures/local/ug/`, which is **gitignored**:
-the text is copyrighted and must not be published. Only URLs and metadata
-are committed in `fixtures/ug-sources.json`.
+The **20 real Ultimate Guitar pages** and **5 real PDFs** live in
+`fixtures/local/`, which is **gitignored**: the text is copyrighted and must
+not be published. Only URLs, metadata and checksums are committed in
+`fixtures/ug-sources.json`, `fixtures/pdf-sources.json` and the generated
+`fixtures/local/manifest.json`.
 
 ```bash
-node scripts/fetch-fixtures.mjs          # download missing pages
-node scripts/fetch-fixtures.mjs --force  # refresh everything
+node scripts/fetch-fixtures.mjs                 # download what is missing
+node scripts/fetch-fixtures.mjs --force         # refresh everything
+node scripts/fetch-fixtures.mjs --only pdf      # one group
+node scripts/fetch-fixtures.mjs --check         # verify checksums, no network
 ```
 
-Then `npm test` runs `local-import.test.ts`; when the folder is missing the
-suite is skipped. Invariants checked: no crash, no `[ch]`/`[tab]` leftovers,
-no `Page 1/2`, capo/title when present, minimum merged chord lines and
-section counts. CI never sees these files.
+Then `npm test` runs `local-import.test.ts` and `local-pdf.test.ts`; when the
+folders are missing the suites are skipped. Assertions are structural: no
+`[ch]`/`[tab]` leftovers, no `Page 1/2`, title/capo when present, minimum
+merged lines and sections, every chord valid, balanced sections, import
+idempotence and ≥65% word retention. CI never sees these files.
 
 ### PDF fixtures
 
@@ -124,7 +129,7 @@ PDF through the real file input.
 
 `deploy.yml` runs `check`, `test`, `mcp:check`, `mcp:test`, `mcp:build`,
 then installs Chromium and runs the E2E suite before deploying. Playwright
-browser downloads are cached; traces are uploaded on failure. The local UG
+browser downloads are cached; traces are uploaded on failure. The local
 corpus is **not** part of CI by design.
 
 ## Deliberate non-goals
