@@ -37,6 +37,15 @@ describe('IndexedDB library store', () => {
     expect(state.songs[0].source).toContain('Demo');
   });
 
+  it('accepts proxy-wrapped entries (Svelte $state objects)', async () => {
+    const store = await openLibraryDb(uniqueName());
+    const song = createSong('{title: Proxied}\n', defaultSettings(), 5, 'p');
+    const proxied = new Proxy(song, {});
+
+    await expect(store.putSong(proxied)).resolves.toBeUndefined();
+    expect(await store.getSongs()).toEqual([song]);
+  });
+
   it('deletion survives a reopen', async () => {
     const name = uniqueName();
     const store = await openLibraryDb(name);

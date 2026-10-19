@@ -24,6 +24,9 @@ export interface LibraryStore {
 export const DB_NAME = 'spartito';
 export const DB_VERSION = 1;
 
+/** If IndexedDB never answers, the app must still boot in demo mode. */
+export const LIBRARY_OPEN_TIMEOUT_MS = 3000;
+
 const SONGS = 'songs';
 const META = 'meta';
 
@@ -34,17 +37,31 @@ function request<T>(req: IDBRequest<T>): Promise<T> {
   });
 }
 
+/**
+ * IndexedDB's structured clone rejects proxies (Svelte 5 `$state` objects
+ * are proxies). Everything we store is plain JSON data, so a JSON round-trip
+ * is a safe, dependency-free way to hand the store a cloneable value.
+ */
+function forStorage<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T;
+}
+
 function wrap(db: IDBDatabase): LibraryStore {
   const run = <T>(store: string, mode: IDBTransactionMode, job: (s: IDBObjectStore) => IDBRequest<T>) =>
     request(job(db.transaction(store, mode).objectStore(store)));
 
   return {
     getSongs: () => run<SongEntry[]>(SONGS, 'readonly', (s) => s.getAll()),
-    putSong: (song) => run<IDBValidKey>(SONGS, 'readwrite', (s) => s.put(song)).then(() => undefined),
+    putSong: (song) =>
+      run<IDBValidKey>(SONGS, 'readwrite', (s) => s.put(forStorage(song))).then(
+        () => undefined
+      ),
     deleteSong: (id) => run<undefined>(SONGS, 'readwrite', (s) => s.delete(id)),
     getMeta: <T>(key: string) => run<T | undefined>(META, 'readonly', (s) => s.get(key)),
     putMeta: (key, value) =>
-      run<IDBValidKey>(META, 'readwrite', (s) => s.put(value, key)).then(() => undefined)
+      run<IDBValidKey>(META, 'readwrite', (s) => s.put(forStorage(value), key)).then(
+        () => undefined
+      )
   };
 }
 

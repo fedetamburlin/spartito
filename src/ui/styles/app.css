@@ -129,6 +129,14 @@ body {
   letter-spacing: 0.01em;
 }
 
+.app-notice {
+  padding: 8px 12px;
+  background: var(--ui-warning);
+  color: var(--ui-on-warning);
+  font-size: 13px;
+  text-align: center;
+}
+
 .app-toolbar {
   display: flex;
   flex-wrap: wrap;

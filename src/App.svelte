@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createBridge, type BridgeStatus } from './core/bridge';
-  import { openLibraryDb, type LibraryStore, type SongEntry } from './core/db';
+  import { openLibraryDb, LIBRARY_OPEN_TIMEOUT_MS, type LibraryStore, type SongEntry } from './core/db';
   import { config } from './core/config';
   import { clearDocumentHash, readDocumentFromHash } from './core/deeplink';
   import { parseChordPro } from './core/chordpro';
@@ -18,6 +18,7 @@
   } from './core/library';
   import { loadLegacyState } from './core/persistence';
   import { sanitizeSettings, withTranspose, type SongSettings } from './core/settings';
+  import { withTimeout } from './core/timeout';
   import { transposedForDisplay } from './core/transpose';
   import EditorPane from './ui/EditorPane.svelte';
   import PreviewPane from './ui/PreviewPane.svelte';
@@ -29,6 +30,7 @@
   const ephemeral = shared !== null;
 
   let ready = $state(ephemeral);
+  let libraryError = $state(false);
   let store: LibraryStore | null = null;
   let songs = $state<SongEntry[]>([]);
   let activeId = $state('');
@@ -51,7 +53,11 @@
   if (!ephemeral) {
     void (async () => {
       try {
-        store = await openLibraryDb();
+        store = await withTimeout(
+          openLibraryDb(),
+          LIBRARY_OPEN_TIMEOUT_MS,
+          'Library open timed out'
+        );
         const state = await initLibrary(store, loadLegacyState(), DEMO_SONG);
         songs = state.songs;
         activeId = state.activeId;
@@ -62,6 +68,7 @@
           settings = active.settings;
         }
       } catch (error) {
+        libraryError = true;
         console.error('[spartito] library unavailable, changes will not be saved:', error);
       } finally {
         ready = true;
@@ -301,6 +308,11 @@
     <img class="app-logo" src="favicon.svg" alt="" width="18" height="18" />
     <span class="app-name">Spartito</span>
   </header>
+  {#if libraryError}
+    <div class="app-notice" role="alert">
+      Library unavailable — songs won't be saved. Check browser storage permissions.
+    </div>
+  {/if}
   {#if ready}
     <Toolbar
       {doc}
