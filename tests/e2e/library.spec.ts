@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { editorContent, openLibrary } from './helpers';
+import { editorContent, openLibrary, waitForStoredTitle } from './helpers';
 
 // Library flows use a real IndexedDB in an isolated browser context per test.
 
@@ -52,6 +52,7 @@ test.describe('song library', () => {
     await active.locator('button[title="Rename"]').click();
     await active.locator('input.song-rename').fill('Persisted Song');
     await active.locator('input.song-rename').press('Enter');
+    await waitForStoredTitle(page, 'Persisted Song');
 
     await page.reload();
 

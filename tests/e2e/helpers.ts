@@ -41,3 +41,31 @@ export async function openLibrary(page: Page): Promise<void> {
   await page.goto('/');
   await expect(page.locator('.cm-editor')).toBeVisible();
 }
+
+/**
+ * Rename and other library writes are fire-and-forget. Reloading right after
+ * a DOM update can race the IndexedDB transaction, so wait for the stored
+ * title before reloading. This also asserts the write actually happened.
+ */
+export async function waitForStoredTitle(page: Page, title: string): Promise<void> {
+  await expect
+    .poll(
+      async () =>
+        page.evaluate(async (expected) => {
+          const db = await new Promise<IDBDatabase>((resolve, reject) => {
+            const request = indexedDB.open('spartito');
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+          });
+          const songs = await new Promise<Array<{ source: string }>>((resolve, reject) => {
+            const request = db.transaction('songs', 'readonly').objectStore('songs').getAll();
+            request.onsuccess = () => resolve(request.result as Array<{ source: string }>);
+            request.onerror = () => reject(request.error);
+          });
+          db.close();
+          return songs.some((song) => song.source.includes(`{title: ${expected}}`));
+        }, title),
+      { timeout: 5000 }
+    )
+    .toBe(true);
+}
