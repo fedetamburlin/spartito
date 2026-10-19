@@ -21,14 +21,14 @@ Node.js 18.19+ (20/22/24 LTS recommended) and npm:
 
 ## Using the app
 
-Source in **ChordPro (subset)** in the left editor, live A4 preview on the right; drag the divider to resize the panes (double-click or Home to reset).
+Source in **ChordPro (subset)** in the left editor (CodeMirror 6: chords, directives and comments highlighted, search with Ctrl+F, undo/redo), live A4 preview on the right; drag the divider to resize the panes (double-click or Home to reset).
 
 - **Insert** menu (grouped snippets) and **?** syntax reference in the editor header — every command shown there is verified by the test suite
 - **Songs sidebar** on the left (collapsible to an icon rail): keep many songs, one active at a time, each with its own source, settings and transposition; rename, duplicate and delete from the list. Songs live in IndexedDB; the old single-song autosave is migrated automatically
 - **Dark theme** for the app chrome (the A4 sheet stays white): follows the system by default, sun/moon toggle at the end of the settings row
 - chords `[Am]word`, `[C][G]word`, Italian note names `[Do]`; blank lines separate paragraphs, also inside sections
 - canonical directive names only (`{title}`, `{start_of_chorus}`, …), with `{chorus}`/`{rit}` as compact chorus recall; unsupported directives are ignored in the preview (a badge reports how many) and preserved on export
-- auto-fit: 1 column → 2 columns → font down to 6pt lyrics / 5pt chords (defaults 11/10); the PDF stays on one page, with a warning when the song does not fit
+- auto-fit: 1 column → 2 columns → font down to 6pt lyrics / 5pt chords (defaults 11/10); short songs instead grow the font up to 14pt to fill the page (badge shows "grown"); the PDF stays on one page, with a warning when the song does not fit
 - **Transpose** stepper (or `+`/`−` keys): preview and PDF only; `{capo: N}` is shown under the title and moves with transposition
 - **From text**: paste from Ultimate Guitar or any chord site, conversion is automatic (Italian notation, sections, UG title/artist markers); **From file**: `.cho`, `.crd`, `.json` and text PDFs
 - **Export chords** (`.cho`) and **Print PDF** (Chrome/Chromium → Save as PDF, default margins, headers off); autosave in `localStorage`
@@ -57,7 +57,7 @@ Click **MCP** in the toolbar: the dot turns green when connected (bridge on `127
 ```
 config/        project defaults and import dictionaries
 public/fonts/  OFL fonts (Inter, IBM Plex Sans Condensed, JetBrains Mono) + licenses
-src/core/      pure TS: config, model, db, library, directives, chordpro, chords, transpose, import, pdf, fit, persistence, settings
+src/core/      pure TS: config, model, db, library, directives, chordpro, chords, transpose, import, pdf, fit, highlight, persistence, settings
 src/ui/        Svelte components, styles and measurement
 packages/mcp/  local MCP server: tools, websocket bridge, stdio/HTTP transports, PDF export
 tests/         fixtures and unit tests
@@ -65,6 +65,6 @@ tests/         fixtures and unit tests
 
 ## Status and license
 
-Working POC (P0). P1/P2 backlog: CodeMirror 6, automatic export, PWA, song library, notation.
+Working POC (P0) with the song library, import from PDF/text and the MCP bridge. P1/P2 backlog: more page formats, automatic export, PWA, setlists, notation.
 
 MIT. Fonts under SIL Open Font License 1.1 (see `public/fonts/OFL-*.txt`).

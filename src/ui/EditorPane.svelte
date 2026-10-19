@@ -1,5 +1,9 @@
 <script lang="ts">
+  import { EditorState } from '@codemirror/state';
+  import { EditorView } from '@codemirror/view';
+  import { onMount } from 'svelte';
   import { applySnippet, directiveById } from '../core/directives';
+  import { editorExtensions } from './editorExtensions';
   import ChordProHelp from './ChordProHelp.svelte';
   import InsertMenu from './InsertMenu.svelte';
 
@@ -9,33 +13,50 @@
 
   let { source = $bindable() }: Props = $props();
 
-  let textarea = $state<HTMLTextAreaElement | null>(null);
+  let host = $state<HTMLDivElement | null>(null);
+  let view = $state.raw<EditorView | null>(null);
+
+  function createState(doc: string): EditorState {
+    return EditorState.create({
+      doc,
+      extensions: editorExtensions((text) => {
+        source = text;
+      })
+    });
+  }
+
+  onMount(() => {
+    if (!host) return;
+    const created = new EditorView({ state: createState(source), parent: host });
+    view = created;
+    return () => {
+      created.destroy();
+      view = null;
+    };
+  });
+
+  // Sync external updates (song switch, import, MCP set_song) into the
+  // editor: a whole-document difference means the change came from outside,
+  // so the state is rebuilt and the undo history does not cross songs.
+  $effect(() => {
+    const current = view;
+    const next = source;
+    if (!current || current.state.doc.toString() === next) return;
+    current.setState(createState(next));
+  });
 
   function insertSnippet(id: string) {
     const snippet = directiveById(id);
-    const el = textarea;
-    if (!snippet || !el) return;
-    const start = el.selectionStart;
-    const end = el.selectionEnd;
-    const edit = applySnippet(source, start, end, snippet);
-    el.focus();
-    el.setSelectionRange(start, end);
-    let handled = false;
-    try {
-      handled = document.execCommand('insertText', false, edit.insertText);
-    } catch {
-      handled = false;
-    }
-    if (handled) {
-      source = el.value;
-    } else {
-      el.setRangeText(edit.insertText, start, end, 'end');
-      source = el.value;
-    }
-    requestAnimationFrame(() => {
-      el.focus();
-      el.setSelectionRange(edit.selectionStart, edit.selectionEnd);
+    const current = view;
+    if (!snippet || !current) return;
+    const { from, to } = current.state.selection.main;
+    const edit = applySnippet(current.state.doc.toString(), from, to, snippet);
+    current.dispatch({
+      changes: { from, to, insert: edit.insertText },
+      selection: { anchor: edit.selectionStart, head: edit.selectionEnd },
+      scrollIntoView: true
     });
+    current.focus();
   }
 </script>
 
@@ -45,11 +66,5 @@
     <ChordProHelp />
     <InsertMenu onInsert={insertSnippet} />
   </div>
-  <textarea
-    class="editor-area"
-    spellcheck="false"
-    autocomplete="off"
-    bind:this={textarea}
-    bind:value={source}
-  ></textarea>
+  <div class="editor-cm" bind:this={host}></div>
 </section>

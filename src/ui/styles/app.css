@@ -35,6 +35,9 @@
   --group-sections-bg: #ecf5ef;
   --group-blocks-bg: #f0f2f5;
   --group-chords-bg: #f3f2f6;
+  --ui-cm-chord: #1a4f8a;
+  --ui-cm-directive: #6a3d9a;
+  --ui-cm-comment: #66707c;
 }
 
 :root[data-theme='dark'] {
@@ -74,6 +77,9 @@
   --group-sections-bg: #1c2a22;
   --group-blocks-bg: #232930;
   --group-chords-bg: #272433;
+  --ui-cm-chord: #86b3e6;
+  --ui-cm-directive: #c6a8f0;
+  --ui-cm-comment: #98a2b1;
 }
 
 * {
@@ -795,16 +801,23 @@ button.primary {
   color: var(--ui-muted);
 }
 
-.editor-area {
+.editor-cm {
   flex: 1;
-  border: 0;
-  resize: none;
-  padding: 12px;
-  outline: none;
-  font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--ui-text);
+  min-height: 0;
+}
+
+.cm-chord {
+  color: var(--ui-cm-chord);
+  font-weight: 600;
+}
+
+.cm-directive {
+  color: var(--ui-cm-directive);
+}
+
+.cm-comment {
+  color: var(--ui-cm-comment);
+  font-style: italic;
 }
 
 .preview {
