@@ -50,7 +50,7 @@
       case 'shrunk':
         return `${columns} · ${outcome.params.textPt}pt (shrunk)`;
       case 'overflow':
-        return 'Does not fit on one page: reduce the text size or pick 2 columns';
+        return 'Does not fit on one page: shorten the song or change columns/margins';
     }
   });
 
