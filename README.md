@@ -17,6 +17,7 @@ Node.js 18.19+ (20/22/24 LTS recommended) and npm:
 | `npm run preview` | serve the build |
 | `npm run check` | svelte-check (TypeScript + Svelte) |
 | `npm test` | unit tests (Vitest) |
+| `npm run test:e2e` | browser smoke tests (Playwright/Chromium; run `npx playwright install chromium` once) |
 | `npm run mcp:build` · `mcp:check` · `mcp:test` | build, type-check, test the MCP server |
 
 ## Using the app
@@ -32,6 +33,12 @@ Source in **ChordPro (subset)** in the left editor (CodeMirror 6: chords, direct
 - **Transpose** stepper (or `+`/`−` keys): preview and PDF only; `{capo: N}` is shown under the title and moves with transposition
 - **From text**: paste from Ultimate Guitar or any chord site, conversion is automatic (Italian notation, sections, UG title/artist markers); **From file**: `.cho`, `.crd`, `.json` and text PDFs
 - **Export chords** (`.cho`) and **Print PDF** (Chrome/Chromium → Save as PDF, default margins, headers off); autosave in `localStorage`
+
+## Tests
+
+`npm test` covers the parser, import (text and PDF), layout, transposition, library and the app-side MCP bridge. `npm run test:e2e` builds the app and drives real Chromium flows: editing, Insert menu, import dialog, library CRUD, PDF export and the storage-unavailable fallback.
+
+The real Ultimate Guitar corpus is **local only** (copyrighted text, gitignored): `node tools/fetch-ug-fixtures.mjs` downloads ten pages, then `npm test` runs the structural checks. See [`tests/README.md`](tests/README.md) for the layer map, conventions and fixture catalogue.
 
 ## MCP server (opencode)
 
@@ -60,7 +67,8 @@ public/fonts/  OFL fonts (Inter, IBM Plex Sans Condensed, JetBrains Mono) + lice
 src/core/      pure TS: config, model, db, library, directives, chordpro, chords, transpose, import, pdf, fit, highlight, persistence, settings
 src/ui/        Svelte components, styles and measurement
 packages/mcp/  local MCP server: tools, websocket bridge, stdio/HTTP transports, PDF export
-tests/         fixtures and unit tests
+tests/         unit/integration tests, fixtures, Playwright E2E (see tests/README.md)
+tools/         fixture downloaders (local-only real-world corpus)
 ```
 
 ## Status and license

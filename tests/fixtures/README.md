@@ -1,0 +1,58 @@
+# Fixture catalogue
+
+All committed fixtures are synthetic or public domain. Third-party lyrics
+never enter this repository (see the project note in `doc/market.md`).
+
+## ChordPro documents (`*.cho`)
+
+| File | What it covers |
+|---|---|
+| `minimal.cho` | Title + one verse, the smallest valid document |
+| `complete.cho` | All supported constructs in one song |
+| `edge.cho` | Empty sections, long lines, unusual spacing |
+| `grid.cho` | Chord grid block, bars, empty beats, repeats |
+| `tab.cho` | Tab block, literal lines |
+| `unknown.cho` | Unsupported directives preserved on export |
+
+## Import fixtures (`import-*.txt`)
+
+All use invented or placeholder lyrics (`My Fake Song`, `Walking down the
+empty road`, `La la la`).
+
+| File | What it covers |
+|---|---|
+| `import-ug.txt` | Ultimate Guitar `[ch]`/`[tab]` markup, sections, capo |
+| `import-ug-header.txt` | `Song Chords` / artist / album header, roman capo |
+| `import-above.txt` | Chords above lyrics, international notation, grid intro |
+| `import-it-above.txt` | Chords above lyrics, Italian notation |
+| `import-real-shape.txt` | Realistic alignment, `Page 1/2` noise, outro |
+| `import-annotations.txt` | `(2x)`, `(instrumental)` annotations, tuning |
+
+## PDFs
+
+| File | Origin | What it covers |
+|---|---|---|
+| `mini.pdf` | Synthetic, hand-made | Coordinate reconstruction: chord line above lyrics |
+| `generated/generated-single-column.pdf` | `generate/make-pdfs.mjs` | One column, metadata, capo, merge |
+| `generated/generated-two-columns.pdf` | `generate/make-pdfs.mjs` | Two-column reading order (left → right) |
+| `generated/generated-noise.pdf` | `generate/make-pdfs.mjs` | `Page 1/2`, decorative lines |
+| `generated/generated-misaligned.pdf` | `generate/make-pdfs.mjs` | Odd chord alignment, `(2x)` annotation |
+| `generated/generated-scan.pdf` | `generate/make-pdfs.mjs` | Image-only PDF, no text layer |
+
+Regenerate the generated PDFs with
+`node tests/fixtures/generate/make-pdfs.mjs` (Chrome required).
+
+## Local-only real-world corpus
+
+`local/` is **gitignored** and never committed:
+
+- `local/ug/*.txt` — ten real Ultimate Guitar pages, fetched by
+  `tools/fetch-ug-fixtures.mjs` from the URLs in `ug-sources.json`
+- `local/pdf/*.pdf` — real downloaded chord-sheet PDFs used for manual/
+  local checks
+
+`ug-sources.json` contains only URLs, dates and structural expectations
+(title, capo, minimum merged lines/sections) — no lyrics.
+
+Why local-only: the text is copyrighted and the repository is public/MIT.
+The local suite (`local-import.test.ts`) checks structure, never content.

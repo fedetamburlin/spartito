@@ -4,3 +4,6 @@ dist/
 *.local
 doc
 out/
+tests/fixtures/local/
+test-results/
+playwright-report/

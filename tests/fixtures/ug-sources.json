@@ -1,0 +1,170 @@
+[
+  {
+    "slug": "windy",
+    "title": "Windy",
+    "artist": "The Association",
+    "url": "https://tabs.ultimate-guitar.com/tab/the-association/windy-chords-1708482",
+    "fetched": "2026-10-19",
+    "features": [
+      "capo text",
+      "song header",
+      "tab",
+      "N.C."
+    ],
+    "expect": {
+      "title": "Windy",
+      "subtitle": "The Association",
+      "capo": 3,
+      "minMerged": 15,
+      "minSections": 3,
+      "minTabs": 1
+    }
+  },
+  {
+    "slug": "4-chords",
+    "title": "4 Chords",
+    "artist": "The Axis of Awesome",
+    "url": "https://tabs.ultimate-guitar.com/tab/the-axis-of-awesome/4-chords-chords-965337",
+    "fetched": "2026-10-19",
+    "features": [
+      "capo recommendation",
+      "very long",
+      "many sections"
+    ],
+    "expect": {
+      "capo": 2,
+      "minMerged": 50
+    }
+  },
+  {
+    "slug": "sh-boom",
+    "title": "Sh-Boom",
+    "artist": "The Chords",
+    "url": "https://tabs.ultimate-guitar.com/tab/the-chords/sh-boom-chords-1833332",
+    "fetched": "2026-10-19",
+    "features": [
+      "[ch]/[tab] markup",
+      "no header",
+      "tuning + capo line"
+    ],
+    "expect": {
+      "minMerged": 20
+    }
+  },
+  {
+    "slug": "my-favourite-chords",
+    "title": "My Favourite Chords",
+    "artist": "The Weakerthans",
+    "url": "https://tabs.ultimate-guitar.com/tab/the-weakerthans/my-favourite-chords-chords-1855417",
+    "fetched": "2026-10-19",
+    "features": [
+      "[ch] markup",
+      "chord list at the top"
+    ],
+    "expect": {
+      "minMerged": 30,
+      "minSections": 5
+    }
+  },
+  {
+    "slug": "knockin-on-heavens-door",
+    "title": "Knockin' on Heaven's Door",
+    "artist": "Bob Dylan",
+    "url": "https://tabs.ultimate-guitar.com/tab/bob-dylan/knockin-on-heavens-door-chords-66587",
+    "fetched": "2026-10-19",
+    "features": [
+      "no capo",
+      "tuning + key",
+      "chord diagrams as text"
+    ],
+    "expect": {
+      "minMerged": 15,
+      "minSections": 4
+    }
+  },
+  {
+    "slug": "wonderwall",
+    "title": "Wonderwall",
+    "artist": "Oasis",
+    "url": "https://tabs.ultimate-guitar.com/tab/oasis/wonderwall-chords-1340333",
+    "fetched": "2026-10-19",
+    "features": [
+      "[Intro]/[Verse]/[Chorus]/[Outro]",
+      "capo 2nd fret",
+      "solo tab"
+    ],
+    "expect": {
+      "capo": 2,
+      "minMerged": 30,
+      "minSections": 5
+    }
+  },
+  {
+    "slug": "albachiara",
+    "title": "Albachiara",
+    "artist": "Vasco Rossi",
+    "url": "https://tabs.ultimate-guitar.com/tab/vasco-rossi/albachiara-chords-2304215",
+    "fetched": "2026-10-19",
+    "features": [
+      "Italian lyrics",
+      "UTF-8 accents",
+      "chorus-first",
+      "G7"
+    ],
+    "expect": {
+      "minMerged": 20,
+      "minSections": 3,
+      "minTabs": 1
+    }
+  },
+  {
+    "slug": "moonlight",
+    "title": "Moonlight",
+    "artist": "Bob Dylan",
+    "url": "https://tabs.ultimate-guitar.com/tab/bob-dylan/moonlight-chords-2846006",
+    "fetched": "2026-10-19",
+    "features": [
+      "capo III (Roman)",
+      "diminished chords",
+      "odd alignment"
+    ],
+    "expect": {
+      "capo": 3,
+      "minMerged": 20,
+      "minSections": 5,
+      "minTabs": 1
+    }
+  },
+  {
+    "slug": "the-bridge",
+    "title": "The Bridge",
+    "artist": "Sting",
+    "url": "https://tabs.ultimate-guitar.com/tab/sting/the-bridge-chords-5867888",
+    "fetched": "2026-10-19",
+    "features": [
+      "author/date header",
+      "no capo",
+      "long"
+    ],
+    "expect": {
+      "minMerged": 20,
+      "minSections": 4
+    }
+  },
+  {
+    "slug": "ujalon-main",
+    "title": "Ujalon Main Chords",
+    "artist": "Mizraab",
+    "url": "https://tabs.ultimate-guitar.com/tab/mizraab/ujalon-main-chords-chords-567572",
+    "fetched": "2026-10-19",
+    "features": [
+      "non-Latin transliteration",
+      "power chord annotation",
+      "chord-only lines",
+      "no header"
+    ],
+    "expect": {
+      "minMerged": 10
+    }
+  }
+]
