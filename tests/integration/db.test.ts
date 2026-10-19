@@ -1,8 +1,8 @@
 import 'fake-indexeddb/auto';
 import { describe, expect, it } from 'vitest';
-import { openLibraryDb } from '../src/core/db';
-import { createSong, initLibrary, removeSong } from '../src/core/library';
-import { defaultSettings } from '../src/core/settings';
+import { openLibraryDb } from '../../src/core/db';
+import { createSong, initLibrary, removeSong } from '../../src/core/library';
+import { defaultSettings } from '../../src/core/settings';
 
 const uniqueName = () => `spartito-test-${Math.random().toString(36).slice(2)}`;
 

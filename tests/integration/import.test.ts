@@ -1,14 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { chordLineTokens, isChordToken, mergeChordLine } from '../src/core/chords';
-import { importSong } from '../src/core/import';
-import { parseChordPro } from '../src/core/chordpro';
-import type { Section } from '../src/core/model';
-
-const fixturesDir = join(dirname(fileURLToPath(import.meta.url)), 'fixtures');
-const load = (name: string) => readFileSync(join(fixturesDir, name), 'utf8');
+import { chordLineTokens, isChordToken, mergeChordLine } from '../../src/core/chords';
+import { importSong } from '../../src/core/import';
+import { parseChordPro } from '../../src/core/chordpro';
+import type { Section } from '../../src/core/model';
+import { loadFixture } from '../helpers/fixtures';
 
 describe('chord grammar', () => {
   it('recognizes international and Italian chords', () => {
@@ -122,7 +117,7 @@ describe('importSong', () => {
   });
 
   it('converts an Ultimate Guitar style copy-paste', () => {
-    const result = importSong(load('import-ug.txt'));
+    const result = importSong(loadFixture('import-ug.txt'));
     expect(result.chordpro).toContain('{start_of_verse: Verse 1}');
     expect(result.chordpro).toContain('{start_of_chorus}');
     expect(result.chordpro).toContain('[Am]Walking down the empty road');
@@ -137,7 +132,7 @@ describe('importSong', () => {
   });
 
   it('converts chords above lyrics (international notation)', () => {
-    const result = importSong(load('import-above.txt'));
+    const result = importSong(loadFixture('import-above.txt'));
     expect(result.chordpro).toContain('{start_of_verse: Intro}');
     expect(result.chordpro).toContain('[C] [G] [Am] [F]');
     expect(result.chordpro).toContain('[C]Walking [G]home tonight');
@@ -147,7 +142,7 @@ describe('importSong', () => {
   });
 
   it('converts chords above lyrics (Italian notation)', () => {
-    const result = importSong(load('import-it-above.txt'));
+    const result = importSong(loadFixture('import-it-above.txt'));
     expect(result.chordpro).toContain('[MIm]Dove cammino senza [LAm7]fretta');
     expect(result.chordpro).toContain('il [LAm6]ricordo di una [SI7][MIm]estate');
     expect(result.stats.merged).toBe(2);
@@ -172,7 +167,7 @@ describe('importSong', () => {
   });
 
   it('converts a real page (Intro], AMaj7, pagination, chord clusters)', () => {
-    const result = importSong(load('import-real-shape.txt'));
+    const result = importSong(loadFixture('import-real-shape.txt'));
     expect(result.chordpro).toContain('{start_of_verse: Intro}');
     expect(result.chordpro).toContain('{start_of_chorus}');
     expect(result.chordpro).toContain('[Em]Walking down the open [D]road tonight');
@@ -185,7 +180,7 @@ describe('importSong', () => {
   });
 
   it('treats bracketed annotations as comments', () => {
-    const result = importSong(load('import-annotations.txt'));
+    const result = importSong(loadFixture('import-annotations.txt'));
     expect(result.chordpro).toContain('[G] [D] [Am7]');
     expect(result.chordpro).toContain('{comment: (instrumental)}');
     expect(result.chordpro).toContain('{comment: (quick fade)}');
@@ -195,7 +190,7 @@ describe('importSong', () => {
   });
 
   it('recognizes title, artist and capo; drops year and decorations', () => {
-    const result = importSong(load('import-ug-header.txt'));
+    const result = importSong(loadFixture('import-ug-header.txt'));
     expect(result.chordpro).toContain('{title: My Fake Song}');
     expect(result.chordpro).toContain('{subtitle: The Fake Band}');
     expect(result.chordpro).toContain('{capo: 3}');
@@ -209,7 +204,7 @@ describe('importSong', () => {
 
   it('produces ChordPro readable by the parser', () => {
     for (const fixture of ['import-ug.txt', 'import-above.txt', 'import-it-above.txt']) {
-      const { chordpro } = importSong(load(fixture));
+      const { chordpro } = importSong(loadFixture(fixture));
       const doc = parseChordPro(chordpro);
       expect(doc.blocks.length, fixture).toBeGreaterThan(0);
       const sections = doc.blocks.filter((block): block is Section => block.kind === 'section');

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { config } from '../src/core/config';
-import { buildJsonExport, fileBaseName, parseImported } from '../src/core/persistence';
-import { defaultSettings, sanitizeSettings } from '../src/core/settings';
+import { config } from '../../src/core/config';
+import { buildJsonExport, fileBaseName, parseImported } from '../../src/core/persistence';
+import { defaultSettings, sanitizeSettings } from '../../src/core/settings';
 
 describe('sanitizeSettings', () => {
   it('applies defaults', () => {

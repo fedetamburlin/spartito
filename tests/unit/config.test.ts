@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { config } from '../src/core/config';
+import { config } from '../../src/core/config';
 
 /**
  * Semantic checks on config/defaults.json: these are the values the rest

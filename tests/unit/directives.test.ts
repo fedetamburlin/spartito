@@ -7,9 +7,9 @@ import {
   REFERENCE,
   rowsForGroup,
   type Directive
-} from '../src/core/directives';
-import { parseChordPro, serializeChordPro, unknownDirectives } from '../src/core/chordpro';
-import type { Section, SectionItem, SongDocument } from '../src/core/model';
+} from '../../src/core/directives';
+import { parseChordPro, serializeChordPro, unknownDirectives } from '../../src/core/chordpro';
+import type { Section, SectionItem, SongDocument } from '../../src/core/model';
 
 function items(doc: SongDocument): SectionItem[] {
   const out: SectionItem[] = [];

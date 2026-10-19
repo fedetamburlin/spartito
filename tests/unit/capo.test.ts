@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { parseCapoValue, parseChordPro, serializeChordPro } from '../src/core/chordpro';
-import { importSong } from '../src/core/import';
-import type { SongDocument } from '../src/core/model';
-import { transposedForDisplay } from '../src/core/transpose';
+import { parseCapoValue, parseChordPro, serializeChordPro } from '../../src/core/chordpro';
+import { importSong } from '../../src/core/import';
+import type { SongDocument } from '../../src/core/model';
+import { transposedForDisplay } from '../../src/core/transpose';
 
 const baseDoc: SongDocument = {
   title: 'Prova',

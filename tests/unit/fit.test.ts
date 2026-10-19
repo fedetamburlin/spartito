@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { config } from '../src/core/config';
-import { chordPtFor, decideLayout, type LayoutParams } from '../src/core/fit';
+import { config } from '../../src/core/config';
+import { chordPtFor, decideLayout, type LayoutParams } from '../../src/core/fit';
 
 const baseOptions = (
   overrides: Partial<{ columns: 'auto' | 1 | 2; textPt: number; allowGrow: boolean }> = {}

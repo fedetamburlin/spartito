@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { LibraryStore, SongEntry } from '../src/core/db';
+import type { LibraryStore, SongEntry } from '../../src/core/db';
 import {
   contentMatches,
   createSong,
@@ -11,8 +11,8 @@ import {
   songTitle,
   sortSongs,
   withTitle
-} from '../src/core/library';
-import { defaultSettings } from '../src/core/settings';
+} from '../../src/core/library';
+import { defaultSettings } from '../../src/core/settings';
 
 class FakeStore implements LibraryStore {
   songs = new Map<string, SongEntry>();

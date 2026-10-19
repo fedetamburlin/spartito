@@ -1,16 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import {
   extractPdfText,
   itemsToLines,
   itemsToText,
   splitColumns,
   type PdfTextItem
-} from '../src/core/pdf';
-
-const fixturesDir = join(dirname(fileURLToPath(import.meta.url)), 'fixtures');
+} from '../../src/core/pdf';
+import { loadFixtureBuffer } from '../helpers/fixtures';
+import { squeeze } from '../helpers/text';
 
 const item = (str: string, x: number, y: number, width?: number, height = 10): PdfTextItem => ({
   str,
@@ -20,7 +17,6 @@ const item = (str: string, x: number, y: number, width?: number, height = 10): P
   height
 });
 
-const squeeze = (text: string) => text.replace(/\s+/g, ' ').trim();
 
 describe('itemsToLines', () => {
   it('rebuilds a chord line above the lyrics', () => {
@@ -55,11 +51,7 @@ describe('itemsToLines', () => {
 
 describe('extractPdfText', () => {
   it('extracts text and does not consume the input buffer', async () => {
-    const file = readFileSync(join(fixturesDir, 'mini.pdf'));
-    const buffer = file.buffer.slice(
-      file.byteOffset,
-      file.byteOffset + file.byteLength
-    ) as ArrayBuffer;
+    const buffer = loadFixtureBuffer('mini.pdf');
     const first = await extractPdfText(buffer);
     expect(first.pages).toBe(1);
     expect(first.hasText).toBe(true);

@@ -16,6 +16,17 @@ maintainer can afford.
 
 First local E2E run: `npx playwright install chromium`.
 
+## Layout
+
+```
+tests/
+  unit/          pure modules (parser, fit, transpose, config, helpers)
+  integration/   multi-module flows (import, PDF, library, DB, bridge)
+  e2e/           Playwright browser specs + helpers
+  helpers/       fixtures paths, semantic chords, text utilities
+  fixtures/      committed synthetic fixtures + generated PDFs
+```
+
 ## Layers
 
 Each layer has a different job. Redundancy is intentional, but it is not the

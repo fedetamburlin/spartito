@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { readDocumentFromHash } from '../src/core/deeplink';
+import { readDocumentFromHash } from '../../src/core/deeplink';
 
 /**
  * Share links are base64url-encoded JSON in the URL hash. Anything

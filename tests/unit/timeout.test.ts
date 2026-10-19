@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { openLibraryDb } from '../src/core/db';
-import { withTimeout } from '../src/core/timeout';
+import { openLibraryDb } from '../../src/core/db';
+import { withTimeout } from '../../src/core/timeout';
 
 describe('withTimeout', () => {
   afterEach(() => {

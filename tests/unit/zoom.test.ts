@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clampZoom, stepZoom, ZOOM_MAX, ZOOM_MIN } from '../src/core/zoom';
+import { clampZoom, stepZoom, ZOOM_MAX, ZOOM_MIN } from '../../src/core/zoom';
 
 describe('clampZoom', () => {
   it('rounds to one decimal', () => {

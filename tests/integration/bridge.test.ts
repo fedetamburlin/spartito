@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createBridge, type BridgeHandlers } from '../src/core/bridge';
-import { defaultSettings, type SongSettings } from '../src/core/settings';
+import { createBridge, type BridgeHandlers } from '../../src/core/bridge';
+import { defaultSettings, type SongSettings } from '../../src/core/settings';
 
 /**
  * The bridge only talks to the browser WebSocket API, so a small fake is

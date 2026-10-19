@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { loadThemePref, parseTheme, resolveTheme } from '../src/core/theme';
+import { loadThemePref, parseTheme, resolveTheme } from '../../src/core/theme';
 
 describe('theme preference', () => {
   it('parses stored values, falling back to auto', () => {

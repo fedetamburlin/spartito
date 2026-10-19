@@ -1,12 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { parseChordPro, serializeChordPro, unknownDirectives } from '../src/core/chordpro';
-import type { Section, UnknownItem } from '../src/core/model';
-
-const fixturesDir = join(dirname(fileURLToPath(import.meta.url)), 'fixtures');
-const load = (name: string) => readFileSync(join(fixturesDir, name), 'utf8');
+import { parseChordPro, serializeChordPro, unknownDirectives } from '../../src/core/chordpro';
+import type { Section, UnknownItem } from '../../src/core/model';
+import { loadFixture } from '../helpers/fixtures';
 
 function unknownRaws(doc: ReturnType<typeof parseChordPro>): string[] {
   const raws: string[] = [];
@@ -24,7 +19,7 @@ function unknownRaws(doc: ReturnType<typeof parseChordPro>): string[] {
 
 describe('parseChordPro', () => {
   it('reads title and inline chords', () => {
-    const doc = parseChordPro(load('minimal.cho'));
+    const doc = parseChordPro(loadFixture('minimal.cho'));
     expect(doc.title).toBe('Canzone Minima');
     const section = doc.blocks[0] as Section;
     expect(section.kind).toBe('section');
@@ -39,7 +34,7 @@ describe('parseChordPro', () => {
   });
 
   it('handles explicit chorus, comments and subtitle', () => {
-    const doc = parseChordPro(load('complete.cho'));
+    const doc = parseChordPro(loadFixture('complete.cho'));
     expect(doc.subtitle).toBe('Testo inventato');
     const chorus = doc.blocks.find(
       (block) => block.kind === 'section' && block.type === 'chorus'
@@ -52,7 +47,7 @@ describe('parseChordPro', () => {
   });
 
   it('preserves unknown directives in order and reads the capo', () => {
-    const doc = parseChordPro(load('unknown.cho'));
+    const doc = parseChordPro(loadFixture('unknown.cho'));
     expect(unknownRaws(doc)).toEqual(['{key: G}', '{x_custom: 42}']);
     expect(doc.capo).toBe(3);
     const serialized = serializeChordPro(doc);
@@ -62,7 +57,7 @@ describe('parseChordPro', () => {
   });
 
   it('handles accents, accidentals, slash chords and multiple chords', () => {
-    const doc = parseChordPro(load('edge.cho'));
+    const doc = parseChordPro(loadFixture('edge.cho'));
     expect(doc.title).toBe('Accenti È À Ò');
     const section = doc.blocks[0] as Section;
     const first = section.items[0];
@@ -97,7 +92,7 @@ describe('parseChordPro', () => {
   });
 
   it('keeps tab content literal', () => {
-    const doc = parseChordPro(load('tab.cho'));
+    const doc = parseChordPro(loadFixture('tab.cho'));
     const section = doc.blocks[0] as Section;
     const tab = section.items[0];
     if (tab.kind !== 'tab') throw new Error('tab expected');
@@ -110,7 +105,7 @@ describe('parseChordPro', () => {
   });
 
   it('tokenizes grid blocks', () => {
-    const doc = parseChordPro(load('grid.cho'));
+    const doc = parseChordPro(loadFixture('grid.cho'));
     const section = doc.blocks[0] as Section;
     const grid = section.items[0];
     if (grid.kind !== 'grid-block') throw new Error('grid-block expected');
@@ -177,7 +172,7 @@ describe('roundtrip parse/serialize', () => {
     'grid.cho'
   ]) {
     it(`preserves the model for ${name}`, () => {
-      const doc = parseChordPro(load(name));
+      const doc = parseChordPro(loadFixture(name));
       const roundtripped = parseChordPro(serializeChordPro(doc));
       expect(roundtripped).toEqual(doc);
       expect(serializeChordPro(roundtripped)).toBe(serializeChordPro(doc));

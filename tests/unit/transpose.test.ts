@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { parseChordPro } from '../src/core/chordpro';
-import type { SongDocument } from '../src/core/model';
-import { defaultSettings, sanitizeSettings, withTranspose } from '../src/core/settings';
+import { parseChordPro } from '../../src/core/chordpro';
+import type { SongDocument } from '../../src/core/model';
+import { defaultSettings, sanitizeSettings, withTranspose } from '../../src/core/settings';
 import {
   TRANSPOSE_MAX,
   TRANSPOSE_MIN,
   transposeChord,
   transposeDocument
-} from '../src/core/transpose';
+} from '../../src/core/transpose';
 
 describe('transposeChord', () => {
   it('transposes international notes with wrap-around', () => {

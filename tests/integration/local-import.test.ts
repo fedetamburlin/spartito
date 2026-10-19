@@ -1,20 +1,19 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { parseChordPro } from '../src/core/chordpro';
-import { importSong } from '../src/core/import';
+import { parseChordPro } from '../../src/core/chordpro';
+import { importSong } from '../../src/core/import';
+import { fixturesDir } from '../helpers/fixtures';
 
 /**
  * Real Ultimate Guitar pages, downloaded locally by
- * `node tools/fetch-ug-fixtures.mjs`.
+ * `node scripts/fetch-fixtures.mjs`.
  *
  * The files are copyrighted and gitignored: this suite only runs when the
  * corpus is present, and CI skips it. What we assert here is structural
  * (title, capo, sections, no leftover markup), never the lyrics.
  */
 
-const fixturesDir = join(dirname(fileURLToPath(import.meta.url)), 'fixtures');
 const corpusDir = join(fixturesDir, 'local/ug');
 
 interface Expectation {

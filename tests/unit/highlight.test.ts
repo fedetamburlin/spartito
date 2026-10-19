@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { scanChordProLine } from '../src/core/highlight';
+import { scanChordProLine } from '../../src/core/highlight';
 
 describe('scanChordProLine', () => {
   it('returns no tokens for plain lyrics', () => {
