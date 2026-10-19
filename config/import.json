@@ -26,13 +26,17 @@
     "coda": "verse"
   },
   "noise": [
-    "^Page \\d+\\s*/\\s*\\d+$",
+    "^Page\\s+\\d+\\s*/\\s*\\d+$",
     "^\\d+\\s*(?:of|di)\\s*\\d+$",
-    "^[—–_=*·•\\-]{3,}$"
+    "^[—–_=*·•\\-]{3,}$",
+    "^tabbed by\\b",
+    "^last (?:update|edit)\\b",
+    "^author\\b"
   ],
   "titleMarkers": ["chords", "tabs"],
   "metadataLoose": ["capo", "capotasto"],
   "metadata": [
+    "song",
     "capo",
     "tuning",
     "accordatura",

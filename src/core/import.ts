@@ -12,6 +12,8 @@ const LOOSE_METADATA = ((importDefaults.metadataLoose ?? []) as string[]).map((l
 const LOOSE_METADATA_RE = LOOSE_METADATA.length
   ? new RegExp(`^(?:${LOOSE_METADATA.join('|')})\\b`, 'i')
   : /$^/;
+const TITLE_LABELS = new Set(['song', 'title', 'titolo']);
+const ARTIST_LABELS = new Set(['artist', 'artista']);
 
 const DIRECTIVE_RE = /^\{\s*[a-zA-Z_][a-zA-Z0-9_]*\s*(?::[\s\S]*?)?\}$/;
 const BRACKET_HEADER_RE = /^\[([^\]]+)\]$/;
@@ -32,21 +34,61 @@ export interface ImportResult {
   stats: ImportStats;
 }
 
+/** True for lines that look like tablature rather than chord/lyric text. */
+function looksLikeTablature(lines: string[]): boolean {
+  return lines.some((line) => /^\s*(?:[eBGDAE]\s*\||\|)/.test(line) && /--/.test(line));
+}
+
 function normalize(raw: string): { text: string; tabs: number } {
   let text = raw.replace(/\r\n?/g, '\n').replace(/\u00a0/g, ' ').replace(/\t/g, '    ');
-  const blocks: string[] = [];
-  text = text.replace(/\[tab\]([\s\S]*?)\[\/tab\]/gi, (_, body: string) => {
-    blocks.push(body.replace(/^\n+|\n+$/g, ''));
-    return `\u0000${blocks.length - 1}\u0000`;
-  });
+
+  // The current Ultimate Guitar copy format wraps each line in
+  // [tab]...[/tab] and chords in [ch]...[/ch]. Unwrap single-line
+  // wrappers first, then convert chord tags; genuine multi-line blocks
+  // are only kept as tablature when their body looks like tablature.
+  text = text.replace(/^[ \t]*\[tab\]([^\n]*?)\[\/tab\][ \t]*$/gim, '$1');
   text = text.replace(/\[ch\]([\s\S]*?)\[\/ch\]/gi, '[$1]');
   text = text.replace(/\[\/?ch\]/gi, '');
-  text = text.replace(/\[\/?tab\]/gi, '');
-  text = text.replace(/<[^>]+>/g, '');
-  text = text.replace(/\u0000(\d+)\u0000/g, (_, index: string) => {
-    return `{start_of_tab}\n${blocks[Number(index)]}\n{end_of_tab}`;
-  });
-  return { text, tabs: blocks.length };
+
+  const lines = text.split('\n');
+  const out: string[] = [];
+  let tabs = 0;
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    if (!/^\[tab\]/i.test(trimmed)) {
+      out.push(line.replace(/\[\/?tab\]/gi, ''));
+      continue;
+    }
+
+    if (/\[\/tab\]/i.test(trimmed)) {
+      out.push(trimmed.replace(/^\[tab\]/i, '').replace(/\[\/tab\]$/i, ''));
+      continue;
+    }
+
+    const body: string[] = [trimmed.replace(/^\[tab\]/i, '')];
+    for (i += 1; i < lines.length; i += 1) {
+      const current = lines[i];
+      if (/\[\/tab\]/i.test(current.trim())) {
+        body.push(current.replace(/\[\/tab\]/gi, ''));
+        break;
+      }
+      body.push(current);
+    }
+
+    const content = body.join('\n').replace(/^\n+|\n+$/g, '');
+    if (looksLikeTablature(body)) {
+      tabs += 1;
+      out.push(`{start_of_tab}\n${content}\n{end_of_tab}`);
+    } else {
+      out.push(content);
+    }
+  }
+
+  text = out.join('\n').replace(/<[^>]+>/g, '');
+  return { text, tabs };
 }
 
 function normalizeKey(label: string): string {
@@ -79,6 +121,23 @@ function hasInlineChords(lines: string[]): boolean {
   );
 }
 
+/**
+ * A line made only of bracketed chords ([Em]  [G]) is how the current UG
+ * copy format writes chord lines. Convert it back to a plain chord line
+ * while keeping every chord at its original column, so mergeChordLine can
+ * align it with the lyrics below.
+ */
+function plainChordLine(line: string): string | null {
+  const matches = [...line.matchAll(/\[([^\]]+)\]/g)];
+  if (matches.length === 0) return null;
+  if (line.replace(/\[[^\]]*\]/g, '').trim() !== '') return null;
+  if (!matches.every((match) => isChordToken(match[1].trim()))) return null;
+  return line.replace(/\[([^\]]*)\]/g, (match, chord: string) => {
+    const text = chord.trim();
+    return text + ' '.repeat(Math.max(0, match.length - text.length));
+  });
+}
+
 function titleFromMarker(line: string): string | null {
   const lower = line.toLowerCase();
   for (const marker of TITLE_MARKERS) {
@@ -95,13 +154,16 @@ function isYearLine(line: string): boolean {
 }
 
 function capoFromLine(line: string): number | null {
-  if (!LOOSE_METADATA_RE.test(line)) return null;
-  const value = line
-    .replace(/^(?:capo|capotasto)\b/i, '')
+  if (!/\bcapo\b/i.test(line)) return null;
+  const afterLabel = line
+    .replace(/^.*?\b(?:capo|capotasto)\b/i, '')
     .replace(/^\s*[:=]?\s*/, '')
-    .replace(/^(?:at|on|al|sul|fret|tasto|no\.?)\s+/i, '')
     .trim();
-  return parseCapoValue(value);
+  const token =
+    /^(\d{1,2}|[ivx]+)/i.exec(afterLabel)?.[1] ??
+    /\b(?:capo|fret)\b[^\dIVX]{0,12}(\d{1,2}|[ivx]+)\b/i.exec(line)?.[1];
+  if (!token) return null;
+  return parseCapoValue(token.replace(/(?:st|nd|rd|th)$/i, ''));
 }
 
 export function importSong(raw: string): ImportResult {
@@ -160,6 +222,22 @@ export function importSong(raw: string): ImportResult {
       continue;
     }
 
+    const metadata = METADATA_RE.exec(trimmed);
+    if (metadata) {
+      const label = metadata[1].toLowerCase();
+      const value = metadata[2].replace(/\s+/g, ' ').trim();
+      if (TITLE_LABELS.has(label) && !titleFound) {
+        out.push(`{title: ${value}}`);
+        titleFound = true;
+        continue;
+      }
+      if (ARTIST_LABELS.has(label) && !subtitleFound) {
+        out.push(`{subtitle: ${value}}`);
+        subtitleFound = true;
+        continue;
+      }
+    }
+
     if (!bodyStarted) {
       if (!titleFound) {
         const title = titleFromMarker(trimmed);
@@ -215,7 +293,7 @@ export function importSong(raw: string): ImportResult {
     }
 
     const capo = capoFromLine(trimmed);
-    if (capo !== null && trimmed.split(/\s+/).length <= 5) {
+    if (capo !== null) {
       out.push(`{capo: ${capo}}`);
       continue;
     }
@@ -232,7 +310,8 @@ export function importSong(raw: string): ImportResult {
       continue;
     }
 
-    const chords = chordLineTokens(trimmed);
+    const plain = plainChordLine(trimmed);
+    const chords = chordLineTokens(plain ?? trimmed);
     if (chords) {
       const nextRaw = i + 1 < lines.length ? lines[i + 1] : '';
       const next = nextRaw.trim();
@@ -243,7 +322,7 @@ export function importSong(raw: string): ImportResult {
         !ANNOTATION_RE.test(next) &&
         headerLabel(next) === null;
       if (nextIsLyric) {
-        out.push(mergeChordLine(rawLine, nextRaw));
+        out.push(mergeChordLine(plain ?? rawLine, nextRaw));
         stats.merged += 1;
         i += 1;
       } else {

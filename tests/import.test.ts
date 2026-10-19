@@ -52,6 +52,75 @@ describe('chord grammar', () => {
 });
 
 describe('importSong', () => {
+  it('converts the current UG [tab]/[ch] line wrapper format', () => {
+    const result = importSong(
+      [
+        '[tab][ch]Em[/ch]            [ch]G[/ch][/tab]',
+        '[tab]  Today is gonna be the day[/tab]',
+        '[tab][ch]D[/ch]                [ch]A[/ch][/tab]',
+        '[tab]  That they will throw it back to you[/tab]'
+      ].join('\n')
+    );
+    expect(result.stats.merged).toBe(2);
+    expect(result.stats.tabs).toBe(0);
+    expect(result.chordpro).toContain('[Em]Today');
+    expect(result.chordpro).not.toContain('[ch]');
+    expect(result.chordpro).not.toContain('[tab]');
+  });
+
+  it('reads Song/Artist metadata from the pasted page', () => {
+    const result = importSong(
+      [
+        'Song: My Fake Song',
+        'Artist: The Fake Band',
+        'Composer: Someone Else',
+        'Album: Fake Album',
+        'CAPO: 3rd fret',
+        '',
+        '[Verse]',
+        '[ch]Am[/ch]Walking down the empty road'
+      ].join('\n')
+    );
+    const doc = parseChordPro(result.chordpro);
+    expect(doc.title).toBe('My Fake Song');
+    expect(doc.subtitle).toBe('The Fake Band');
+    expect(doc.capo).toBe(3);
+    expect(result.chordpro).toContain('{comment: Composer: Someone Else}');
+  });
+
+  it('recognizes common capo spellings', () => {
+    const cases: Array<[string, number]> = [
+      ['CAPO: 3rd fret', 3],
+      ['Capo 2nd fret', 2],
+      ['Capo: III', 3],
+      ['Recommend Capo Fret 2', 2],
+      ['Capo III for original key or to play along at https://example.com', 3],
+      ['Capo: 5th fret', 5]
+    ];
+    for (const [line, capo] of cases) {
+      const result = importSong(`{title: T}\n${line}\n[Am]hello`);
+      expect(parseChordPro(result.chordpro).capo, line).toBe(capo);
+    }
+  });
+
+  it('keeps genuine multi-line tablature as a tab block', () => {
+    const result = importSong(
+      ['[Verse]', '[tab]', 'e|--0--1--0--|', 'B|--1--1--1--|', '[/tab]'].join('\n')
+    );
+    expect(result.stats.tabs).toBe(1);
+    expect(result.chordpro).toContain('{start_of_tab}');
+    expect(result.chordpro).toContain('e|--0--1--0--|');
+  });
+
+  it('treats a chord/lyric [tab] block as text, not tablature', () => {
+    const result = importSong(
+      ['[tab][ch]C[/ch]   [ch]G[/ch]', 'Sing it loud and clear[/tab]'].join('\n')
+    );
+    expect(result.stats.tabs).toBe(0);
+    expect(result.stats.merged).toBe(1);
+    expect(result.chordpro).not.toContain('{start_of_tab}');
+  });
+
   it('converts an Ultimate Guitar style copy-paste', () => {
     const result = importSong(load('import-ug.txt'));
     expect(result.chordpro).toContain('{start_of_verse: Verse 1}');
