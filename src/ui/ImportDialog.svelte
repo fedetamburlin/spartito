@@ -75,7 +75,7 @@
         {#if summary}<div>{summary}</div>{/if}
         {#if result.warnings.length > 0}
           <ul>
-            {#each result.warnings as warning}<li>{warning}</li>{/each}
+            {#each result.warnings as warning, warningIndex (warningIndex)}<li>{warning}</li>{/each}
           </ul>
         {/if}
       </div>

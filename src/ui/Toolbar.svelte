@@ -170,7 +170,7 @@
     <label
       >Font
       <select value={settings.fontId} onchange={setFont}>
-        {#each config.typography.fonts as font}
+        {#each config.typography.fonts as font (font.id)}
           <option value={font.id}>{font.family}</option>
         {/each}
       </select>

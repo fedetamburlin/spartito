@@ -101,7 +101,7 @@
               {#each group.rows as row (row.id)}
                 <tr>
                   <td>
-                    {#each row.syntax as token}<code>{token}</code>{/each}
+                    {#each row.syntax as token, tokenIndex (tokenIndex)}<code>{token}</code>{/each}
                   </td>
                   <td class="help-effect">{row.description}</td>
                 </tr>

@@ -13,6 +13,9 @@
 
   let { doc, layout, settings, capo = 0 }: Props = $props();
 
+  /** A literal space between word spans must survive Svelte's whitespace handling. */
+  const WORD_GAP = ' ';
+
   const pageStyle = $derived(
     [
       `--text-pt: ${layout.textPt}pt`,
@@ -40,7 +43,7 @@
     {#if capo > 0}<p class="song-capo">Capo {capo}</p>{/if}
   </header>
   <div class="content">
-    {#each doc.blocks as block}
+    {#each doc.blocks as block, blockIndex (blockIndex)}
       {#if block.kind === 'section'}
         <section
           class="section"
@@ -48,18 +51,22 @@
           class:bridge={block.type === 'bridge'}
         >
           {#if block.label}<div class="section-label">{block.label}</div>{/if}
-          {#each block.items as item}
+          {#each block.items as item, itemIndex (itemIndex)}
             {#if item.kind === 'line'}
               <div class="line">
-                {#each item.words as word, index}<span class="pair"
+                {#each item.words as word, index (index)}<span class="pair"
                     >{#if word.chords.length > 0}<span class="chords"
-                        >{#each word.chords as chord}<span class="chord">{chord}</span>{/each}</span
+                        >{#each word.chords as chord, chordIndex (chordIndex)}<span class="chord"
+                            >{chord}</span
+                          >{/each}</span
                       >{/if}<span class="word">{word.text}</span></span
-                  >{#if index < item.words.length - 1}{' '}{/if}{/each}
+                  >{#if index < item.words.length - 1}{WORD_GAP}{/if}{/each}
               </div>
             {:else if item.kind === 'grid'}
               <div class="line grid">
-                {#each item.chords as chord}<span class="gchord">{chord}</span>{/each}
+                {#each item.chords as chord, chordIndex (chordIndex)}<span class="gchord"
+                    >{chord}</span
+                  >{/each}
               </div>
             {:else if item.kind === 'comment'}
               <div class="comment">{item.text}</div>
@@ -71,9 +78,9 @@
             {:else if item.kind === 'grid-block'}
               <div class="grid-block">
                 {#if item.label}<div class="section-label">{item.label}</div>{/if}
-                {#each item.rows as row}
+                {#each item.rows as row, rowIndex (rowIndex)}
                   <div class="grid-row">
-                    {#each row as token}
+                    {#each row as token, tokenIndex (tokenIndex)}
                       {#if token.kind === 'chord'}
                         <span class="gchord">{token.chord}</span>
                       {:else if token.kind === 'bar'}
