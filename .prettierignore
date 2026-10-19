@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+test-results
+playwright-report
+blob-report
+package-lock.json
+doc
+tests/fixtures/local
+tests/fixtures/generated
+public/fonts
+*.pdf
