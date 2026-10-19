@@ -1,6 +1,11 @@
 <script lang="ts">
   import { createBridge, type BridgeStatus } from './core/bridge';
-  import { openLibraryDb, LIBRARY_OPEN_TIMEOUT_MS, type LibraryStore, type SongEntry } from './core/db';
+  import {
+    LIBRARY_OPEN_TIMEOUT_MS,
+    openLibraryDb,
+    type LibraryStore,
+    type SongEntry
+  } from './core/db';
   import { config } from './core/config';
   import { clearDocumentHash, readDocumentFromHash } from './core/deeplink';
   import { parseChordPro } from './core/chordpro';
