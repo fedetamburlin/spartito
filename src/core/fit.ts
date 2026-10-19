@@ -10,6 +10,7 @@ export interface FitOptions {
   columns: 'auto' | 1 | 2;
   textPt: number;
   allowShrink?: boolean;
+  allowGrow?: boolean;
 }
 
 export type FitStatus = 'fits' | 'columns' | 'shrunk' | 'overflow';
@@ -45,15 +46,29 @@ export function decideLayout(measure: Measure, cfg: AppConfig, options: FitOptio
     return measure(params) ? null : params;
   };
 
+  /** Grow from a fitting size up to textPtMax, in 0.5pt steps, while it still fits. */
+  const growToFit = (columns: 1 | 2, params: LayoutParams): LayoutParams => {
+    if (!options.allowGrow) return params;
+    let best = params;
+    for (let pt = params.textPt + 0.5; pt <= cfg.layout.textPtMax + 1e-9; pt += 0.5) {
+      const rounded = Math.round(pt * 10) / 10;
+      if (rounded > cfg.layout.textPtMax) break;
+      const candidate = tryParams(columns, rounded);
+      if (!candidate) break;
+      best = candidate;
+    }
+    return best;
+  };
+
   const firstColumns: 1 | 2 = options.columns === 'auto' ? cfg.layout.columnsDefault : options.columns;
   const autoColumns = options.columns === 'auto' && cfg.layout.autoColumns && maxColumns === 2;
 
   let params = tryParams(firstColumns, target);
-  if (params) return { params, status: 'fits', attempts };
+  if (params) return { params: growToFit(firstColumns, params), status: 'fits', attempts };
 
   if (autoColumns && firstColumns === 1) {
     params = tryParams(2, target);
-    if (params) return { params, status: 'columns', attempts };
+    if (params) return { params: growToFit(2, params), status: 'columns', attempts };
   }
 
   if (options.allowShrink !== false) {

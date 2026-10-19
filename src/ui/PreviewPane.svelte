@@ -47,7 +47,8 @@
       const measure = createMeasure(page);
       const result = decideLayout(measure, config, {
         columns: currentSettings.columns,
-        textPt: currentSettings.textPt
+        textPt: currentSettings.textPt,
+        allowGrow: config.layout.autoGrow
       });
       layout = result.params;
       outcome = result;
@@ -72,7 +73,9 @@
     const columns = outcome.params.columns === 2 ? '2 columns' : '1 column';
     switch (outcome.status) {
       case 'fits':
-        return `${columns} · ${outcome.params.textPt}pt`;
+        return outcome.params.textPt > config.layout.textPtDefault
+          ? `${columns} · ${outcome.params.textPt}pt (grown)`
+          : `${columns} · ${outcome.params.textPt}pt`;
       case 'columns':
         return `${columns} · ${outcome.params.textPt}pt (auto)`;
       case 'shrunk':

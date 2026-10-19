@@ -20,7 +20,7 @@
     "columnsMax": 2,
     "autoColumns": true,
     "autoFit": true,
-    "autoGrow": false
+    "autoGrow": true
   },
   "typography": {
     "fontDefault": "inter",
