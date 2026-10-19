@@ -15,11 +15,14 @@
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "npm run build && playwright test",
+    "test:e2e:ui": "npm run build && playwright test --ui",
     "mcp:build": "npm run build -w spartito-mcp",
     "mcp:check": "npm run check -w spartito-mcp",
     "mcp:test": "npm run test -w spartito-mcp"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "@tsconfig/svelte": "^5.0.0",
     "@types/node": "^18.19.130",
