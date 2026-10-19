@@ -35,7 +35,7 @@ export function sanitizeSettings(partial?: Partial<SongSettings> | null): SongSe
   return {
     fontId: fontExists ? (partial.fontId as string) : base.fontId,
     textPt:
-      typeof partial.textPt === 'number'
+      typeof partial.textPt === 'number' && Number.isFinite(partial.textPt)
         ? clamp(partial.textPt, config.layout.textPtMin, config.layout.textPtMax)
         : base.textPt,
     columns:
@@ -43,11 +43,11 @@ export function sanitizeSettings(partial?: Partial<SongSettings> | null): SongSe
         ? partial.columns
         : base.columns,
     marginsMm:
-      typeof partial.marginsMm === 'number'
+      typeof partial.marginsMm === 'number' && Number.isFinite(partial.marginsMm)
         ? clamp(partial.marginsMm, config.page.marginsMinMm, config.page.marginsMaxMm)
         : base.marginsMm,
     transpose:
-      typeof partial.transpose === 'number'
+      typeof partial.transpose === 'number' && Number.isFinite(partial.transpose)
         ? clamp(Math.round(partial.transpose), TRANSPOSE_MIN, TRANSPOSE_MAX)
         : base.transpose,
     textColor: typeof partial.textColor === 'string' ? partial.textColor : base.textColor,
