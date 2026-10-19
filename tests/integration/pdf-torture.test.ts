@@ -58,9 +58,9 @@ describe('PDF torture fixtures', () => {
   });
 
   it('rejects corrupted and empty PDFs', async () => {
-    const valid = Buffer.from(loadFixtureBuffer('generated/generated-single-column.pdf'));
-    await expect(extractPdfText(new Uint8Array(valid.subarray(0, 400)))).rejects.toThrow();
-    await expect(extractPdfText(new Uint8Array(0))).rejects.toThrow();
+    const valid = loadFixtureBuffer('generated/generated-single-column.pdf');
+    await expect(extractPdfText(valid.slice(0, 400))).rejects.toThrow();
+    await expect(extractPdfText(new ArrayBuffer(0))).rejects.toThrow();
   });
 
   it('keeps the single-page two-column reading order from the old fixture', async () => {

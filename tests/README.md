@@ -35,7 +35,7 @@ same test copied five times.
 | Layer | Files | Catches | Does not catch |
 |---|---|---|---|
 | 1. Pure unit | `chordpro`, `chords` (in `import.test`), `transpose`, `capo`, `fit`, `zoom`, `theme`, `highlight`, `settings` (in `invariants`) | Local logic errors | Errors between modules |
-| 2. Invariants | `invariants`, `config`, `timeout`, `deeplink` | Contract errors, config drift, async edge cases | UI errors |
+| 2. Invariants + stress | `invariants`, `config`, `timeout`, `deeplink`, `stress` (300 seeded songs + adversarial inputs) | Contract errors, config drift, async edge cases, crash safety | UI errors |
 | 3. Data fixtures | `import`, `pdf`, `pdf-fixtures`, `local-import`, `local-pdf` | Real-world input shapes (UG markup, PDF coordinates) | User flows |
 | 4. Browser E2E | `e2e/*.spec.ts` | Svelte ↔ CodeMirror ↔ IndexedDB ↔ print glue | Algorithm details |
 | 5. MCP | `../packages/mcp/test` | Protocol, bridge, HTTP, tools | UI |
@@ -60,6 +60,7 @@ same test copied five times.
 | Print/PDF export | `e2e/pdf.spec.ts` |
 | Editing, Insert menu, transpose shortcut, undo boundary | `e2e/editing.spec.ts` |
 | Config coherence | `config.test.ts` |
+| Robustness: seeded songs, malformed input | `stress.test.ts` |
 | MCP tools/bridge/HTTP | `packages/mcp/test/*` |
 
 ## Conventions
@@ -141,7 +142,7 @@ corpus is **not** part of CI by design.
 - HTML snapshots and visual baselines (brittle, updated on every CSS tweak).
 - jsdom/testing-library for every component (CodeMirror needs a real browser).
 - Multi-browser E2E (the PDF target is Chromium; the UI is desktop-first).
-- Fuzzing, mutation testing, performance assertions (flaky or low value here).
+- Unseeded fuzzing, mutation testing, performance assertions (flaky or low value here).
 
 ## Known limitations encoded in tests
 

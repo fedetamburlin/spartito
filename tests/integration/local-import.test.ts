@@ -2,9 +2,9 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { isChordToken } from '../../src/core/chords';
 import { parseChordPro } from '../../src/core/chordpro';
 import { importSong } from '../../src/core/import';
+import { invalidChords } from '../helpers/chords';
 import { fixturesDir } from '../helpers/fixtures';
 
 /**
@@ -46,28 +46,6 @@ const LEFTOVER_MARKUP = ['[ch]', '[/ch]', '[tab]', '[/tab]', '<ch>', '</ch>'];
 const MIN_WORD_RETENTION = 0.65;
 
 const wordCount = (text: string) => text.split(/\s+/).filter(Boolean).length;
-
-function invalidChords(doc: ReturnType<typeof parseChordPro>): string[] {
-  const invalid: string[] = [];
-  const check = (chord: string) => {
-    if (!isChordToken(chord)) invalid.push(chord);
-  };
-  for (const block of doc.blocks) {
-    if (block.kind !== 'section') continue;
-    for (const item of block.items) {
-      if (item.kind === 'line') item.words.forEach((word) => word.chords.forEach(check));
-      if (item.kind === 'grid') item.chords.forEach(check);
-      if (item.kind === 'grid-block') {
-        item.rows.forEach((row) =>
-          row.forEach((token) => {
-            if (token.kind === 'chord') check(token.chord);
-          })
-        );
-      }
-    }
-  }
-  return invalid;
-}
 
 describe.skipIf(files.length === 0)('local Ultimate Guitar corpus (copyrighted, not in git)', () => {
   it('has every listed sample, so the corpus is complete', () => {
