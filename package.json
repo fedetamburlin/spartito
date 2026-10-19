@@ -35,7 +35,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "verify": "npm run check && npm test && npm run test:e2e && npm run mcp:check && npm run mcp:test",
+    "verify": "npm run format:check && npm run lint && npm run check && npm test && npm run test:e2e && npm run mcp:check && npm run mcp:test && npm run mcp:build",
     "mcp:build": "npm run build -w spartito-mcp",
     "mcp:check": "npm run check -w spartito-mcp",
     "mcp:test": "npm run test -w spartito-mcp"
