@@ -236,6 +236,8 @@
     "fetched": "2026-10-19",
     "features": ["long", "many sections", "solo"],
     "expect": {
+      "title": "Hotel California",
+      "subtitle": "Eagles",
       "capo": 2,
       "minMerged": 40,
       "minSections": 5

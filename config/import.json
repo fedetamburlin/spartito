@@ -31,7 +31,9 @@
     "^[—–_=*·•\\-]{3,}$",
     "^tabbed by\\b",
     "^last (?:update|edit)\\b",
-    "^author\\b"
+    "^author\\b",
+    "^https?://\\S+$",
+    "^www\\.\\S+$"
   ],
   "titleMarkers": ["chords", "tabs"],
   "metadataLoose": ["capo", "capotasto"],

@@ -245,6 +245,27 @@ describe('importSong', () => {
     expect(result.chordpro).not.toContain('Chords');
   });
 
+  it('reads a decorated UG title and artist, and drops the URL header', () => {
+    const result = importSong(
+      [
+        'My Fake Song chords *',
+        'The Fake Band 1976 (My Fake Song)',
+        '',
+        'https://example.com/my-fake-song',
+        '',
+        '[Verse]',
+        '[ch]Am[/ch]Walking down the empty road'
+      ].join('\n')
+    );
+    const doc = parseChordPro(result.chordpro);
+    expect(doc.title).toBe('My Fake Song');
+    expect(doc.subtitle).toBe('The Fake Band');
+    expect(result.chordpro).toContain('{start_of_verse}');
+    expect(result.chordpro).toContain('[Am]Walking down the empty road');
+    expect(result.chordpro).not.toContain('chords *');
+    expect(result.chordpro).not.toContain('https://');
+  });
+
   it('produces ChordPro readable by the parser', () => {
     for (const fixture of ['import-ug.txt', 'import-above.txt', 'import-it-above.txt']) {
       const { chordpro } = importSong(loadFixture(fixture));

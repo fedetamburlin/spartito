@@ -153,12 +153,16 @@ function plainChordLine(line: string): string | null {
 }
 
 function titleFromMarker(line: string): string | null {
-  const lower = line.toLowerCase();
+  // UG often decorates the marker: "Hotel California chords *",
+  // "Song (Chords)" or "Song Chords -". Strip the trailing decoration
+  // before looking for the marker, then clean what remains of the title.
+  const clean = line.replace(/[\s*·•|:;\-–—)\]]+$/g, '');
+  const lower = clean.toLowerCase();
   for (const marker of TITLE_MARKERS) {
-    if (lower.endsWith(marker) && line.length > marker.length) {
-      const title = line
-        .slice(0, line.length - marker.length)
-        .replace(/[\s\-–—|]+$/, '')
+    if (lower.endsWith(marker) && clean.length > marker.length) {
+      const title = clean
+        .slice(0, clean.length - marker.length)
+        .replace(/[\s\-–—|*·•:;(]+$/, '')
         .trim();
       return title || null;
     }
@@ -168,6 +172,14 @@ function titleFromMarker(line: string): string | null {
 
 function isYearLine(line: string): boolean {
   return /\b(?:19|20)\d{2}\b/.test(line) && line.split(/\s+/).length <= 4;
+}
+
+/** "Eagles 1976 (Hotel California)" -> "Eagles"; a bare year is not an artist. */
+function artistFromYearLine(line: string): string | null {
+  const match = /^(.+?)\s+(?:19|20)\d{2}\b\s*\(/.exec(line);
+  if (!match) return null;
+  const artist = match[1].replace(/[\s\-–—|*·•:;]+$/, '').trim();
+  return artist || null;
 }
 
 function capoFromLine(line: string): number | null {
@@ -265,18 +277,27 @@ export function importSong(raw: string): ImportResult {
           continue;
         }
         beginBody();
+      } else if (!subtitleFound) {
+        const artist = artistFromYearLine(trimmed);
+        if (artist) {
+          out.push(`{subtitle: ${artist}}`);
+          subtitleFound = true;
+          continue;
+        }
+        if (isYearLine(trimmed)) continue;
+        if (
+          trimmed.split(/\s+/).length <= 5 &&
+          !chordLineTokens(trimmed) &&
+          headerLabel(trimmed) === null &&
+          !DIRECTIVE_RE.test(trimmed) &&
+          !LOOSE_METADATA_RE.test(trimmed)
+        ) {
+          out.push(`{subtitle: ${trimmed}}`);
+          subtitleFound = true;
+          continue;
+        }
+        beginBody();
       } else if (isYearLine(trimmed)) {
-        continue;
-      } else if (
-        !subtitleFound &&
-        trimmed.split(/\s+/).length <= 5 &&
-        !chordLineTokens(trimmed) &&
-        headerLabel(trimmed) === null &&
-        !DIRECTIVE_RE.test(trimmed) &&
-        !LOOSE_METADATA_RE.test(trimmed)
-      ) {
-        out.push(`{subtitle: ${trimmed}}`);
-        subtitleFound = true;
         continue;
       } else {
         beginBody();
