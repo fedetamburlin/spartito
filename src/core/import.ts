@@ -17,6 +17,8 @@ const ARTIST_LABELS = new Set(['artist', 'artista']);
 
 const DIRECTIVE_RE = /^\{\s*[a-zA-Z_][a-zA-Z0-9_]*\s*(?::[\s\S]*?)?\}$/;
 const BRACKET_HEADER_RE = /^\[([^\]]+)\]$/;
+const BRACKET_HEADER_WITH_MARKER_RE =
+  /^\[([^\]]+)\]\s*(?:x\s*\d+|\d+\s*x|\(\s*\d+\s*x\s*\)|\(\s*x\s*\d+\s*\)|\[\s*x\s*\d+\s*\])$/i;
 const INLINE_CHORD_RE = /\[([^\]]+)\]/g;
 const ANNOTATION_RE = /^\([^)]*\)$/;
 
@@ -49,6 +51,8 @@ function normalize(raw: string): { text: string; tabs: number } {
   text = text.replace(/^[ \t]*\[tab\]([^\n]*?)\[\/tab\][ \t]*$/gim, '$1');
   text = text.replace(/\[ch\]([\s\S]*?)\[\/ch\]/gi, '[$1]');
   text = text.replace(/\[\/?ch\]/gi, '');
+  // Repeat markers such as [8x] / [x2] are annotations, not chords.
+  text = text.replace(/\[(\d+x|x\d+)\]/gi, '$1');
 
   const lines = text.split('\n');
   const out: string[] = [];
@@ -105,7 +109,7 @@ function sectionType(label: string): 'verse' | 'chorus' | 'bridge' | null {
 }
 
 function headerLabel(line: string): string | null {
-  const bracket = BRACKET_HEADER_RE.exec(line);
+  const bracket = BRACKET_HEADER_WITH_MARKER_RE.exec(line) ?? BRACKET_HEADER_RE.exec(line);
   if (bracket) {
     const label = bracket[1].trim();
     return isChordToken(label) ? null : label;
@@ -315,9 +319,12 @@ export function importSong(raw: string): ImportResult {
     if (chords) {
       const nextRaw = i + 1 < lines.length ? lines[i + 1] : '';
       const next = nextRaw.trim();
+      const nextPlain = plainChordLine(next);
       const nextIsLyric =
         next.length > 0 &&
+        nextPlain === null &&
         !chordLineTokens(next) &&
+        !hasInlineChords([next]) &&
         !DIRECTIVE_RE.test(next) &&
         !ANNOTATION_RE.test(next) &&
         headerLabel(next) === null;

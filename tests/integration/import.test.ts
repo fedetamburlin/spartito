@@ -116,6 +116,32 @@ describe('importSong', () => {
     expect(result.chordpro).not.toContain('{start_of_tab}');
   });
 
+  it('recognizes a section label followed by a repeat marker', () => {
+    const result = importSong('[Refrão] x2\n[ch]C[/ch]Sing it loud');
+    expect(result.chordpro).toContain('{start_of_chorus');
+    expect(result.stats.sections).toBe(1);
+  });
+
+  it('turns bracketed repeat markers into plain annotations', () => {
+    const result = importSong('[Em] [C] [8x]\n[G] [D] [4x]');
+    expect(result.chordpro).not.toContain('[8x]');
+    expect(result.chordpro).not.toContain('[4x]');
+    expect(result.chordpro).toContain('8x');
+    expect(result.chordpro).toContain('4x');
+  });
+
+  it('is idempotent for bracketed chord-only lines', () => {
+    const canonical = [
+      '{start_of_verse}',
+      '[Em] [C]',
+      '[G] [D]',
+      'Where do we go now',
+      '{end_of_verse}'
+    ].join('\n');
+    const once = importSong(canonical).chordpro;
+    expect(importSong(once).chordpro).toBe(once);
+  });
+
   it('converts an Ultimate Guitar style copy-paste', () => {
     const result = importSong(loadFixture('import-ug.txt'));
     expect(result.chordpro).toContain('{start_of_verse: Verse 1}');
