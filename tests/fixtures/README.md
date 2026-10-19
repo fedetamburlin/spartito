@@ -37,10 +37,16 @@ empty road`, `La la la`).
 | `generated/generated-two-columns.pdf` | `scripts/make-pdf-fixtures.mjs` | Two-column reading order (left → right) |
 | `generated/generated-noise.pdf` | `scripts/make-pdf-fixtures.mjs` | `Page 1/2`, decorative lines |
 | `generated/generated-misaligned.pdf` | `scripts/make-pdf-fixtures.mjs` | Odd chord alignment, `(2x)` annotation |
+| `generated/generated-multipage-columns.pdf` | `scripts/make-pdf-fixtures.mjs` | 3 pages, 2 columns, running header/footer |
+| `generated/generated-rotated.pdf` | `scripts/make-pdf-fixtures.mjs` | Vertical/rotated text flow |
+| `generated/generated-mixed.pdf` | `scripts/make-pdf-fixtures.mjs` | Text plus image |
+| `generated/generated-hyphenated.pdf` | `scripts/make-pdf-fixtures.mjs` | Soft hyphens and proportional font |
 | `generated/generated-scan.pdf` | `scripts/make-pdf-fixtures.mjs` | Image-only PDF, no text layer |
+| `generated/generated-encrypted.pdf` | `scripts/make-pdf-fixtures.mjs` + Ghostscript | Password-protected PDF, clean rejection |
 
 Regenerate the generated PDFs with
-`node scripts/make-pdf-fixtures.mjs` (Chrome required).
+`node scripts/make-pdf-fixtures.mjs` (Chrome required; Ghostscript for the
+encrypted fixture).
 
 ## Local-only real-world corpus
 

@@ -52,4 +52,17 @@ test.describe('import from text', () => {
     await expect(editorContent(page)).toContainText('[Am]Walking');
     await expect(page.locator('.song-item.active .song-select')).toHaveText('Generated Song');
   });
+
+  test('rejects an unreadable PDF with an alert', async ({ page }) => {
+    await openLibrary(page);
+    const dialogPromise = page.waitForEvent('dialog');
+    await page.locator('input[type="file"]').setInputFiles({
+      name: 'broken.pdf',
+      mimeType: 'application/pdf',
+      buffer: Buffer.from('this is not a pdf')
+    });
+    const alert = await dialogPromise;
+    expect(alert.message()).toContain('PDF not readable');
+    await alert.dismiss();
+  });
 });

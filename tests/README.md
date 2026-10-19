@@ -119,11 +119,14 @@ idempotence and ≥65% word retention. CI never sees these files.
 node scripts/make-pdf-fixtures.mjs
 ```
 
-Requires Chrome/Chromium (`SPARTITO_CHROME_PATH` overrides). The script
-writes five PDFs with invented lyrics: single column, two columns, noise,
-misaligned chords and an image-only scan (no text layer). `pdf-fixtures.test.ts`
-checks extraction and import; the E2E suite also imports the single-column
-PDF through the real file input.
+Requires Chrome/Chromium (`SPARTITO_CHROME_PATH` overrides) and, for the
+encrypted fixture, Ghostscript. The script writes PDFs with invented
+lyrics: single column, two columns, noise, misaligned chords, three-page
+two-column songbook, rotated text, mixed text/image, hyphenated text, an
+image-only scan and a password-protected file. `pdf-fixtures.test.ts` and
+`pdf-torture.test.ts` check extraction and graceful failure; the E2E suite
+also imports the single-column PDF through the real file input and checks
+the alert for a corrupted file.
 
 ## CI
 
