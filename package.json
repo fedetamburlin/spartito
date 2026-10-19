@@ -5,6 +5,17 @@
   "type": "module",
   "description": "Minimal editor to create A4 PDF song sheets (lyrics + chords) to read on a tablet",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fedetamburlin/spartito.git"
+  },
+  "homepage": "https://fedetamburlin.github.io/spartito/",
+  "bugs": {
+    "url": "https://github.com/fedetamburlin/spartito/issues"
+  },
+  "engines": {
+    "node": ">=20.19"
+  },
   "workspaces": [
     "packages/*"
   ],
@@ -12,11 +23,15 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "clean": "node scripts/clean.mjs",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "npm run build && playwright test",
     "test:e2e:ui": "npm run build && playwright test --ui",
+    "fixtures:sync": "node scripts/fetch-fixtures.mjs",
+    "fixtures:pdf": "node scripts/make-pdf-fixtures.mjs",
+    "verify": "npm run check && npm test && npm run test:e2e && npm run mcp:check && npm run mcp:test",
     "mcp:build": "npm run build -w spartito-mcp",
     "mcp:check": "npm run check -w spartito-mcp",
     "mcp:test": "npm run test -w spartito-mcp"

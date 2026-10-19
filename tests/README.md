@@ -88,8 +88,8 @@ the text is copyrighted and must not be published. Only URLs and metadata
 are committed in `fixtures/ug-sources.json`.
 
 ```bash
-node tools/fetch-ug-fixtures.mjs          # download missing pages
-node tools/fetch-ug-fixtures.mjs --force  # refresh everything
+node scripts/fetch-fixtures.mjs          # download missing pages
+node scripts/fetch-fixtures.mjs --force  # refresh everything
 ```
 
 Then `npm test` runs `local-import.test.ts`; when the folder is missing the
@@ -100,7 +100,7 @@ section counts. CI never sees these files.
 ### PDF fixtures
 
 ```bash
-node tests/fixtures/generate/make-pdfs.mjs
+node scripts/make-pdf-fixtures.mjs
 ```
 
 Requires Chrome/Chromium (`SPARTITO_CHROME_PATH` overrides). The script

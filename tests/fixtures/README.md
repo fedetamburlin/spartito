@@ -33,21 +33,21 @@ empty road`, `La la la`).
 | File | Origin | What it covers |
 |---|---|---|
 | `mini.pdf` | Synthetic, hand-made | Coordinate reconstruction: chord line above lyrics |
-| `generated/generated-single-column.pdf` | `generate/make-pdfs.mjs` | One column, metadata, capo, merge |
-| `generated/generated-two-columns.pdf` | `generate/make-pdfs.mjs` | Two-column reading order (left → right) |
-| `generated/generated-noise.pdf` | `generate/make-pdfs.mjs` | `Page 1/2`, decorative lines |
-| `generated/generated-misaligned.pdf` | `generate/make-pdfs.mjs` | Odd chord alignment, `(2x)` annotation |
-| `generated/generated-scan.pdf` | `generate/make-pdfs.mjs` | Image-only PDF, no text layer |
+| `generated/generated-single-column.pdf` | `scripts/make-pdf-fixtures.mjs` | One column, metadata, capo, merge |
+| `generated/generated-two-columns.pdf` | `scripts/make-pdf-fixtures.mjs` | Two-column reading order (left → right) |
+| `generated/generated-noise.pdf` | `scripts/make-pdf-fixtures.mjs` | `Page 1/2`, decorative lines |
+| `generated/generated-misaligned.pdf` | `scripts/make-pdf-fixtures.mjs` | Odd chord alignment, `(2x)` annotation |
+| `generated/generated-scan.pdf` | `scripts/make-pdf-fixtures.mjs` | Image-only PDF, no text layer |
 
 Regenerate the generated PDFs with
-`node tests/fixtures/generate/make-pdfs.mjs` (Chrome required).
+`node scripts/make-pdf-fixtures.mjs` (Chrome required).
 
 ## Local-only real-world corpus
 
 `local/` is **gitignored** and never committed:
 
 - `local/ug/*.txt` — ten real Ultimate Guitar pages, fetched by
-  `tools/fetch-ug-fixtures.mjs` from the URLs in `ug-sources.json`
+  `scripts/fetch-fixtures.mjs` from the URLs in `ug-sources.json`
 - `local/pdf/*.pdf` — real downloaded chord-sheet PDFs used for manual/
   local checks
 

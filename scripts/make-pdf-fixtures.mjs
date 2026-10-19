@@ -6,7 +6,7 @@
  * The content is invented on purpose: fixtures must not embed third-party
  * lyrics. Run from the repo root:
  *
- *   node tests/fixtures/generate/make-pdfs.mjs
+ *   node scripts/make-pdf-fixtures.mjs
  */
 
 import { execFileSync } from 'node:child_process';
@@ -16,7 +16,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const OUT_DIR = join(HERE, '..', 'generated');
+const OUT_DIR = join(HERE, '..', 'tests', 'fixtures', 'generated');
 const WORK_DIR = join(tmpdir(), 'spartito-pdf-fixtures');
 
 function findChrome() {

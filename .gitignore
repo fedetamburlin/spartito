@@ -7,3 +7,7 @@ out/
 tests/fixtures/local/
 test-results/
 playwright-report/
+blob-report/
+coverage/
+.eslintcache
+.prettiercache

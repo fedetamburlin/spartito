@@ -7,7 +7,7 @@
  * gitignored and CI never runs this script. Only URLs and metadata are
  * committed. Use --force to refresh files that already exist.
  *
- * Usage: node tools/fetch-ug-fixtures.mjs [--force]
+ * Usage: node scripts/fetch-fixtures.mjs [--force]
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';

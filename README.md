@@ -38,7 +38,7 @@ Source in **ChordPro (subset)** in the left editor (CodeMirror 6: chords, direct
 
 `npm test` covers the parser, import (text and PDF), layout, transposition, library and the app-side MCP bridge. `npm run test:e2e` builds the app and drives real Chromium flows: editing, Insert menu, import dialog, library CRUD, PDF export and the storage-unavailable fallback.
 
-The real Ultimate Guitar corpus is **local only** (copyrighted text, gitignored): `node tools/fetch-ug-fixtures.mjs` downloads ten pages, then `npm test` runs the structural checks. See [`tests/README.md`](tests/README.md) for the layer map, conventions and fixture catalogue.
+The real Ultimate Guitar corpus is **local only** (copyrighted text, gitignored): `node scripts/fetch-fixtures.mjs` downloads ten pages, then `npm test` runs the structural checks. See [`tests/README.md`](tests/README.md) for the layer map, conventions and fixture catalogue.
 
 ## MCP server (opencode)
 
