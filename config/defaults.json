@@ -19,8 +19,7 @@
     "columnsDefault": 1,
     "columnsMax": 2,
     "autoColumns": true,
-    "autoFit": true,
-    "autoGrow": true
+    "autoFit": true
   },
   "typography": {
     "fontDefault": "inter",

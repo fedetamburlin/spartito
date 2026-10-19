@@ -29,7 +29,6 @@ export interface AppConfig {
     columnsMax: 1 | 2;
     autoColumns: boolean;
     autoFit: boolean;
-    autoGrow: boolean;
   };
   typography: {
     fontDefault: string;

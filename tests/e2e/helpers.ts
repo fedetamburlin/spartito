@@ -15,6 +15,11 @@ export async function openShared(page: Page, source: string): Promise<void> {
   await page.goto(shareLink(source));
   await expect(page.locator('.cm-editor')).toBeVisible();
   await expect(page.locator('.page')).toBeVisible();
+  // Wait for the first auto-fit measurement, not just the initial render.
+  await expect(page.locator('.preview')).toHaveAttribute(
+    'data-fit-status',
+    /^(fits|columns|shrunk|overflow)$/
+  );
 }
 
 export const editorContent = (page: Page) => page.locator('.cm-content');

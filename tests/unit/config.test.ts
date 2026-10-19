@@ -64,7 +64,6 @@ describe('config coherence', () => {
 
   it('keeps the layout feature flags boolean', () => {
     expect(typeof config.layout.autoFit).toBe('boolean');
-    expect(typeof config.layout.autoGrow).toBe('boolean');
     expect(typeof config.layout.autoColumns).toBe('boolean');
   });
 

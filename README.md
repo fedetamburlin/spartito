@@ -31,7 +31,7 @@ Source in **ChordPro (subset)** in the left editor (CodeMirror 6: chords, direct
 - **Dark theme** for the app chrome (the A4 sheet stays white): follows the system by default, sun/moon toggle at the end of the settings row
 - chords `[Am]word`, `[C][G]word`, Italian note names `[Do]`; blank lines separate paragraphs, also inside sections
 - canonical directive names only (`{title}`, `{start_of_chorus}`, …), with `{chorus}`/`{rit}` as compact chorus recall; unsupported directives are ignored in the preview (a badge reports how many) and preserved on export
-- auto-fit: 1 column → 2 columns → font down to 6pt lyrics / 5pt chords (defaults 11/10); short songs instead grow the font up to 14pt to fill the page (badge shows "grown"); the PDF stays on one page, with a warning when the song does not fit
+- auto-fit: 1 column → 2 columns → font down to 6pt lyrics / 5pt chords (defaults 11/10); the Text size you choose is never increased automatically, and the field stops at the largest size that keeps the song on one page; the PDF stays on one page, with a warning when even the minimum does not fit
 - **Transpose** stepper (or `+`/`−` keys): preview and PDF only; `{capo: N}` is shown under the title and moves with transposition
 - **From text**: paste from Ultimate Guitar or any chord site, conversion is automatic (Italian notation, sections, UG title/artist markers); **From file**: `.cho`, `.crd`, `.json` and text PDFs
 - **Export chords** (`.cho`), **Print PDF** (Chrome/Chromium → Save as PDF, default margins, headers off) and **Songbook**: pick songs from the library, set their order and print them as a single PDF, one song per sheet

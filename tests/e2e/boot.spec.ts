@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { collectErrors, editorContent, openShared, previewPage } from './helpers';
 
 // Boot, rendering and theme: the app must come up cleanly from a share link.
@@ -14,6 +14,17 @@ const SONG = `{title: Smoke Song}
 const SHORT = `{title: Small Song}
 [Am]one short line`;
 
+const LONG = `{title: Long Song}
+
+${Array.from({ length: 100 }, (_, index) => `[C]line ${index} with a few words to wrap`).join(
+  '\n'
+)}`;
+
+const textPtOf = (page: Page) =>
+  page
+    .locator('.page')
+    .evaluate((el) => (el as HTMLElement).style.getPropertyValue('--text-pt').trim());
+
 test.describe('boot', () => {
   test('loads a shared song with editor and preview', async ({ page }) => {
     const errors = collectErrors(page);
@@ -26,12 +37,31 @@ test.describe('boot', () => {
     expect(errors).toEqual([]);
   });
 
-  test('grows the font for a short song', async ({ page }) => {
+  test('uses the text size chosen in the toolbar', async ({ page }) => {
     await openShared(page, SHORT);
+    const input = page.getByRole('spinbutton', { name: 'Text pt' });
 
-    const badge = page.locator('.preview-meta .badge').first();
-    await expect(badge).toContainText('(grown)');
-    await expect(badge).toContainText('14pt');
+    await input.fill('13');
+    await input.blur();
+    await expect.poll(() => textPtOf(page)).toBe('13pt');
+
+    await input.fill('9');
+    await input.blur();
+    await expect.poll(() => textPtOf(page)).toBe('9pt');
+  });
+
+  test('stops the text size at the largest one that fits', async ({ page }) => {
+    await openShared(page, LONG);
+    const input = page.getByRole('spinbutton', { name: 'Text pt' });
+
+    await input.fill('14');
+    await input.blur();
+
+    await expect.poll(async () => Number(await input.getAttribute('max'))).toBeLessThan(14);
+    const max = Number(await input.getAttribute('max'));
+    await expect.poll(async () => Number(await input.inputValue())).toBe(max);
+    await expect.poll(() => textPtOf(page)).toBe(`${max}pt`);
+    await expect(page.locator('.preview-meta.warning')).toHaveCount(0);
   });
 
   test('theme toggle persists across a reload', async ({ page }) => {

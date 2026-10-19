@@ -25,6 +25,8 @@
     onImportSong: (text: string, settings?: Partial<SongSettings>) => void;
     /** Absent when there is no library to pick songs from. */
     onSongbook?: () => void;
+    /** Largest text size that still fits the current song on one page. */
+    maxTextPt?: number;
   }
 
   let {
@@ -34,8 +36,13 @@
     bridgeStatus,
     onToggleBridge,
     onImportSong,
-    onSongbook
+    onSongbook,
+    maxTextPt = config.layout.textPtMax
   }: Props = $props();
+
+  const textMax = $derived(
+    Math.min(config.layout.textPtMax, Math.max(config.layout.textPtMin, maxTextPt))
+  );
 
   let fileInput = $state<HTMLInputElement | null>(null);
   let importOpen = $state(false);
@@ -121,7 +128,12 @@
   }
 
   function setTextPt(event: Event) {
-    const value = Number((event.currentTarget as HTMLInputElement).value);
+    const input = event.currentTarget as HTMLInputElement;
+    const raw = Number(input.value);
+    const value = Number.isFinite(raw)
+      ? Math.min(textMax, Math.max(config.layout.textPtMin, raw))
+      : settings.textPt;
+    input.value = String(value);
     settings = sanitizeSettings({ ...settings, textPt: value });
   }
 
@@ -183,9 +195,10 @@
       <input
         type="number"
         min={config.layout.textPtMin}
-        max={config.layout.textPtMax}
+        max={textMax}
         step="0.5"
         value={settings.textPt}
+        title={`Maximum ${textMax}pt to keep this song on one page`}
         onchange={setTextPt}
       /> pt
     </label>

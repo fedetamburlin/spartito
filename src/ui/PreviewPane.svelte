@@ -11,9 +11,11 @@
     doc: SongDocument;
     capo: number;
     settings: SongSettings;
+    /** Largest size that fits, used to cap the manual text input. */
+    onLimit?: (maxTextPt: number) => void;
   }
 
-  let { doc, capo, settings }: Props = $props();
+  let { doc, capo, settings, onLimit }: Props = $props();
 
   let scrollEl = $state<HTMLElement | null>(null);
   let zoom = $state(1);
@@ -22,6 +24,7 @@
 
   function handleFit(next: FitOutcome) {
     outcome = next;
+    onLimit?.(next.maxTextPt);
   }
 
   $effect(() => {
@@ -41,9 +44,7 @@
     const columns = outcome.params.columns === 2 ? '2 columns' : '1 column';
     switch (outcome.status) {
       case 'fits':
-        return outcome.params.textPt > config.layout.textPtDefault
-          ? `${columns} · ${outcome.params.textPt}pt (grown)`
-          : `${columns} · ${outcome.params.textPt}pt`;
+        return `${columns} · ${outcome.params.textPt}pt`;
       case 'columns':
         return `${columns} · ${outcome.params.textPt}pt (auto)`;
       case 'shrunk':
@@ -63,7 +64,7 @@
   const unknowns = $derived(unknownDirectives(doc));
 </script>
 
-<div class="preview">
+<div class="preview" data-fit-status={outcome?.status ?? 'pending'}>
   {#if showMeta || unknowns.length > 0}
     <div class="preview-meta" class:warning={outcome?.status === 'overflow'}>
       {#if showMeta}

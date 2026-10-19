@@ -39,12 +39,13 @@ describe('seeded stress', () => {
       const threshold = config.layout.textPtMin - 1 + step * 0.17;
       const result = decideLayout((params) => params.textPt > threshold, config, {
         columns: 'auto',
-        textPt: config.layout.textPtDefault,
-        allowGrow: true
+        textPt: config.layout.textPtDefault
       });
       expect(result.attempts).toBeLessThan(100);
       expect(result.params.textPt).toBeGreaterThanOrEqual(config.layout.textPtMin);
       expect(result.params.textPt).toBeLessThanOrEqual(config.layout.textPtMax);
+      expect(result.maxTextPt).toBeGreaterThanOrEqual(result.params.textPt);
+      expect(result.maxTextPt).toBeLessThanOrEqual(config.layout.textPtMax);
     }
   });
 });

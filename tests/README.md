@@ -47,7 +47,7 @@ same test copied five times.
 | Chord grammar, chord-above-lyrics merge                 | `import.test.ts`                                                                                                           |
 | ChordPro parser, directives, capo, chorus recall        | `chordpro.test.ts`, `directives.test.ts`                                                                                   |
 | Transposition, capo display                             | `transpose.test.ts`, `capo.test.ts`, `invariants.test.ts`                                                                  |
-| Layout, auto-fit, auto-grow                             | `fit.test.ts`, `invariants.test.ts`, `e2e/boot.spec.ts`                                                                    |
+| Layout, auto-fit, text ceiling                          | `fit.test.ts`, `invariants.test.ts`, `e2e/boot.spec.ts`                                                                    |
 | Import from text/UG/PDF                                 | `import.test.ts`, `pdf.test.ts`, `pdf-fixtures.test.ts`, `local-import.test.ts`, `local-pdf.test.ts`, `e2e/import.spec.ts` |
 | Library, IndexedDB, legacy migration                    | `library.test.ts`, `db.test.ts`                                                                                            |
 | Persistence, export filename                            | `persistence.test.ts`, `invariants.test.ts`                                                                                |

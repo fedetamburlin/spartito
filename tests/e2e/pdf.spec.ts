@@ -16,7 +16,7 @@ const SONG = `{title: Print Me}
 test.describe('PDF export', () => {
   test('prints one A4 page with text and without editor source', async ({ page }) => {
     await openShared(page, SONG);
-    await expect(page.locator('.preview-meta .badge').first()).toBeVisible();
+    await expect(page.locator('.preview')).toHaveAttribute('data-fit-status', 'fits');
 
     const buffer = await page.pdf({ format: 'A4', printBackground: true, preferCSSPageSize: true });
     const pdf = await getDocumentProxy(new Uint8Array(buffer));

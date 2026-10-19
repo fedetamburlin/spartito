@@ -48,6 +48,8 @@
 
   let source = $state(shared?.source ?? DEMO_SONG);
   let settings = $state<SongSettings>(sanitizeSettings(shared?.settings));
+  /** Ceiling for the manual text size, reported by the preview's fit. */
+  let fitTextMax = $state(config.layout.textPtMax);
   let doc = $derived(parseChordPro(source));
   let display = $derived(transposedForDisplay(doc, settings.transpose));
 
@@ -74,6 +76,7 @@
         songs = state.songs;
         activeId = state.activeId;
         sidebarOpen = state.sidebarOpen;
+        fitTextMax = config.layout.textPtMax;
         const active = state.songs.find((song) => song.id === state.activeId);
         if (active) {
           source = active.source;
@@ -114,6 +117,7 @@
     flushActive();
     clearTimeout(saveTimer);
     activeId = id;
+    fitTextMax = config.layout.textPtMax;
     source = target.source;
     settings = target.settings;
     void store?.putMeta('activeId', id);
@@ -130,12 +134,14 @@
       songs = [...songs, song];
       void store.putSong(song);
       activeId = song.id;
+      fitTextMax = config.layout.textPtMax;
       source = song.source;
       settings = song.settings;
       void store.putMeta('activeId', song.id);
       return;
     }
     // No library (shared document): just load the content.
+    fitTextMax = config.layout.textPtMax;
     source = song.source;
     settings = song.settings;
   }
@@ -179,6 +185,7 @@
     if (result.removedActive) {
       const next = result.songs.find((song) => song.id === result.activeId) ?? result.songs[0];
       activeId = next.id;
+      fitTextMax = config.layout.textPtMax;
       source = next.source;
       settings = next.settings;
       void store.putMeta('activeId', next.id);
@@ -190,8 +197,23 @@
     void store?.putMeta('sidebarOpen', sidebarOpen);
   }
 
+  /**
+   * The preview measures the largest text size that still fits. Never raise
+   * the stored size automatically: shorten the song and the user can grow it
+   * by hand. If the current size no longer fits, pull it down to the ceiling.
+   */
+  function handleFitLimit(maxTextPt: number) {
+    if (!Number.isFinite(maxTextPt)) return;
+    const limit = Math.min(config.layout.textPtMax, Math.max(config.layout.textPtMin, maxTextPt));
+    fitTextMax = limit;
+    if (settings.textPt > limit) {
+      settings = sanitizeSettings({ ...settings, textPt: limit });
+    }
+  }
+
   function importAsSong(text: string, importedSettings?: Partial<SongSettings>) {
     if (ephemeral || !store) {
+      fitTextMax = config.layout.textPtMax;
       source = text;
       if (importedSettings) settings = sanitizeSettings({ ...settings, ...importedSettings });
       return;
@@ -352,6 +374,7 @@
       onToggleBridge={toggleBridge}
       onImportSong={importAsSong}
       onSongbook={songs.length > 0 ? openSongbook : undefined}
+      maxTextPt={fitTextMax}
     />
     <div class="app-body">
       {#if !ephemeral}
@@ -388,7 +411,7 @@
           ondblclick={resetSplit}
           onkeydown={onSplitKeydown}
         ></div>
-        <PreviewPane doc={display.doc} capo={display.capo} {settings} />
+        <PreviewPane doc={display.doc} capo={display.capo} {settings} onLimit={handleFitLimit} />
       </main>
     </div>
   {:else}

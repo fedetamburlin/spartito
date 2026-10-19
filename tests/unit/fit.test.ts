@@ -1,10 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { config } from '../../src/core/config';
-import { chordPtFor, decideLayout, type LayoutParams } from '../../src/core/fit';
+import { chordPtFor, decideLayout } from '../../src/core/fit';
 
-const baseOptions = (
-  overrides: Partial<{ columns: 'auto' | 1 | 2; textPt: number; allowGrow: boolean }> = {}
-) => ({
+const baseOptions = (overrides: Partial<{ columns: 'auto' | 1 | 2; textPt: number }> = {}) => ({
   columns: 'auto' as const,
   textPt: config.layout.textPtDefault,
   ...overrides
@@ -12,20 +10,11 @@ const baseOptions = (
 
 describe('decideLayout', () => {
   it('uses the default when it fits in one column', () => {
-    const seen: LayoutParams[] = [];
-    const result = decideLayout(
-      (params) => {
-        seen.push(params);
-        return false;
-      },
-      config,
-      baseOptions()
-    );
+    const result = decideLayout(() => false, config, baseOptions());
     expect(result.status).toBe('fits');
     expect(result.params.columns).toBe(1);
     expect(result.params.textPt).toBe(config.layout.textPtDefault);
-    expect(result.attempts).toBe(1);
-    expect(seen).toHaveLength(1);
+    expect(result.maxTextPt).toBe(config.layout.textPtMax);
   });
 
   it('switches to two columns when one overflows', () => {
@@ -33,7 +22,7 @@ describe('decideLayout', () => {
     expect(result.status).toBe('columns');
     expect(result.params.columns).toBe(2);
     expect(result.params.textPt).toBe(config.layout.textPtDefault);
-    expect(result.attempts).toBe(2);
+    expect(result.maxTextPt).toBe(config.layout.textPtMax);
   });
 
   it('shrinks the font when two columns overflow too', () => {
@@ -41,6 +30,7 @@ describe('decideLayout', () => {
     expect(result.status).toBe('shrunk');
     expect(result.params.textPt).toBe(10.5);
     expect(result.params.columns).toBe(2);
+    expect(result.maxTextPt).toBe(10.5);
   });
 
   it('goes down to the minimum readable size', () => {
@@ -51,12 +41,14 @@ describe('decideLayout', () => {
     );
     expect(result.status).toBe('shrunk');
     expect(result.params.textPt).toBe(config.layout.textPtMin);
+    expect(result.maxTextPt).toBe(config.layout.textPtMin);
   });
 
   it('reports overflow when nothing fits', () => {
     const result = decideLayout(() => true, config, baseOptions());
     expect(result.status).toBe('overflow');
     expect(result.params.textPt).toBe(config.layout.textPtMin);
+    expect(result.maxTextPt).toBe(config.layout.textPtMin);
   });
 
   it('never uses two columns with fixed 1 column', () => {
@@ -96,78 +88,45 @@ describe('decideLayout', () => {
   });
 });
 
-describe('decideLayout allowGrow', () => {
-  it('grows a short song up to the maximum when there is room', () => {
-    const result = decideLayout(() => false, config, baseOptions({ allowGrow: true }));
+describe('decideLayout text ceiling', () => {
+  it('keeps the requested size for a short song', () => {
+    const result = decideLayout(() => false, config, baseOptions({ textPt: 9 }));
     expect(result.status).toBe('fits');
-    expect(result.params.textPt).toBe(config.layout.textPtMax);
-    expect(result.params.columns).toBe(1);
-    // 11 -> 14 in 0.5pt steps: 1 initial + 6 grow attempts
-    expect(result.attempts).toBe(1 + (config.layout.textPtMax - config.layout.textPtDefault) / 0.5);
+    expect(result.params.textPt).toBe(9);
+    expect(result.maxTextPt).toBe(config.layout.textPtMax);
   });
 
-  it('grows in two columns when the song needed them', () => {
-    const result = decideLayout(
-      (params) => params.columns === 1 || params.textPt > 13,
-      config,
-      baseOptions({ allowGrow: true })
-    );
-    expect(result.status).toBe('columns');
-    expect(result.params.columns).toBe(2);
+  it('never grows the layout above the requested size', () => {
+    const result = decideLayout(() => false, config, baseOptions({ textPt: 13 }));
     expect(result.params.textPt).toBe(13);
   });
 
-  it('stops growing at the first size that overflows', () => {
-    const seen: number[] = [];
-    const result = decideLayout(
-      (params) => {
-        seen.push(params.textPt);
-        return params.textPt > 12;
-      },
-      config,
-      baseOptions({ allowGrow: true })
-    );
-    expect(result.params.textPt).toBe(12);
-    expect(seen).toContain(12.5);
-    expect(seen).not.toContain(13);
-  });
-
-  it('never grows past textPtMax', () => {
-    const seen: number[] = [];
-    decideLayout(
-      (params) => {
-        seen.push(params.textPt);
-        return false;
-      },
-      config,
-      baseOptions({ allowGrow: true })
-    );
-    expect(Math.max(...seen)).toBe(config.layout.textPtMax);
-  });
-
-  it('leaves the layout untouched when allowGrow is not set', () => {
-    const result = decideLayout(() => false, config, baseOptions());
+  it('caps the ceiling at the last size that fits', () => {
+    const result = decideLayout((params) => params.textPt > 12, config, baseOptions());
     expect(result.params.textPt).toBe(config.layout.textPtDefault);
-    expect(result.attempts).toBe(1);
+    expect(result.maxTextPt).toBe(12);
   });
 
-  it('does not grow after shrinking or overflowing', () => {
-    const grown = decideLayout(
-      (params) => params.textPt > 10.5,
+  it('caps the ceiling after an automatic shrink', () => {
+    const result = decideLayout((params) => params.textPt > 10.5, config, baseOptions());
+    expect(result.params.textPt).toBe(10.5);
+    expect(result.maxTextPt).toBe(10.5);
+  });
+
+  it('lets the ceiling use two columns when they fit a larger size', () => {
+    const result = decideLayout(
+      (params) => params.columns === 1 || params.textPt > 13,
       config,
-      baseOptions({ allowGrow: true })
+      baseOptions()
     );
-    expect(grown.status).toBe('shrunk');
-    expect(grown.params.textPt).toBe(10.5);
-
-    const overflow = decideLayout(() => true, config, baseOptions({ allowGrow: true }));
-    expect(overflow.status).toBe('overflow');
-    expect(overflow.params.textPt).toBe(config.layout.textPtMin);
+    expect(result.params.columns).toBe(2);
+    expect(result.params.textPt).toBe(config.layout.textPtDefault);
+    expect(result.maxTextPt).toBe(13);
   });
 
-  it('grows from a user size above the default', () => {
-    const result = decideLayout(() => false, config, baseOptions({ textPt: 13, allowGrow: true }));
-    expect(result.status).toBe('fits');
-    expect(result.params.textPt).toBe(config.layout.textPtMax);
+  it('falls back to the minimum when no size fits', () => {
+    const result = decideLayout(() => true, config, baseOptions({ textPt: 14 }));
+    expect(result.status).toBe('overflow');
+    expect(result.maxTextPt).toBe(config.layout.textPtMin);
   });
 });

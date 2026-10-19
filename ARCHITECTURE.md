@@ -40,7 +40,7 @@ paste / .cho / PDF ──► importSong ──► canonical ChordPro ──► e
 | `chords`                                | chord grammar, chord-line detection, chord/lyric merge        |
 | `transpose`                             | non-destructive transposition and capo display                |
 | `directives`                            | single source of truth for the supported ChordPro subset      |
-| `fit`                                   | column/font cascade, auto-grow, overflow status               |
+| `fit`                                   | column/font cascade, text ceiling, overflow status            |
 | `settings`                              | per-song settings and sanitization                            |
 | `persistence`                           | legacy localStorage, JSON import/export, file names           |
 | `db`                                    | tiny IndexedDB wrapper (`songs` + `meta`)                     |
@@ -94,7 +94,8 @@ and a headless-Chrome PDF renderer. It shares the wire protocol with
 
 - The page is A4 portrait in millimetres; margins default to 5 mm.
 - Auto-fit measures a clone of the real page: 1 column → 2 columns → smaller
-  font (6 pt lyrics / 5 pt chords), and grows short songs up to 14 pt.
+  font (6 pt lyrics / 5 pt chords). It never enlarges the chosen text size; it
+  reports the largest size that still fits so the toolbar can stop there.
 - `@media print` hides the app chrome and prints only the page.
 - A songbook prints one sheet per picked song (`SongbookPrint`) in the order set
   in `SongbookDialog`, with an optional cover listing them: the book is laid out

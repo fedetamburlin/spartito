@@ -10,7 +10,6 @@ export interface FitOptions {
   columns: 'auto' | 1 | 2;
   textPt: number;
   allowShrink?: boolean;
-  allowGrow?: boolean;
 }
 
 export type FitStatus = 'fits' | 'columns' | 'shrunk' | 'overflow';
@@ -18,6 +17,13 @@ export type FitStatus = 'fits' | 'columns' | 'shrunk' | 'overflow';
 export interface FitOutcome {
   params: LayoutParams;
   status: FitStatus;
+  /**
+   * Largest text size that still fits on the page, for the manual size
+   * ceiling. When even the minimum overflows, this is the minimum: the
+   * status warns that no size fits.
+   */
+  maxTextPt: number;
+  /** Measurements performed, including the ceiling probe. */
   attempts: number;
 }
 
@@ -35,54 +41,64 @@ function paramsFor(columns: 1 | 2, textPt: number, cfg: AppConfig): LayoutParams
 export function decideLayout(measure: Measure, cfg: AppConfig, options: FitOptions): FitOutcome {
   const target = Math.min(cfg.layout.textPtMax, Math.max(cfg.layout.textPtMin, options.textPt));
   const maxColumns = cfg.layout.columnsMax >= 2 ? 2 : 1;
-  let attempts = 0;
-
-  const tryParams = (columns: 1 | 2, textPt: number): LayoutParams | null => {
-    const params = paramsFor(columns, textPt, cfg);
-    attempts += 1;
-    return measure(params) ? null : params;
-  };
-
-  /** Grow from a fitting size up to textPtMax, in 0.5pt steps, while it still fits. */
-  const growToFit = (columns: 1 | 2, params: LayoutParams): LayoutParams => {
-    if (!options.allowGrow) return params;
-    let best = params;
-    for (let pt = params.textPt + 0.5; pt <= cfg.layout.textPtMax + 1e-9; pt += 0.5) {
-      const rounded = Math.round(pt * 10) / 10;
-      if (rounded > cfg.layout.textPtMax) break;
-      const candidate = tryParams(columns, rounded);
-      if (!candidate) break;
-      best = candidate;
-    }
-    return best;
-  };
-
   const firstColumns: 1 | 2 =
     options.columns === 'auto' ? cfg.layout.columnsDefault : options.columns;
   const autoColumns = options.columns === 'auto' && cfg.layout.autoColumns && maxColumns === 2;
+  let attempts = 0;
 
-  let params = tryParams(firstColumns, target);
-  if (params) return { params: growToFit(firstColumns, params), status: 'fits', attempts };
+  const fits = (columns: 1 | 2, textPt: number): boolean => {
+    attempts += 1;
+    return !measure(paramsFor(columns, textPt, cfg));
+  };
 
-  if (autoColumns && firstColumns === 1) {
-    params = tryParams(2, target);
-    if (params) return { params: growToFit(2, params), status: 'columns', attempts };
-  }
+  /** Would this size fit with the same column choice the preview makes? */
+  const fitsAuto = (textPt: number): boolean => {
+    if (fits(firstColumns, textPt)) return true;
+    return autoColumns && firstColumns === 1 && fits(2, textPt);
+  };
 
-  if (options.allowShrink !== false) {
-    const shrinkColumns: 1 | 2 = autoColumns ? 2 : firstColumns;
-    for (let pt = target - 0.5; pt >= cfg.layout.textPtMin - 1e-9; pt -= 0.5) {
-      const rounded = Math.round(pt * 10) / 10;
-      if (rounded < cfg.layout.textPtMin) break;
-      params = tryParams(shrinkColumns, rounded);
-      if (params) return { params, status: 'shrunk', attempts };
+  let columns = firstColumns;
+  let textPt = target;
+  let status: FitStatus = 'fits';
+
+  if (!fits(firstColumns, target)) {
+    if (autoColumns && firstColumns === 1 && fits(2, target)) {
+      columns = 2;
+      status = 'columns';
+    } else if (options.allowShrink !== false) {
+      columns = autoColumns ? 2 : firstColumns;
+      status = 'shrunk';
+      let shrunk: number | null = null;
+      for (let pt = target - 0.5; pt >= cfg.layout.textPtMin - 1e-9; pt -= 0.5) {
+        const rounded = Math.round(pt * 10) / 10;
+        if (rounded < cfg.layout.textPtMin) break;
+        if (fits(columns, rounded)) {
+          shrunk = rounded;
+          break;
+        }
+      }
+      if (shrunk === null) {
+        status = 'overflow';
+        textPt = cfg.layout.textPtMin;
+      } else {
+        textPt = shrunk;
+      }
+    } else {
+      columns = autoColumns ? 2 : firstColumns;
+      textPt = cfg.layout.textPtMin;
+      status = 'overflow';
     }
   }
 
-  const fallbackColumns: 1 | 2 = autoColumns ? 2 : firstColumns;
-  return {
-    params: paramsFor(fallbackColumns, cfg.layout.textPtMin, cfg),
-    status: 'overflow',
-    attempts
-  };
+  // Probe upward without applying the result: the preview stays at the
+  // requested (or shrunk) size, while the toolbar caps manual growth here.
+  let maxTextPt = textPt;
+  for (let pt = textPt + 0.5; pt <= cfg.layout.textPtMax + 1e-9; pt += 0.5) {
+    const rounded = Math.round(pt * 10) / 10;
+    if (rounded > cfg.layout.textPtMax) break;
+    if (!fitsAuto(rounded)) break;
+    maxTextPt = rounded;
+  }
+
+  return { params: paramsFor(columns, textPt, cfg), status, maxTextPt, attempts };
 }

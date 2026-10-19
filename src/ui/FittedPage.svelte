@@ -9,7 +9,8 @@
 
   /**
    * A sheet with its layout decided by the same auto-fit used in the preview:
-   * one column -> two columns -> smaller type. Renders nothing but the page.
+   * one column -> two columns -> smaller type, never larger than the size
+   * chosen in the toolbar. Renders nothing but the page.
    */
 
   interface Props {
@@ -48,8 +49,7 @@
       if (!page) return;
       const result = decideLayout(createMeasure(page), config, {
         columns: currentSettings.columns,
-        textPt: currentSettings.textPt,
-        allowGrow: config.layout.autoGrow
+        textPt: currentSettings.textPt
       });
       layout = result.params;
       // The callback must not re-run the measurement when the parent re-renders.

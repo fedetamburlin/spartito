@@ -114,44 +114,32 @@ describe('settings invariants', () => {
 });
 
 describe('fit invariants', () => {
-  const maxPt = config.layout.textPtMax;
-  const minPt = config.layout.textPtMin;
-  const thresholds: number[] = [];
-  for (let pt = minPt - 0.5; pt <= maxPt + 0.5; pt += 0.5) thresholds.push(pt);
+  const { textPtMin, textPtMax, textPtDefault } = config.layout;
 
-  it.each(thresholds)('picks the largest size that fits (threshold %spt)', (threshold) => {
-    const measure = (params: { textPt: number }) => params.textPt > threshold;
-    const result = decideLayout(measure, config, {
-      columns: 1,
-      textPt: config.layout.textPtDefault,
-      allowGrow: true
-    });
-    if (threshold < minPt) {
-      expect(result.status).toBe('overflow');
-      expect(result.params.textPt).toBe(minPt);
-      return;
+  it('never returns a layout above the requested size', () => {
+    for (let pt = textPtMin; pt <= textPtMax; pt += 0.5) {
+      const result = decideLayout((params) => params.textPt > 10, config, {
+        columns: 1,
+        textPt: pt
+      });
+      expect(result.params.textPt).toBeLessThanOrEqual(pt);
     }
-    const expected = Math.min(config.layout.textPtMax, threshold);
-    expect(result.params.textPt).toBe(expected);
   });
 
-  it('never grows past textPtMax', () => {
+  it('never reports a ceiling above the configured maximum', () => {
     const result = decideLayout(() => false, config, {
       columns: 1,
-      textPt: config.layout.textPtDefault,
-      allowGrow: true
+      textPt: textPtDefault
     });
-    expect(result.params.textPt).toBe(config.layout.textPtMax);
+    expect(result.maxTextPt).toBe(textPtMax);
   });
 
-  it('keeps the old behaviour when growth is disabled', () => {
-    const result = decideLayout(() => false, config, {
+  it('reports a ceiling at least as large as the rendered size', () => {
+    const result = decideLayout((params) => params.textPt > 10.5, config, {
       columns: 1,
-      textPt: config.layout.textPtDefault
+      textPt: textPtDefault
     });
-    expect(result.status).toBe('fits');
-    expect(result.params.textPt).toBe(config.layout.textPtDefault);
-    expect(result.attempts).toBe(1);
+    expect(result.maxTextPt).toBeGreaterThanOrEqual(result.params.textPt);
   });
 });
 
