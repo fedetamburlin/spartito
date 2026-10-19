@@ -1,12 +1,11 @@
 <script lang="ts">
   import { config } from '../core/config';
   import { unknownDirectives } from '../core/chordpro';
-  import { decideLayout, type FitOutcome, type LayoutParams } from '../core/fit';
+  import type { FitOutcome } from '../core/fit';
   import type { SongDocument } from '../core/model';
   import type { SongSettings } from '../core/settings';
   import { stepZoom, ZOOM_MAX, ZOOM_MIN } from '../core/zoom';
-  import { createMeasure } from './measure';
-  import Page from './Page.svelte';
+  import FittedPage from './FittedPage.svelte';
 
   interface Props {
     doc: SongDocument;
@@ -16,45 +15,14 @@
 
   let { doc, capo, settings }: Props = $props();
 
-  let wrapEl = $state<HTMLElement | null>(null);
   let scrollEl = $state<HTMLElement | null>(null);
   let zoom = $state(1);
   let zoomPct = $derived(Math.round(zoom * 100));
-  let layout = $state<LayoutParams>({
-    columns: config.layout.columnsDefault,
-    textPt: config.layout.textPtDefault,
-    chordPt: config.layout.chordPtDefault
-  });
   let outcome = $state<FitOutcome | null>(null);
-  let fontsReady = $state(false);
 
-  $effect(() => {
-    document.fonts.ready.then(() => {
-      fontsReady = true;
-    });
-  });
-
-  $effect(() => {
-    const el = wrapEl;
-    const currentDoc = doc;
-    const currentSettings = settings;
-    const ready = fontsReady;
-    if (!el || !ready || !currentDoc) return;
-
-    const frame = requestAnimationFrame(() => {
-      const page = el.querySelector<HTMLElement>('.page');
-      if (!page) return;
-      const measure = createMeasure(page);
-      const result = decideLayout(measure, config, {
-        columns: currentSettings.columns,
-        textPt: currentSettings.textPt,
-        allowGrow: config.layout.autoGrow
-      });
-      layout = result.params;
-      outcome = result;
-    });
-    return () => cancelAnimationFrame(frame);
-  });
+  function handleFit(next: FitOutcome) {
+    outcome = next;
+  }
 
   $effect(() => {
     const el = scrollEl;
@@ -111,11 +79,10 @@
   <div class="preview-scroll" bind:this={scrollEl}>
     <div
       class="preview-wrap"
-      bind:this={wrapEl}
       style={`--zoom: ${zoom}; --page-w: ${config.page.widthMm}mm; --page-h: ${config.page.heightMm}mm`}
     >
       <div class="zoom-layer">
-        <Page {doc} {layout} {settings} {capo} />
+        <FittedPage {doc} {settings} {capo} onFit={handleFit} />
       </div>
     </div>
   </div>

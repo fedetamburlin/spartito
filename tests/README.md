@@ -58,6 +58,7 @@ same test copied five times.
 | Share links                                             | `deeplink.test.ts`                                                                                                         |
 | Library open timeout / blocked storage                  | `timeout.test.ts`, `e2e/fallback.spec.ts`                                                                                  |
 | Print/PDF export                                        | `e2e/pdf.spec.ts`                                                                                                          |
+| Songbook selection and export                           | `songbook.test.ts`, `e2e/songbook.spec.ts`                                                                                 |
 | Editing, Insert menu, transpose shortcut, undo boundary | `e2e/editing.spec.ts`                                                                                                      |
 | Config coherence                                        | `config.test.ts`                                                                                                           |
 | Robustness: seeded songs, malformed input               | `stress.test.ts`                                                                                                           |

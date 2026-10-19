@@ -1,0 +1,106 @@
+import { expect, test, type Page } from '@playwright/test';
+import { extractText, getDocumentProxy } from 'unpdf';
+import { openLibrary } from './helpers';
+
+// A songbook is the library made printable: the picked songs, one sheet each,
+// in the order set in the dialog, with an optional cover listing them.
+
+type PrintWindow = Window & { __printed?: boolean };
+
+/** Replace the blocking print dialog with a flag the test can observe. */
+async function stubPrint(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const target = window as PrintWindow;
+    target.__printed = false;
+    window.print = () => {
+      target.__printed = true;
+    };
+  });
+}
+
+async function waitForPrint(page: Page): Promise<void> {
+  await expect
+    .poll(() => page.evaluate(() => Boolean((window as PrintWindow).__printed)), {
+      timeout: 10_000
+    })
+    .toBe(true);
+}
+
+test.describe('songbook export', () => {
+  test('prints the picked songs in the chosen order', async ({ page }) => {
+    await openLibrary(page);
+
+    for (const title of ['Alpha Song', 'Beta Song']) {
+      await page.locator('.sidebar-head button[title="New song"]').click();
+      const active = page.locator('.song-item.active');
+      await active.locator('button[title="Rename"]').click();
+      await active.locator('input.song-rename').fill(title);
+      await active.locator('input.song-rename').press('Enter');
+      await expect(active.locator('.song-select')).toHaveText(title);
+    }
+
+    await page.getByRole('button', { name: 'Songbook' }).click();
+    const dialog = page.locator('.songbook-modal');
+    await expect(dialog).toBeVisible();
+
+    for (const title of ['Alpha Song', 'Beta Song', 'The Road Back Home']) {
+      await dialog.locator('.songbook-pick').filter({ hasText: title }).click();
+    }
+    const order = dialog.locator('.songbook-order .songbook-title');
+    await expect(order).toHaveText(['Alpha Song', 'Beta Song', 'The Road Back Home']);
+
+    // Move the demo song to the top of the book.
+    const moveUp = dialog.getByRole('button', { name: 'Move The Road Back Home up' });
+    await moveUp.click();
+    await moveUp.click();
+    await expect(order).toHaveText(['The Road Back Home', 'Alpha Song', 'Beta Song']);
+
+    await stubPrint(page);
+    await dialog.getByRole('button', { name: 'Export PDF' }).click();
+    await waitForPrint(page);
+
+    // Cover + one sheet per song.
+    await expect(page.locator('.songbook .page')).toHaveCount(4);
+
+    const buffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      preferCSSPageSize: true
+    });
+    const pdf = await getDocumentProxy(new Uint8Array(buffer));
+    expect(pdf.numPages).toBe(4);
+
+    const { text: sheets } = await extractText(pdf);
+    expect(sheets[0]).toContain('Songbook');
+    expect(sheets[1]).toContain('The Road Back Home');
+    expect(sheets[2]).toContain('Alpha Song');
+    expect(sheets[3]).toContain('Beta Song');
+    for (const sheet of sheets) expect(sheet).not.toContain('{title');
+  });
+
+  test('exports only the songs picked', async ({ page }) => {
+    await openLibrary(page);
+    await page.getByRole('button', { name: 'Songbook' }).click();
+
+    const dialog = page.locator('.songbook-modal');
+    await dialog.locator('.songbook-pick').filter({ hasText: 'The Road Back Home' }).click();
+    await dialog.locator('input[type="checkbox"]').uncheck();
+    await expect(dialog.locator('.songbook-order .songbook-title')).toHaveCount(1);
+
+    await stubPrint(page);
+    await dialog.getByRole('button', { name: 'Export PDF' }).click();
+    await waitForPrint(page);
+    await expect(page.locator('.songbook .page')).toHaveCount(1);
+
+    const buffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      preferCSSPageSize: true
+    });
+    const pdf = await getDocumentProxy(new Uint8Array(buffer));
+    expect(pdf.numPages).toBe(1);
+
+    const { text: sheets } = await extractText(pdf);
+    expect(sheets[0]).toContain('The Road Back Home');
+  });
+});

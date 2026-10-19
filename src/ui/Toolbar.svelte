@@ -23,6 +23,8 @@
     bridgeStatus: BridgeStatus;
     onToggleBridge: () => void;
     onImportSong: (text: string, settings?: Partial<SongSettings>) => void;
+    /** Absent when there is no library to pick songs from. */
+    onSongbook?: () => void;
   }
 
   let {
@@ -31,7 +33,8 @@
     settings = $bindable(),
     bridgeStatus,
     onToggleBridge,
-    onImportSong
+    onImportSong,
+    onSongbook
   }: Props = $props();
 
   let fileInput = $state<HTMLInputElement | null>(null);
@@ -318,6 +321,13 @@
         title="Save as PDF · default margins · headers off"
         onclick={() => window.print()}>Print PDF</button
       >
+      {#if onSongbook}
+        <button
+          class="btn-export"
+          title="Pick songs from the library and export them as one PDF"
+          onclick={onSongbook}>Songbook</button
+        >
+      {/if}
     </div>
     <input
       class="hidden-input"

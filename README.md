@@ -34,11 +34,11 @@ Source in **ChordPro (subset)** in the left editor (CodeMirror 6: chords, direct
 - auto-fit: 1 column → 2 columns → font down to 6pt lyrics / 5pt chords (defaults 11/10); short songs instead grow the font up to 14pt to fill the page (badge shows "grown"); the PDF stays on one page, with a warning when the song does not fit
 - **Transpose** stepper (or `+`/`−` keys): preview and PDF only; `{capo: N}` is shown under the title and moves with transposition
 - **From text**: paste from Ultimate Guitar or any chord site, conversion is automatic (Italian notation, sections, UG title/artist markers); **From file**: `.cho`, `.crd`, `.json` and text PDFs
-- **Export chords** (`.cho`) and **Print PDF** (Chrome/Chromium → Save as PDF, default margins, headers off); autosave in `localStorage`
+- **Export chords** (`.cho`), **Print PDF** (Chrome/Chromium → Save as PDF, default margins, headers off) and **Songbook**: pick songs from the library, set their order and print them as a single PDF, one song per sheet
 
 ## Tests
 
-`npm test` covers the parser, import (text and PDF), layout, transposition, library and the app-side MCP bridge. `npm run test:e2e` builds the app and drives real Chromium flows: editing, Insert menu, import dialog, library CRUD, PDF export and the storage-unavailable fallback.
+`npm test` covers the parser, import (text and PDF), layout, transposition, library, songbook and the app-side MCP bridge. `npm run test:e2e` builds the app and drives real Chromium flows: editing, Insert menu, import dialog, library CRUD, PDF export, songbook export and the storage-unavailable fallback.
 
 The real-world corpus is **local only** (copyrighted text, gitignored): `node scripts/fetch-fixtures.mjs` downloads 20 Ultimate Guitar pages and 5 real PDFs, then `npm test` runs the structural checks. `--check` verifies the checksums without network. See [`tests/README.md`](tests/README.md) for the layer map, conventions and fixture catalogue.
 

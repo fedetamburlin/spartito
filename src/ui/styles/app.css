@@ -404,6 +404,17 @@ button.primary {
   color: var(--ui-on-accent);
 }
 
+button.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ui-accent);
+}
+
+button.link:hover {
+  text-decoration: underline;
+}
+
 .btn-import {
   background: var(--ui-import-bg);
   border-color: var(--ui-import-border);
@@ -541,6 +552,141 @@ button.primary {
 
 .modal footer .spacer {
   flex: 1;
+}
+
+/* Songbook dialog: pick library songs and set their order. */
+.songbook-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  min-height: 0;
+}
+
+.songbook-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  background: var(--ui-panel-soft);
+  overflow: hidden;
+}
+
+.songbook-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--ui-border);
+  font-size: 12px;
+  color: var(--ui-muted);
+}
+
+.songbook-search {
+  padding: 8px 10px;
+  border: 0;
+  border-bottom: 1px solid var(--ui-border);
+  background: var(--ui-control-bg);
+  font: inherit;
+  font-size: 13px;
+  color: var(--ui-text);
+  outline: none;
+}
+
+.songbook-search:focus {
+  border-bottom-color: var(--ui-accent);
+}
+
+.songbook-list {
+  flex: 1;
+  max-height: 320px;
+  margin: 0;
+  padding: 4px;
+  overflow: auto;
+  list-style: none;
+}
+
+.songbook-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.songbook-pick {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 8px;
+  border-color: transparent;
+  background: none;
+  text-align: left;
+}
+
+.songbook-pick:hover {
+  background: var(--ui-hover);
+}
+
+.songbook-pick.picked {
+  border-color: var(--ui-export-border);
+  background: var(--ui-selected);
+}
+
+.songbook-title {
+  flex: 1;
+  overflow: hidden;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.songbook-mark {
+  color: var(--ui-muted);
+  font-size: 12px;
+}
+
+.songbook-pick.picked .songbook-mark {
+  color: var(--ui-ok);
+}
+
+.songbook-index {
+  min-width: 18px;
+  color: var(--ui-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.songbook-actions {
+  display: flex;
+  gap: 2px;
+}
+
+.songbook-actions .icon-button {
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+}
+
+.songbook-actions .icon-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.songbook-empty {
+  padding: 10px;
+  color: var(--ui-muted);
+  font-size: 12px;
+}
+
+.songbook-cover-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ui-muted);
 }
 
 .app-workspace {
@@ -934,6 +1080,46 @@ button.primary {
   box-shadow: none;
 }
 
+/* Songbook: laid out for real, but invisible until the book is printed. */
+.songbook {
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+}
+
+.songbook-item {
+  break-inside: avoid;
+  break-after: page;
+}
+
+.songbook-item.last {
+  break-after: auto;
+}
+
+.songbook-cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.songbook-cover h1 {
+  margin: 0 0 8mm;
+  font-size: 2em;
+}
+
+.songbook-cover ol {
+  margin: 0;
+  padding-left: 6mm;
+  columns: 2;
+  column-gap: 10mm;
+}
+
+.songbook-cover li {
+  break-inside: avoid;
+  margin-bottom: 1mm;
+  font-size: 0.95em;
+}
+
 @media print {
   @page {
     size: 210mm 297mm;
@@ -984,5 +1170,21 @@ button.primary {
 
   .measuring-clone {
     display: none !important;
+  }
+
+  /* Songbook: only the book is printed, never the app. */
+  body[data-print-mode='book'],
+  body[data-print-mode='book'] #app {
+    height: auto;
+  }
+
+  body[data-print-mode='book'] .app {
+    display: none !important;
+  }
+
+  body[data-print-mode='book'] .songbook {
+    visibility: visible;
+    height: auto;
+    overflow: visible;
   }
 }

@@ -23,11 +23,14 @@
   } from './core/library';
   import { loadLegacyState } from './core/persistence';
   import { sanitizeSettings, withTranspose, type SongSettings } from './core/settings';
+  import { songbookPages, type SongbookDraft } from './core/songbook';
   import { withTimeout } from './core/timeout';
   import { transposedForDisplay } from './core/transpose';
   import EditorPane from './ui/EditorPane.svelte';
   import PreviewPane from './ui/PreviewPane.svelte';
   import Sidebar from './ui/Sidebar.svelte';
+  import SongbookDialog from './ui/SongbookDialog.svelte';
+  import SongbookPrint from './ui/SongbookPrint.svelte';
   import Toolbar from './ui/Toolbar.svelte';
 
   const shared = readDocumentFromHash(location.hash);
@@ -40,6 +43,8 @@
   let songs = $state<SongEntry[]>([]);
   let activeId = $state('');
   let sidebarOpen = $state(true);
+  let songbookOpen = $state(false);
+  let songbookDraft = $state<SongbookDraft | null>(null);
 
   let source = $state(shared?.source ?? DEMO_SONG);
   let settings = $state<SongSettings>(sanitizeSettings(shared?.settings));
@@ -54,6 +59,8 @@
       active: song.id === activeId
     }))
   );
+
+  const bookPages = $derived(songbookDraft ? songbookPages(songbookDraft, songs) : []);
 
   if (!ephemeral) {
     void (async () => {
@@ -192,6 +199,24 @@
     addSong({ source: text, settings: importedSettings });
   }
 
+  function openSongbook() {
+    songbookOpen = true;
+  }
+
+  /** The dialog hands over the pick: render the book, then print it. */
+  function exportSongbook(draft: SongbookDraft) {
+    songbookOpen = false;
+    songbookDraft = draft;
+  }
+
+  function printSongbook() {
+    window.print();
+  }
+
+  function closeSongbookPrint() {
+    songbookDraft = null;
+  }
+
   let bridgeStatus = $state<BridgeStatus>('disconnected');
   const bridge = createBridge({
     getState: () => ({ source, settings: { ...settings } }),
@@ -326,6 +351,7 @@
       {bridgeStatus}
       onToggleBridge={toggleBridge}
       onImportSong={importAsSong}
+      onSongbook={songs.length > 0 ? openSongbook : undefined}
     />
     <div class="app-body">
       {#if !ephemeral}
@@ -369,3 +395,21 @@
     <div class="app-loading">Loading library…</div>
   {/if}
 </div>
+
+{#if songbookOpen}
+  <SongbookDialog
+    songs={listItems}
+    onExport={exportSongbook}
+    onClose={() => (songbookOpen = false)}
+  />
+{/if}
+{#key songbookDraft}
+  {#if songbookDraft}
+    <SongbookPrint
+      draft={songbookDraft}
+      pages={bookPages}
+      onReady={printSongbook}
+      onDone={closeSongbookPrint}
+    />
+  {/if}
+{/key}

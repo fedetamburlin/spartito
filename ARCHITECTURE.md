@@ -63,9 +63,12 @@ when a domain grows past ~8 modules or the folder passes ~30 files.
 
 - `App.svelte` owns source, settings, library state and the MCP bridge.
 - `EditorPane.svelte` owns the CodeMirror instance and the two-way binding.
-- `PreviewPane.svelte` owns zoom and the auto-fit effect.
-- `Page.svelte` renders the measured A4 page; `measure.ts` clones it for fitting.
-- `Sidebar`, `Toolbar`, `InsertMenu`, `ChordProHelp`, `ImportDialog` are presentational.
+- `PreviewPane.svelte` owns zoom and the fit status badge.
+- `FittedPage.svelte` decides the layout of one sheet and renders `Page.svelte`;
+  `measure.ts` clones that page for fitting. `SongbookPrint.svelte` reuses it to
+  lay out every sheet of a book.
+- `Sidebar`, `Toolbar`, `InsertMenu`, `ChordProHelp`, `ImportDialog`,
+  `SongbookDialog` are presentational.
 - `styles/app.css` is the UI shell; `styles/paper.css` is the sheet and is the only CSS that affects the PDF.
 
 ### `packages/mcp` — local MCP server
@@ -93,6 +96,9 @@ and a headless-Chrome PDF renderer. It shares the wire protocol with
 - Auto-fit measures a clone of the real page: 1 column → 2 columns → smaller
   font (6 pt lyrics / 5 pt chords), and grows short songs up to 14 pt.
 - `@media print` hides the app chrome and prints only the page.
+- A songbook prints one sheet per picked song (`SongbookPrint`) in the order set
+  in `SongbookDialog`, with an optional cover listing them: the book is laid out
+  but invisible until `body[data-print-mode='book']` hides the app for printing.
 - Chrome/Chromium is the reference renderer. The PDF is the canonical
   artifact: export once and share that file instead of re-printing from
   another browser.
