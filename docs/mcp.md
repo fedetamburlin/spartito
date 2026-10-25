@@ -30,9 +30,11 @@ contains this entry in `opencode.json`:
 ```json
 {
   "mcp": {
-    "spartito": {
-      "type": "local",
-      "command": ["node", "packages/mcp/dist/index.js"]
+    "servers": {
+      "spartito": {
+        "type": "local",
+        "command": ["node", "packages/mcp/dist/index.js"]
+      }
     }
   }
 }
@@ -77,6 +79,9 @@ Streamable HTTP endpoint at `http://127.0.0.1:7331/mcp`.
 
 - **Red dot or connection refused** — the app is not open, the MCP server is not
   running, or another process owns the bridge port.
+- **`spawn node ENOENT` / server failed to start** — Node is not on the PATH of
+  the client process. Start the client from a shell where `node` is available,
+  or point `command` at an absolute Node path.
 - **Chrome not found** — install Chrome/Chromium or set `SPARTITO_CHROME_PATH`.
 - **Safari** — Safari blocks `ws://localhost` from an HTTPS page. Run the app
   locally when using MCP.
