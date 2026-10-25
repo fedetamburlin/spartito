@@ -11,3 +11,6 @@ blob-report/
 coverage/
 .eslintcache
 .prettiercache
+
+# Local launch material (assets and drafts)
+docs/launch/
