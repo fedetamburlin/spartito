@@ -230,6 +230,8 @@
   }
 
   function openSongbook() {
+    // Include the latest editor changes even before the autosave debounce.
+    flushActive();
     songbookOpen = true;
   }
 

@@ -69,14 +69,17 @@
     });
   }
 
-  // Safety net: if a sheet never reports its fit (broken measurement, exotic
-  // browser), print whatever is laid out instead of leaving the export stuck.
+  // Safety net: if a sheet never reports its fit (slow layout, broken
+  // measurement, exotic browser), ask before printing instead of silently
+  // cutting content off.
   $effect(() => {
     if (pages.length === 0) return;
     const timer = setTimeout(() => {
       if (printing) return;
       printing = true;
-      onReady();
+      const pending = pages.filter((page) => !fitted.has(page.id)).map((page) => page.title);
+      if (pending.length > 0) onOverflow(pending);
+      else onReady();
     }, 5000);
     return () => clearTimeout(timer);
   });
