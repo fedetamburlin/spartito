@@ -8,13 +8,16 @@ updates:
       day: monday
     open-pull-requests-limit: 5
     # Major upgrades need a dedicated migration: Vite 8 with plugin Svelte 7
-    # together, and @types/node only when the Node runtime moves.
+    # together, @types/node only when the Node runtime moves, and TypeScript 7
+    # once typescript-eslint and svelte-check support it.
     ignore:
       - dependency-name: vite
         update-types: ['version-update:semver-major']
       - dependency-name: '@sveltejs/vite-plugin-svelte'
         update-types: ['version-update:semver-major']
       - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      - dependency-name: typescript
         update-types: ['version-update:semver-major']
     groups:
       npm-minor-patch:
