@@ -8,8 +8,7 @@
     "isolatedModules": true,
     "strict": true,
     "noUnusedLocals": true,
-    "types": ["vite/client", "svelte", "node"],
-    "baseUrl": "."
+    "types": ["vite/client", "svelte", "node"]
   },
   "include": [
     "src/**/*.ts",
