@@ -62,6 +62,22 @@ test.describe('songbook export', () => {
     // Cover + one sheet per song.
     await expect(page.locator('.songbook .page')).toHaveCount(4);
 
+    // Cover titles stack vertically, one per line.
+    const coverItems = page.locator('.songbook-cover li');
+    await expect(coverItems).toHaveCount(3);
+    const coverBoxes = await coverItems.evaluateAll((items) =>
+      items.map((item) => {
+        const box = item.getBoundingClientRect();
+        return { x: box.x, y: box.y };
+      })
+    );
+    for (const box of coverBoxes) {
+      expect(Math.abs(box.x - coverBoxes[0].x)).toBeLessThan(1);
+    }
+    for (let index = 1; index < coverBoxes.length; index++) {
+      expect(coverBoxes[index].y).toBeGreaterThan(coverBoxes[index - 1].y);
+    }
+
     const buffer = await page.pdf({
       format: 'A4',
       printBackground: true,
