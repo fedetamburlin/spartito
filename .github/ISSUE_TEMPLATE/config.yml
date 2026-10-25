@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Open Spartito
+    url: https://fedetamburlin.github.io/spartito/
+    about: Try the live app
+  - name: Documentation
+    url: https://github.com/fedetamburlin/spartito#readme
+    about: Setup, features and development

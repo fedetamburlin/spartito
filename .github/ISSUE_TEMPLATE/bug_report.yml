@@ -1,0 +1,51 @@
+name: Bug report
+description: Something is broken or prints incorrectly
+title: '[Bug]: '
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping. Please include enough detail to reproduce the problem.
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      description: e.g. Chrome 142 on Windows 11, Safari on iPad
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open ...
+        2. Click ...
+        3. See ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happens instead
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Song source (optional)
+      description: Paste the ChordPro source if the issue is about layout or printing. Remove copyrighted lyrics if needed.
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues
+          required: true
