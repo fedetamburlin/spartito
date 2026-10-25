@@ -1,9 +1,9 @@
 {
   "name": "spartito-app",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
-  "description": "Minimal editor to create A4 PDF song sheets (lyrics + chords) to read on a tablet",
+  "description": "Turn ChordPro lyrics and chords into one-page A4 PDFs for tablet use.",
   "license": "MIT",
   "repository": {
     "type": "git",

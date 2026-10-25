@@ -4,7 +4,7 @@
 
 **Turn ChordPro lyrics and chords into clean, one-page A4 PDFs made for reading on a tablet.** Write or paste a song, tune the layout, print it once, and keep the PDF. Spartito runs entirely in the browser: no account, no backend, no upload.
 
-[Live app](https://fedetamburlin.github.io/spartito/) · [Architecture](ARCHITECTURE.md) · [Contributing](CONTRIBUTING.md)
+[Live app](https://fedetamburlin.github.io/spartito/) · [Changelog](CHANGELOG.md) · [Architecture](ARCHITECTURE.md) · [Contributing](CONTRIBUTING.md)
 
 ![Spartito editor with a live A4 preview](docs/screenshot.png)
 
@@ -45,6 +45,12 @@ npm run preview
 
 Spartito keeps the song on one A4 page. If even the minimum size does not fit, it warns you before printing. Chrome/Chromium is the reference renderer.
 
+## Browser support and limitations
+
+- Current Chrome, Edge, Firefox and Safari. PDF export is tuned for Chrome/Chromium.
+- One A4 page per song; songs that overflow are listed before printing.
+- Songs live in this browser only: no account, sync or server backup. Keep the PDFs you care about.
+
 ## MCP automation (optional)
 
 `packages/mcp` is a local MCP server that lets a client such as opencode read or edit the open song, change layout settings and export a PDF. It connects to the app through a localhost WebSocket bridge; song data is not sent to a server.
@@ -74,7 +80,11 @@ Project structure, test layers and conventions are in [`CONTRIBUTING.md`](CONTRI
 
 ## Status
 
-Spartito is actively maintained. Current scope: one-page A4 sheets, song library, text/PDF import, songbook export and local MCP automation. Planned work includes additional page formats, installable PWA, setlists and notation.
+Spartito is actively maintained. Current release: **v0.2.0** (public beta). Current scope: one-page A4 sheets, song library, text/PDF import, songbook export and local MCP automation. Planned work includes additional page formats, installable PWA, setlists and notation.
+
+## Feedback
+
+Found a bug or missing a feature? [Open an issue](https://github.com/fedetamburlin/spartito/issues/new/choose). Include your browser, device and, when relevant, the ChordPro source.
 
 ## License
 
