@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { PersistenceState } from '../core/storage';
+
   interface SongItem {
     id: string;
     title: string;
@@ -8,18 +10,64 @@
   interface Props {
     songs: SongItem[];
     open: boolean;
+    persistence: PersistenceState;
+    canExportBackup: boolean;
+    canRestoreBackup: boolean;
     onToggle: () => void;
     onSelect: (id: string) => void;
     onNew: () => void;
     onRename: (id: string, title: string) => void;
     onDuplicate: (id: string) => void;
     onDelete: (id: string) => void;
+    onExportBackup: () => void;
+    onRestoreBackup: (file: File) => void;
   }
 
-  let { songs, open, onToggle, onSelect, onNew, onRename, onDuplicate, onDelete }: Props = $props();
+  let {
+    songs,
+    open,
+    persistence,
+    canExportBackup,
+    canRestoreBackup,
+    onToggle,
+    onSelect,
+    onNew,
+    onRename,
+    onDuplicate,
+    onDelete,
+    onExportBackup,
+    onRestoreBackup
+  }: Props = $props();
 
   let editingId = $state<string | null>(null);
   let draft = $state('');
+  let backupInput = $state<HTMLInputElement | null>(null);
+
+  const storageNote = $derived.by(() => {
+    if (persistence === 'granted') {
+      return {
+        text: 'Storage: protected',
+        warning: false,
+        title: 'The browser has granted persistent storage for this library.'
+      };
+    }
+    if (persistence === 'pending') {
+      return { text: 'Storage: checking…', warning: false, title: 'Checking storage permissions.' };
+    }
+    if (persistence === 'denied') {
+      return {
+        text: 'Storage: best effort — back up',
+        warning: true,
+        title: 'The browser may clear this library when storage is low. Export a backup regularly.'
+      };
+    }
+    return {
+      text: 'Storage: local only — back up',
+      warning: true,
+      title:
+        'This browser does not guarantee persistent storage. The library may be cleared when storage is low. Export a backup regularly.'
+    };
+  });
 
   function startRename(song: SongItem) {
     editingId = song.id;
@@ -39,6 +87,13 @@
   function focusInput(node: HTMLInputElement) {
     node.focus();
     node.select();
+  }
+
+  function pickBackup(event: Event) {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (file) onRestoreBackup(file);
   }
 </script>
 
@@ -160,6 +215,35 @@
           {/if}
         </div>
       {/each}
+    </div>
+
+    <div class="sidebar-foot">
+      <div class="sidebar-foot-actions">
+        <button
+          type="button"
+          class="sidebar-action"
+          title="Download every song and its layout settings as a JSON backup"
+          disabled={!canExportBackup}
+          onclick={onExportBackup}>Backup</button
+        >
+        <button
+          type="button"
+          class="sidebar-action"
+          title="Restore songs from a JSON backup"
+          disabled={!canRestoreBackup}
+          onclick={() => backupInput?.click()}>Restore</button
+        >
+      </div>
+      <span class="storage-note" class:warning={storageNote.warning} title={storageNote.title}>
+        {storageNote.text}
+      </span>
+      <input
+        class="hidden-input library-restore-input"
+        type="file"
+        accept=".json,application/json"
+        bind:this={backupInput}
+        onchange={pickBackup}
+      />
     </div>
   {/if}
 </aside>

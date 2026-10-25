@@ -141,6 +141,11 @@ body {
   text-align: center;
 }
 
+.app-notice.success {
+  background: var(--ui-ok);
+  color: var(--ui-on-warning);
+}
+
 .app-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -329,6 +334,44 @@ body {
   gap: 2px;
   padding: 6px;
   overflow: auto;
+}
+
+.sidebar-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border-top: 1px solid var(--ui-border);
+}
+
+.sidebar-foot-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.sidebar-action {
+  flex: 1;
+  padding: 4px 6px;
+  font-size: 11.5px;
+}
+
+.sidebar-action:disabled {
+  color: var(--ui-muted);
+  cursor: default;
+}
+
+.sidebar-action:disabled:hover {
+  border-color: var(--ui-border);
+}
+
+.storage-note {
+  font-size: 10.5px;
+  line-height: 1.3;
+  color: var(--ui-muted);
+}
+
+.storage-note.warning {
+  color: var(--ui-warning);
 }
 
 .song-item {
@@ -552,6 +595,30 @@ button.link:hover {
 
 .modal footer .spacer {
   flex: 1;
+}
+
+.modal .modal-error {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--ui-notice-bg);
+  color: var(--ui-warning);
+  font-size: 13px;
+}
+
+button.btn-danger {
+  background: var(--ui-warning);
+  border-color: var(--ui-warning);
+  color: var(--ui-on-warning);
+}
+
+button.btn-danger:hover:not(:disabled) {
+  border-color: var(--ui-warning);
+}
+
+button.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 /* Songbook dialog: pick library songs and set their order. */
@@ -1100,6 +1167,10 @@ button.link:hover {
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.songbook-cover-content {
+  width: 100%;
 }
 
 .songbook-cover h1 {

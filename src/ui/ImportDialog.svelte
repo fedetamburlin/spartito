@@ -1,6 +1,7 @@
 <script lang="ts">
   import { untrack } from 'svelte';
   import { importSong, type ImportResult } from '../core/import';
+  import { trapFocus } from './focus';
 
   interface Props {
     onApply: (source: string) => void;
@@ -54,7 +55,7 @@
 <svelte:window onkeydown={(event) => event.key === 'Escape' && onClose()} />
 
 <div class="modal-backdrop">
-  <div class="modal" role="dialog" aria-modal="true" tabindex="-1">
+  <div class="modal" role="dialog" aria-modal="true" tabindex="-1" use:trapFocus>
     <h2>{title}</h2>
     <p class="hint">
       {#if hint}
@@ -66,6 +67,7 @@
       {/if}
     </p>
     <textarea
+      data-autofocus
       bind:value={raw}
       oninput={() => (result = null)}
       spellcheck="false"

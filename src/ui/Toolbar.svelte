@@ -1,6 +1,7 @@
 <script lang="ts">
   import { config } from '../core/config';
   import type { BridgeStatus } from '../core/bridge';
+  import { downloadFile } from '../core/download';
   import { importSong } from '../core/import';
   import type { SongDocument } from '../core/model';
   import { extractPdfText } from '../core/pdf';
@@ -65,13 +66,7 @@
   const bridgeAria = $derived(`MCP server: ${bridgeStatus}`);
 
   function download(filename: string, content: string, type: string) {
-    const blob = new Blob([content], { type });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-    URL.revokeObjectURL(url);
+    downloadFile(filename, content, type);
   }
 
   function exportCho() {
@@ -331,8 +326,11 @@
         title="Download the song as a .cho (ChordPro) file"
         onclick={exportCho}>Export chords</button
       >
-      <button class="primary" title="Save as PDF · default margins · headers off" onclick={onPrint}
-        >Print PDF</button
+      <button
+        class="primary"
+        data-print-trigger
+        title="Save as PDF · default margins · headers off"
+        onclick={onPrint}>Print PDF</button
       >
       {#if onSongbook}
         <button
@@ -343,7 +341,7 @@
       {/if}
     </div>
     <input
-      class="hidden-input"
+      class="hidden-input song-import-input"
       type="file"
       accept=".cho,.crd,.json,.txt,.pdf,text/plain,application/pdf"
       bind:this={fileInput}

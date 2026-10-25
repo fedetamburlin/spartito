@@ -24,6 +24,13 @@ class FakeStore implements LibraryStore {
   async putSong(song: SongEntry) {
     this.songs.set(song.id, song);
   }
+  async putSongs(songs: SongEntry[]) {
+    for (const song of songs) this.songs.set(song.id, song);
+  }
+  async replaceSongs(songs: SongEntry[]) {
+    this.songs.clear();
+    for (const song of songs) this.songs.set(song.id, song);
+  }
   async deleteSong(id: string) {
     this.songs.delete(id);
   }

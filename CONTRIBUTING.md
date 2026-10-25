@@ -39,14 +39,44 @@ the MCP build.
 ```
 config/        project defaults and import dictionaries
 public/fonts/  OFL fonts (Inter, IBM Plex Sans Condensed, JetBrains Mono) + licenses
-src/core/      pure TS: config, model, db, library, directives, chordpro, chords,
-               transpose, import, pdf, fit, highlight, persistence, settings
-src/ui/        Svelte components, styles and measurement
+src/core/      pure TS: config, model, db, library, backup, storage, chords,
+               directives, chordpro, transpose, import, pdf, fit, highlight,
+               persistence, settings, download
+src/ui/        Svelte components, styles, measurement and focus management
 packages/mcp/  local MCP server: tools, websocket bridge, stdio/HTTP transports, PDF export
 tests/         unit/integration tests, fixtures, Playwright E2E (see tests/README.md)
 scripts/       fixture downloaders and PDF fixture generator
 docs/adr/      architecture decision records
 ```
+
+## Pull requests
+
+- Keep one concern per PR and link the issue it resolves.
+- Add or update the test that would have caught the bug or would catch a
+  regression in the new behaviour.
+- Run `npm run verify` before requesting review.
+- Note user-visible changes in `CHANGELOG.md` and update the README when
+  behaviour or limitations change.
+- UI changes must keep keyboard access and the dialog focus trap intact; run
+  the accessibility E2E specs.
+- Never commit third-party lyrics, real Ultimate Guitar pages or copyrighted
+  PDFs. Use synthetic fixtures.
+
+## Good first issues
+
+Issues labelled **good first issue** are self-contained and have a known test
+layer. Good candidates:
+
+- a missing or misbehaving ChordPro directive with a small synthetic source;
+- an import shape (text or PDF) that can be reduced to a fixture;
+- a documentation or help-panel improvement;
+- a small accessibility fix with a keyboard assertion;
+- a focused UI polish with an existing E2E spec.
+
+A good issue states the files involved, the expected behaviour, the acceptance
+test and the command to run. If you want to work on one, comment on the issue
+so nobody duplicates the effort. New contributors are welcome to ask for
+guidance before writing code.
 
 ## Tests
 
@@ -74,6 +104,9 @@ feature→test map and conventions. In short:
 `main` deploys to GitHub Pages on every push. Work on a feature branch and
 open a PR; CI runs check, lint, format check, unit tests, MCP tests and E2E
 before deploying.
+
+The release checklist, backup-format contract and Dependabot policy are in
+[`MAINTAINING.md`](MAINTAINING.md).
 
 ## Adding a directive
 

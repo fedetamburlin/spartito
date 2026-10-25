@@ -16,6 +16,8 @@ export interface SongEntry {
 export interface LibraryStore {
   getSongs(): Promise<SongEntry[]>;
   putSong(song: SongEntry): Promise<void>;
+  putSongs(songs: SongEntry[]): Promise<void>;
+  replaceSongs(songs: SongEntry[]): Promise<void>;
   deleteSong(id: string): Promise<void>;
   getMeta<T>(key: string): Promise<T | undefined>;
   putMeta(key: string, value: unknown): Promise<void>;
@@ -53,10 +55,24 @@ function wrap(db: IDBDatabase): LibraryStore {
     job: (s: IDBObjectStore) => IDBRequest<T>
   ) => request(job(db.transaction(store, mode).objectStore(store)));
 
+  /** One transaction for a batch: either all songs land, or none do. */
+  const writeSongs = (songs: SongEntry[], clear: boolean): Promise<void> =>
+    new Promise((resolve, reject) => {
+      const transaction = db.transaction(SONGS, 'readwrite');
+      const store = transaction.objectStore(SONGS);
+      if (clear) store.clear();
+      for (const song of songs) store.put(forStorage(song));
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error ?? new Error('IndexedDB write failed'));
+      transaction.onabort = () => reject(transaction.error ?? new Error('IndexedDB write aborted'));
+    });
+
   return {
     getSongs: () => run<SongEntry[]>(SONGS, 'readonly', (s) => s.getAll()),
     putSong: (song) =>
       run<IDBValidKey>(SONGS, 'readwrite', (s) => s.put(forStorage(song))).then(() => undefined),
+    putSongs: (songs) => writeSongs(songs, false),
+    replaceSongs: (songs) => writeSongs(songs, true),
     deleteSong: (id) => run<undefined>(SONGS, 'readwrite', (s) => s.delete(id)),
     getMeta: <T>(key: string) => run<T | undefined>(META, 'readonly', (s) => s.get(key)),
     putMeta: (key, value) =>

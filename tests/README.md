@@ -51,6 +51,9 @@ same test copied five times.
 | Layout, auto-fit, text ceiling                          | `fit.test.ts`, `invariants.test.ts`, `e2e/boot.spec.ts`                                                                    |
 | Import from text/UG/PDF                                 | `import.test.ts`, `pdf.test.ts`, `pdf-fixtures.test.ts`, `local-import.test.ts`, `local-pdf.test.ts`, `e2e/import.spec.ts` |
 | Library, IndexedDB, legacy migration                    | `library.test.ts`, `db.test.ts`                                                                                            |
+| Library backup format, merge/replace restore            | `backup.test.ts` (unit + integration), `e2e/backup.spec.ts`                                                                |
+| Persistent storage request and UI                       | `storage.test.ts`, `e2e/storage.spec.ts`                                                                                   |
+| Modal focus trap, initial focus and restore             | `e2e/a11y.spec.ts`                                                                                                         |
 | Persistence, export filename                            | `persistence.test.ts`, `invariants.test.ts`                                                                                |
 | Settings sanitization                                   | `invariants.test.ts`, `persistence.test.ts`                                                                                |
 | Theme, zoom                                             | `theme.test.ts`, `zoom.test.ts`                                                                                            |
@@ -60,8 +63,7 @@ same test copied five times.
 | Library open timeout / blocked storage                  | `timeout.test.ts`, `e2e/fallback.spec.ts`                                                                                  |
 | Print/PDF export                                        | `e2e/pdf.spec.ts`                                                                                                          |
 | Overflow print guard, PDF completeness                  | `e2e/overflow.spec.ts`                                                                                                     |
-| Songbook selection and export                           | `songbook.test.ts`, `e2e/songbook.spec.ts`                                                                                 |
-| Cross-browser smoke, tablet viewport                    | `e2e/cross-browser.spec.ts`                                                                                                |
+| Songbook selection and export, cover overflow guard     | `songbook.test.ts`, `e2e/songbook.spec.ts`                                                                                 |     | Cross-browser smoke, tablet viewport | `e2e/cross-browser.spec.ts` |
 | Editing, Insert menu, transpose shortcut, undo boundary | `e2e/editing.spec.ts`                                                                                                      |
 | Config coherence                                        | `config.test.ts`                                                                                                           |
 | Robustness: seeded songs, malformed input               | `stress.test.ts`                                                                                                           |
