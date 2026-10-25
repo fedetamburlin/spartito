@@ -1110,8 +1110,6 @@ button.link:hover {
 .songbook-cover ol {
   margin: 0;
   padding-left: 6mm;
-  columns: 2;
-  column-gap: 10mm;
 }
 
 .songbook-cover li {
@@ -1169,6 +1167,11 @@ button.link:hover {
   }
 
   .measuring-clone {
+    display: none !important;
+  }
+
+  /* A guard is only a pre-print confirmation: never include it in the PDF. */
+  .modal-backdrop {
     display: none !important;
   }
 

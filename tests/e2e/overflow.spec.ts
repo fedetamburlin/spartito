@@ -5,7 +5,7 @@ import { editorContent, openLibrary, openShared } from './helpers';
 // The product promise is one page per song. When even the minimum size
 // overflows, printing must be an explicit choice: the PDF would be cut off.
 
-type PrintWindow = Window & { __printed?: boolean };
+type PrintWindow = Window & { __printed?: boolean; __guardAtPrint?: boolean };
 
 const longSource = (title: string, lines: number, prefix = 'line') =>
   `{title: ${title}}\n${Array.from(
@@ -17,13 +17,17 @@ async function stubPrint(page: Page): Promise<void> {
   await page.evaluate(() => {
     const target = window as PrintWindow;
     target.__printed = false;
+    target.__guardAtPrint = undefined;
     window.print = () => {
       target.__printed = true;
+      target.__guardAtPrint = Boolean(document.querySelector('.modal-backdrop'));
     };
   });
 }
 
 const printed = (page: Page) => page.evaluate(() => Boolean((window as PrintWindow).__printed));
+const guardAtPrint = (page: Page) =>
+  page.evaluate(() => Boolean((window as PrintWindow).__guardAtPrint));
 
 test.describe('one-page guard', () => {
   test('keeps every line of a long song in the one-page PDF', async ({ page }) => {
@@ -107,5 +111,27 @@ test.describe('one-page guard', () => {
     await expect(dialog).toBeHidden();
     await expect(page.locator('.songbook')).toHaveCount(0);
     expect(await printed(page)).toBe(false);
+
+    // Confirming must remove the guard before the print snapshot.
+    await page.getByRole('button', { name: 'Songbook' }).click();
+    const again = page.locator('.songbook-modal');
+    await again.locator('.songbook-pick').filter({ hasText: 'Long Book Song' }).click();
+    await again.getByRole('button', { name: 'Export PDF' }).click();
+
+    const confirm = page.getByRole('dialog');
+    await expect(confirm).toBeVisible({ timeout: 15_000 });
+    await confirm.getByRole('button', { name: 'Print anyway' }).click();
+    await expect.poll(() => printed(page)).toBe(true);
+    expect(await guardAtPrint(page)).toBe(false);
+
+    const buffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      preferCSSPageSize: true
+    });
+    const pdf = await getDocumentProxy(new Uint8Array(buffer));
+    const { text } = await extractText(pdf, { mergePages: true });
+    expect(text).not.toContain("won't fit on one page");
+    expect(text).toContain('Long Book Song');
   });
 });

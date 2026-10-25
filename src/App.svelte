@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import { createBridge, type BridgeStatus } from './core/bridge';
   import {
     LIBRARY_OPEN_TIMEOUT_MS,
@@ -261,8 +262,10 @@
     printSongbook();
   }
 
-  function confirmPrint() {
+  async function confirmPrint() {
     printGuard = null;
+    // Let Svelte remove the guard before Chrome snapshots the page.
+    await tick();
     window.print();
   }
 
