@@ -22,6 +22,7 @@
     settings: SongSettings;
     bridgeStatus: BridgeStatus;
     onToggleBridge: () => void;
+    onPrint: () => void;
     onImportSong: (text: string, settings?: Partial<SongSettings>) => void;
     /** Absent when there is no library to pick songs from. */
     onSongbook?: () => void;
@@ -35,6 +36,7 @@
     settings = $bindable(),
     bridgeStatus,
     onToggleBridge,
+    onPrint,
     onImportSong,
     onSongbook,
     maxTextPt = config.layout.textPtMax
@@ -329,14 +331,12 @@
         title="Download the song as a .cho (ChordPro) file"
         onclick={exportCho}>Export chords</button
       >
-      <button
-        class="primary"
-        title="Save as PDF · default margins · headers off"
-        onclick={() => window.print()}>Print PDF</button
+      <button class="primary" title="Save as PDF · default margins · headers off" onclick={onPrint}
+        >Print PDF</button
       >
       {#if onSongbook}
         <button
-          class="btn-export"
+          class="primary"
           title="Pick songs from the library and export them as one PDF"
           onclick={onSongbook}>Songbook</button
         >

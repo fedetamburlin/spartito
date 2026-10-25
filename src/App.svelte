@@ -8,6 +8,7 @@
   } from './core/db';
   import { config } from './core/config';
   import { clearDocumentHash, readDocumentFromHash } from './core/deeplink';
+  import type { FitStatus } from './core/fit';
   import { parseChordPro } from './core/chordpro';
   import { DEMO_SONG } from './core/demo';
   import {
@@ -28,6 +29,7 @@
   import { transposedForDisplay } from './core/transpose';
   import EditorPane from './ui/EditorPane.svelte';
   import PreviewPane from './ui/PreviewPane.svelte';
+  import PrintGuardDialog from './ui/PrintGuardDialog.svelte';
   import Sidebar from './ui/Sidebar.svelte';
   import SongbookDialog from './ui/SongbookDialog.svelte';
   import SongbookPrint from './ui/SongbookPrint.svelte';
@@ -45,6 +47,8 @@
   let sidebarOpen = $state(true);
   let songbookOpen = $state(false);
   let songbookDraft = $state<SongbookDraft | null>(null);
+  let fitStatus = $state<FitStatus | 'pending'>('pending');
+  let printGuard = $state<{ kind: 'song' | 'songbook'; titles: string[] } | null>(null);
 
   let source = $state(shared?.source ?? DEMO_SONG);
   let settings = $state<SongSettings>(sanitizeSettings(shared?.settings));
@@ -211,6 +215,10 @@
     }
   }
 
+  function handleFitStatus(status: FitStatus) {
+    fitStatus = status;
+  }
+
   function importAsSong(text: string, importedSettings?: Partial<SongSettings>) {
     if (ephemeral || !store) {
       fitTextMax = config.layout.textPtMax;
@@ -233,6 +241,33 @@
 
   function printSongbook() {
     window.print();
+  }
+
+  function requestPrint() {
+    if (fitStatus === 'overflow') {
+      printGuard = { kind: 'song', titles: [] };
+      return;
+    }
+    window.print();
+  }
+
+  function requestSongbookPrint(titles: string[]) {
+    if (titles.length > 0) {
+      printGuard = { kind: 'songbook', titles };
+      return;
+    }
+    printSongbook();
+  }
+
+  function confirmPrint() {
+    printGuard = null;
+    window.print();
+  }
+
+  function cancelPrint() {
+    const guard = printGuard;
+    printGuard = null;
+    if (guard?.kind === 'songbook') closeSongbookPrint();
   }
 
   function closeSongbookPrint() {
@@ -372,6 +407,7 @@
       bind:settings
       {bridgeStatus}
       onToggleBridge={toggleBridge}
+      onPrint={requestPrint}
       onImportSong={importAsSong}
       onSongbook={songs.length > 0 ? openSongbook : undefined}
       maxTextPt={fitTextMax}
@@ -411,7 +447,13 @@
           ondblclick={resetSplit}
           onkeydown={onSplitKeydown}
         ></div>
-        <PreviewPane doc={display.doc} capo={display.capo} {settings} onLimit={handleFitLimit} />
+        <PreviewPane
+          doc={display.doc}
+          capo={display.capo}
+          {settings}
+          onLimit={handleFitLimit}
+          onStatus={handleFitStatus}
+        />
       </main>
     </div>
   {:else}
@@ -432,7 +474,22 @@
       draft={songbookDraft}
       pages={bookPages}
       onReady={printSongbook}
+      onOverflow={requestSongbookPrint}
       onDone={closeSongbookPrint}
     />
   {/if}
 {/key}
+
+{#if printGuard}
+  <PrintGuardDialog
+    title={printGuard.kind === 'song'
+      ? "This song won't fit on one page"
+      : "Some songs won't fit on one page"}
+    message={printGuard.kind === 'song'
+      ? 'Printing will cut off the remaining lines. Shorten the song, reduce the text size, or change columns/margins.'
+      : 'These songs will be cut off on their page. Shorten them or change their layout before exporting:'}
+    details={printGuard.titles}
+    onCancel={cancelPrint}
+    onConfirm={confirmPrint}
+  />
+{/if}

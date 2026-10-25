@@ -7,12 +7,13 @@ maintainer can afford.
 
 ## Running
 
-| Command                       | What it does                                           | Time  |
-| ----------------------------- | ------------------------------------------------------ | ----- |
-| `npm test`                    | Unit + integration (Vitest)                            | ~3 s  |
-| `npm run test:e2e`            | Build, then browser smoke tests (Playwright, Chromium) | ~20 s |
-| `npm run mcp:test`            | MCP server tests                                       | ~1 s  |
-| `npm run check` / `mcp:check` | TypeScript + Svelte diagnostics                        | ~5 s  |
+| Command                                                                                       | What it does                                           | Time  |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ----- |
+| `npm test`                                                                                    | Unit + integration (Vitest)                            | ~3 s  |
+| `npm run test:e2e`                                                                            | Build, then browser smoke tests (Playwright, Chromium) | ~20 s |
+| `npm run test:e2e` + `CROSS_BROWSER=1 npx playwright test --project=firefox --project=webkit` | Firefox/WebKit smoke (install both browsers once)      | ~15 s |
+| `npm run mcp:test`                                                                            | MCP server tests                                       | ~1 s  |
+| `npm run check` / `mcp:check`                                                                 | TypeScript + Svelte diagnostics                        | ~5 s  |
 
 First local E2E run: `npx playwright install chromium`.
 
@@ -58,7 +59,9 @@ same test copied five times.
 | Share links                                             | `deeplink.test.ts`                                                                                                         |
 | Library open timeout / blocked storage                  | `timeout.test.ts`, `e2e/fallback.spec.ts`                                                                                  |
 | Print/PDF export                                        | `e2e/pdf.spec.ts`                                                                                                          |
+| Overflow print guard, PDF completeness                  | `e2e/overflow.spec.ts`                                                                                                     |
 | Songbook selection and export                           | `songbook.test.ts`, `e2e/songbook.spec.ts`                                                                                 |
+| Cross-browser smoke, tablet viewport                    | `e2e/cross-browser.spec.ts`                                                                                                |
 | Editing, Insert menu, transpose shortcut, undo boundary | `e2e/editing.spec.ts`                                                                                                      |
 | Config coherence                                        | `config.test.ts`                                                                                                           |
 | Robustness: seeded songs, malformed input               | `stress.test.ts`                                                                                                           |
@@ -142,7 +145,7 @@ corpus is **not** part of CI by design.
 - Coverage thresholds (vanity metric; tests are chosen by risk).
 - HTML snapshots and visual baselines (brittle, updated on every CSS tweak).
 - jsdom/testing-library for every component (CodeMirror needs a real browser).
-- Multi-browser E2E (the PDF target is Chromium; the UI is desktop-first).
+- Full multi-browser E2E (the PDF target is Chromium; a Firefox/WebKit smoke runs in CI).
 - Unseeded fuzzing, mutation testing, performance assertions (flaky or low value here).
 
 ## Known limitations encoded in tests
