@@ -3,6 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -11,7 +12,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -42,6 +43,12 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: End-to-end tests
         run: npx playwright test
+      - name: Install Playwright Firefox and WebKit
+        run: npx playwright install --with-deps firefox webkit
+      - name: Cross-browser smoke tests
+        env:
+          CROSS_BROWSER: '1'
+        run: npx playwright test --project=firefox --project=webkit
       - name: Upload E2E artifacts on failure
         if: failure()
         uses: actions/upload-artifact@v7
@@ -50,12 +57,15 @@ jobs:
           path: test-results/
           retention-days: 7
       - uses: actions/configure-pages@v6
+        if: github.event_name != 'pull_request'
       - uses: actions/upload-pages-artifact@v5
+        if: github.event_name != 'pull_request'
         with:
           path: dist
 
   deploy:
     needs: build
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

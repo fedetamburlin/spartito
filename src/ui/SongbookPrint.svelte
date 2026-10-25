@@ -1,7 +1,8 @@
 <script lang="ts">
   import { untrack } from 'svelte';
-  import { SvelteSet } from 'svelte/reactivity';
+  import { SvelteMap, SvelteSet } from 'svelte/reactivity';
   import { fontStack } from '../core/config';
+  import type { FitOutcome } from '../core/fit';
   import type { SongbookDraft, SongbookPage } from '../core/songbook';
   import { defaultSettings } from '../core/settings';
   import FittedPage from './FittedPage.svelte';
@@ -17,13 +18,16 @@
     pages: SongbookPage[];
     /** Every sheet has been laid out: safe to open the print dialog. */
     onReady: () => void;
+    /** Some sheets cannot fit: let the app ask before printing. */
+    onOverflow: (titles: string[]) => void;
     /** The print dialog is closed (printed or cancelled). */
     onDone: () => void;
   }
 
-  let { draft, pages, onReady, onDone }: Props = $props();
+  let { draft, pages, onReady, onOverflow, onDone }: Props = $props();
 
   const fitted = new SvelteSet<string>();
+  const overflowTitles = new SvelteMap<string, string>();
   let printing = false;
 
   const coverDefaults = defaultSettings();
@@ -47,25 +51,35 @@
     untrack(() => onDone());
   });
 
-  function handleFit(id: string) {
+  function handleFit(id: string, outcome: FitOutcome) {
+    if (outcome.status === 'overflow') {
+      const page = pages.find((item) => item.id === id);
+      if (page) overflowTitles.set(id, page.title);
+    }
     fitted.add(id);
     if (printing || fitted.size < pages.length) return;
     printing = true;
     // Fonts and layout settle before the dialog opens: what is measured is
     // what gets printed.
     void document.fonts.ready.then(() => {
-      requestAnimationFrame(() => onReady());
+      requestAnimationFrame(() => {
+        if (overflowTitles.size > 0) onOverflow([...overflowTitles.values()]);
+        else onReady();
+      });
     });
   }
 
-  // Safety net: if a sheet never reports its fit (broken measurement, exotic
-  // browser), print whatever is laid out instead of leaving the export stuck.
+  // Safety net: if a sheet never reports its fit (slow layout, broken
+  // measurement, exotic browser), ask before printing instead of silently
+  // cutting content off.
   $effect(() => {
     if (pages.length === 0) return;
     const timer = setTimeout(() => {
       if (printing) return;
       printing = true;
-      onReady();
+      const pending = pages.filter((page) => !fitted.has(page.id)).map((page) => page.title);
+      if (pending.length > 0) onOverflow(pending);
+      else onReady();
     }, 5000);
     return () => clearTimeout(timer);
   });
@@ -90,7 +104,7 @@
         doc={page.doc}
         settings={page.settings}
         capo={page.capo}
-        onFit={() => handleFit(page.id)}
+        onFit={(outcome) => handleFit(page.id, outcome)}
       />
     </div>
   {/each}

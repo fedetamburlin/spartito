@@ -1,7 +1,7 @@
 <script lang="ts">
   import { config } from '../core/config';
   import { unknownDirectives } from '../core/chordpro';
-  import type { FitOutcome } from '../core/fit';
+  import type { FitOutcome, FitStatus } from '../core/fit';
   import type { SongDocument } from '../core/model';
   import type { SongSettings } from '../core/settings';
   import { stepZoom, ZOOM_MAX, ZOOM_MIN } from '../core/zoom';
@@ -13,9 +13,11 @@
     settings: SongSettings;
     /** Largest size that fits, used to cap the manual text input. */
     onLimit?: (maxTextPt: number) => void;
+    /** Current fit result, used to guard printing. */
+    onStatus?: (status: FitStatus) => void;
   }
 
-  let { doc, capo, settings, onLimit }: Props = $props();
+  let { doc, capo, settings, onLimit, onStatus }: Props = $props();
 
   let scrollEl = $state<HTMLElement | null>(null);
   let zoom = $state(1);
@@ -25,6 +27,7 @@
   function handleFit(next: FitOutcome) {
     outcome = next;
     onLimit?.(next.maxTextPt);
+    onStatus?.(next.status);
   }
 
   $effect(() => {
@@ -50,7 +53,7 @@
       case 'shrunk':
         return `${columns} · ${outcome.params.textPt}pt (shrunk)`;
       case 'overflow':
-        return 'Does not fit on one page: shorten the song or change columns/margins';
+        return 'Does not fit on one page; printing will cut off the remaining lines';
     }
   });
 
