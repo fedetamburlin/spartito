@@ -5,7 +5,7 @@ is the product; the editor is the tool that produces it.
 
 ## Setup
 
-- Node.js **20.19+** (22 LTS recommended; `.nvmrc` pins 22)
+- Node.js **22.12+** (Node 24+ is also supported; `.nvmrc` pins 22)
 - `npm ci`
 - `npx playwright install chromium` for browser tests
 
@@ -33,6 +33,20 @@ npm run verify
 
 That runs format check, lint, type check, unit tests, E2E, MCP checks and
 the MCP build.
+
+## Project layout
+
+```
+config/        project defaults and import dictionaries
+public/fonts/  OFL fonts (Inter, IBM Plex Sans Condensed, JetBrains Mono) + licenses
+src/core/      pure TS: config, model, db, library, directives, chordpro, chords,
+               transpose, import, pdf, fit, highlight, persistence, settings
+src/ui/        Svelte components, styles and measurement
+packages/mcp/  local MCP server: tools, websocket bridge, stdio/HTTP transports, PDF export
+tests/         unit/integration tests, fixtures, Playwright E2E (see tests/README.md)
+scripts/       fixture downloaders and PDF fixture generator
+docs/adr/      architecture decision records
+```
 
 ## Tests
 
