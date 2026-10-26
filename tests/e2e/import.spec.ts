@@ -37,7 +37,7 @@ test.describe('import from text', () => {
   test('imports a PDF with a text layer', async ({ page }) => {
     await openLibrary(page);
     await page
-      .locator('input[type="file"]')
+      .locator('.song-import-input')
       .setInputFiles('tests/fixtures/generated/generated-single-column.pdf');
 
     const dialog = page.getByRole('dialog');
@@ -56,7 +56,7 @@ test.describe('import from text', () => {
   test('rejects an unreadable PDF with an alert', async ({ page }) => {
     await openLibrary(page);
     const dialogPromise = page.waitForEvent('dialog');
-    await page.locator('input[type="file"]').setInputFiles({
+    await page.locator('.song-import-input').setInputFiles({
       name: 'broken.pdf',
       mimeType: 'application/pdf',
       buffer: Buffer.from('this is not a pdf')

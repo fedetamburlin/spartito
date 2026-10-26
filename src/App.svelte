@@ -1,5 +1,13 @@
 <script lang="ts">
   import { tick } from 'svelte';
+  import {
+    buildLibraryBackup,
+    parseLibraryBackup,
+    restoreLibrary,
+    serializeLibraryBackup,
+    type LibraryBackup,
+    type RestoreMode
+  } from './core/backup';
   import { createBridge, type BridgeStatus } from './core/bridge';
   import {
     LIBRARY_OPEN_TIMEOUT_MS,
@@ -9,6 +17,7 @@
   } from './core/db';
   import { config } from './core/config';
   import { clearDocumentHash, readDocumentFromHash } from './core/deeplink';
+  import { downloadFile } from './core/download';
   import type { FitStatus } from './core/fit';
   import { parseChordPro } from './core/chordpro';
   import { DEMO_SONG } from './core/demo';
@@ -26,9 +35,15 @@
   import { loadLegacyState } from './core/persistence';
   import { sanitizeSettings, withTranspose, type SongSettings } from './core/settings';
   import { songbookPages, type SongbookDraft } from './core/songbook';
+  import {
+    ensurePersistentStorage,
+    checkPersistentStorage,
+    type PersistenceState
+  } from './core/storage';
   import { withTimeout } from './core/timeout';
   import { transposedForDisplay } from './core/transpose';
   import EditorPane from './ui/EditorPane.svelte';
+  import LibraryRestoreDialog from './ui/LibraryRestoreDialog.svelte';
   import PreviewPane from './ui/PreviewPane.svelte';
   import PrintGuardDialog from './ui/PrintGuardDialog.svelte';
   import Sidebar from './ui/Sidebar.svelte';
@@ -42,7 +57,7 @@
 
   let ready = $state(ephemeral);
   let libraryError = $state(false);
-  let store: LibraryStore | null = null;
+  let store = $state.raw<LibraryStore | null>(null);
   let songs = $state<SongEntry[]>([]);
   let activeId = $state('');
   let sidebarOpen = $state(true);
@@ -50,6 +65,13 @@
   let songbookDraft = $state<SongbookDraft | null>(null);
   let fitStatus = $state<FitStatus | 'pending'>('pending');
   let printGuard = $state<{ kind: 'song' | 'songbook'; titles: string[] } | null>(null);
+  let persistence = $state<PersistenceState>('pending');
+  let pendingRestore = $state<{ backup: LibraryBackup; filename: string } | null>(null);
+  let restoring = $state(false);
+  let restoreError = $state<string | null>(null);
+  let notice = $state<string | null>(null);
+  let noticeTimer: ReturnType<typeof setTimeout> | undefined;
+  let persistenceRequested = false;
 
   let source = $state(shared?.source ?? DEMO_SONG);
   let settings = $state<SongSettings>(sanitizeSettings(shared?.settings));
@@ -87,8 +109,12 @@
           source = active.source;
           settings = active.settings;
         }
+        void checkPersistentStorage().then((result) => {
+          if (!persistenceRequested) persistence = result;
+        });
       } catch (error) {
         libraryError = true;
+        persistence = 'error';
         console.error('[spartito] library unavailable, changes will not be saved:', error);
       } finally {
         ready = true;
@@ -96,10 +122,11 @@
     })();
   }
 
-  function saveSong(id: string, nextSource: string, nextSettings: SongSettings) {
-    if (!store) return;
+  function saveSong(id: string, nextSource: string, nextSettings: SongSettings): Promise<void> {
+    if (!store) return Promise.resolve();
     const entry = songs.find((song) => song.id === id);
-    if (!entry || contentMatches(entry, nextSource, nextSettings)) return;
+    if (!entry || contentMatches(entry, nextSource, nextSettings)) return Promise.resolve();
+    requestPersistence();
     const updated: SongEntry = {
       ...entry,
       source: nextSource,
@@ -107,19 +134,19 @@
       updatedAt: Date.now()
     };
     songs = songs.map((song) => (song.id === id ? updated : song));
-    void store.putSong(updated);
+    return store.putSong(updated);
   }
 
-  function flushActive() {
-    if (!store || !activeId) return;
-    saveSong(activeId, source, settings);
+  function flushActive(): Promise<void> {
+    if (!store || !activeId) return Promise.resolve();
+    return saveSong(activeId, source, settings);
   }
 
   function selectSong(id: string) {
     if (id === activeId) return;
     const target = songs.find((song) => song.id === id);
     if (!target) return;
-    flushActive();
+    void flushActive();
     clearTimeout(saveTimer);
     activeId = id;
     fitTextMax = config.layout.textPtMax;
@@ -134,7 +161,8 @@
       : { ...settings, transpose: 0 };
     const song = createSong(initial?.source ?? NEW_SONG_SOURCE, merged);
     if (store && activeId) {
-      flushActive();
+      requestPersistence();
+      void flushActive();
       clearTimeout(saveTimer);
       songs = [...songs, song];
       void store.putSong(song);
@@ -154,6 +182,7 @@
   function duplicate(id: string) {
     const target = songs.find((song) => song.id === id);
     if (!target) return;
+    requestPersistence();
     const copy = duplicateSong(target);
     songs = [...songs, copy];
     void store?.putSong(copy);
@@ -164,6 +193,7 @@
     const clean = title.trim();
     const target = songs.find((song) => song.id === id);
     if (!target || !clean) return;
+    requestPersistence();
     const nextSource = withTitle(target.source, clean);
     const updated: SongEntry = { ...target, source: nextSource, updatedAt: Date.now() };
     songs = songs.map((song) => (song.id === id ? updated : song));
@@ -176,10 +206,11 @@
     if (!target) return;
     if (!confirm(`Delete "${songTitle(target.source)}"?`)) return;
     if (!store) return;
+    requestPersistence();
 
     // Flush the active song first, then drop any pending autosave so it
     // cannot rewrite (or resurrect) the deleted one.
-    flushActive();
+    await flushActive();
     clearTimeout(saveTimer);
 
     const result = await removeSong(store, songs, id, activeId, {
@@ -200,6 +231,84 @@
   function toggleSidebar() {
     sidebarOpen = !sidebarOpen;
     void store?.putMeta('sidebarOpen', sidebarOpen);
+  }
+
+  function showNotice(message: string) {
+    notice = message;
+    clearTimeout(noticeTimer);
+    noticeTimer = setTimeout(() => (notice = null), 6000);
+  }
+
+  function requestPersistence() {
+    if (persistenceRequested || persistence === 'granted') return;
+    persistenceRequested = true;
+    void ensurePersistentStorage().then((result) => (persistence = result));
+  }
+
+  async function exportBackup() {
+    if (!store || songs.length === 0) return;
+    requestPersistence();
+    await flushActive();
+    const backup = buildLibraryBackup(songs, activeId || null);
+    const date = backup.exportedAt.slice(0, 10);
+    downloadFile(
+      `spartito-library-${date}.json`,
+      serializeLibraryBackup(backup),
+      'application/json;charset=utf-8'
+    );
+    showNotice(
+      `Backup downloaded: ${backup.songs.length} song${backup.songs.length === 1 ? '' : 's'}.`
+    );
+  }
+
+  async function restoreBackup(file: File) {
+    let text: string;
+    try {
+      text = await file.text();
+    } catch {
+      alert('Could not read the backup file.');
+      return;
+    }
+    const parsed = parseLibraryBackup(text);
+    if (!parsed.ok) {
+      alert(parsed.message);
+      return;
+    }
+    restoreError = null;
+    pendingRestore = { backup: parsed.backup, filename: file.name };
+  }
+
+  async function applyRestore(mode: RestoreMode) {
+    const pending = pendingRestore;
+    if (!store || !pending || restoring) return;
+    restoring = true;
+    restoreError = null;
+    requestPersistence();
+    try {
+      await flushActive();
+      clearTimeout(saveTimer);
+      const result = await restoreLibrary(store, songs, activeId, pending.backup, mode);
+      songs = result.songs;
+      activeId = result.activeId;
+      fitTextMax = config.layout.textPtMax;
+      const active = songs.find((song) => song.id === result.activeId);
+      if (active) {
+        source = active.source;
+        settings = active.settings;
+      }
+      pendingRestore = null;
+      const skipped = result.skippedCount > 0 ? `, ${result.skippedCount} already present` : '';
+      showNotice(
+        mode === 'replace'
+          ? `Library replaced: ${result.importedCount} songs.`
+          : `Backup merged: ${result.importedCount} added${skipped}.`
+      );
+    } catch (error) {
+      console.error('[spartito] library restore failed:', error);
+      restoreError = 'Could not restore this backup. Your current library was not changed.';
+    } finally {
+      restoring = false;
+    }
   }
 
   /**
@@ -232,7 +341,7 @@
 
   function openSongbook() {
     // Include the latest editor changes even before the autosave debounce.
-    flushActive();
+    void flushActive();
     songbookOpen = true;
   }
 
@@ -310,6 +419,7 @@
 
   function onKeydown(event: KeyboardEvent) {
     if (event.ctrlKey || event.metaKey || event.altKey || isEditing(event.target)) return;
+    if (document.querySelector('.modal-backdrop')) return;
     if (event.key === '+' || event.key === '=') {
       settings = withTranspose(settings, 1);
     } else if (event.key === '-' || event.key === '_') {
@@ -384,7 +494,7 @@
     if (ephemeral || !ready || !store || !currentId) return;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
-      saveSong(currentId, currentSource, currentSettings);
+      void saveSong(currentId, currentSource, currentSettings);
     }, config.storage.autosaveDebounceMs);
   });
 
@@ -405,6 +515,9 @@
       Library unavailable — songs won't be saved. Check browser storage permissions.
     </div>
   {/if}
+  {#if notice}
+    <div class="app-notice success" role="status">{notice}</div>
+  {/if}
   {#if ready}
     <Toolbar
       {doc}
@@ -422,12 +535,17 @@
         <Sidebar
           songs={listItems}
           open={sidebarOpen}
+          {persistence}
+          canExportBackup={store !== null && songs.length > 0}
+          canRestoreBackup={store !== null}
           onToggle={toggleSidebar}
           onSelect={selectSong}
           onNew={() => addSong()}
           onRename={rename}
           onDuplicate={duplicate}
           onDelete={remove}
+          onExportBackup={exportBackup}
+          onRestoreBackup={restoreBackup}
         />
       {/if}
       <main
@@ -489,12 +607,29 @@
   <PrintGuardDialog
     title={printGuard.kind === 'song'
       ? "This song won't fit on one page"
-      : "Some songs won't fit on one page"}
+      : "Some pages won't fit on one page"}
     message={printGuard.kind === 'song'
       ? 'Printing will cut off the remaining lines. Shorten the song, reduce the text size, or change columns/margins.'
-      : 'These songs will be cut off on their page. Shorten them or change their layout before exporting:'}
+      : 'These pages will be cut off. Shorten the songs, reduce the cover list, or change the layout before exporting:'}
     details={printGuard.titles}
     onCancel={cancelPrint}
     onConfirm={confirmPrint}
+  />
+{/if}
+
+{#if pendingRestore}
+  <LibraryRestoreDialog
+    filename={pendingRestore.filename}
+    songCount={pendingRestore.backup.songs.length}
+    exportedAt={pendingRestore.backup.exportedAt}
+    busy={restoring}
+    error={restoreError}
+    onMerge={() => applyRestore('merge')}
+    onReplace={() => applyRestore('replace')}
+    onClose={() => {
+      if (restoring) return;
+      pendingRestore = null;
+      restoreError = null;
+    }}
   />
 {/if}

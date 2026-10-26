@@ -6,6 +6,7 @@
     toggleSongbookSong,
     type SongbookDraft
   } from '../core/songbook';
+  import { trapFocus } from './focus';
 
   /**
    * Pick songs from the library and order them for a songbook export.
@@ -47,8 +48,15 @@
 <svelte:window onkeydown={(event) => event.key === 'Escape' && onClose()} />
 
 <div class="modal-backdrop">
-  <div class="modal songbook-modal" role="dialog" aria-modal="true" tabindex="-1">
-    <h2>Songbook</h2>
+  <div
+    class="modal songbook-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="songbook-title"
+    tabindex="-1"
+    use:trapFocus
+  >
+    <h2 id="songbook-title">Songbook</h2>
     <p class="hint">
       Pick songs from the library and set their order: each one is printed on its own page.
     </p>
@@ -59,6 +67,7 @@
           type="search"
           placeholder="Search songs…"
           aria-label="Search songs"
+          data-autofocus
           bind:value={query}
         />
         <ul class="songbook-list">

@@ -61,4 +61,20 @@ describe('IndexedDB library store', () => {
     const ids = (await reopened.getSongs()).map((song) => song.id).sort();
     expect(ids).toEqual(['a', 'c']);
   });
+
+  it('writes and replaces songs in one transaction', async () => {
+    const name = uniqueName();
+    const store = await openLibraryDb(name);
+    const a = createSong('{title: A}\n', defaultSettings(), 2, 'a');
+    const b = createSong('{title: B}\n', defaultSettings(), 1, 'b');
+
+    await store.putSongs([a, b]);
+    expect((await store.getSongs()).map((song) => song.id).sort()).toEqual(['a', 'b']);
+
+    await store.replaceSongs([b]);
+    expect((await store.getSongs()).map((song) => song.id)).toEqual(['b']);
+
+    const reopened = await openLibraryDb(name);
+    expect((await reopened.getSongs()).map((song) => song.id)).toEqual(['b']);
+  });
 });

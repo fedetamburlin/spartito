@@ -119,4 +119,64 @@ test.describe('songbook export', () => {
     const { text: sheets } = await extractText(pdf);
     expect(sheets[0]).toContain('The Road Back Home');
   });
+
+  test('warns when the songbook cover cannot fit its titles', async ({ page }) => {
+    await openLibrary(page);
+
+    // A real library with many long titles: the cover is one fixed A4 page.
+    await page.evaluate(async (count) => {
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const request = indexedDB.open('spartito');
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+      const existing = await new Promise<Array<{ settings: unknown }>>((resolve, reject) => {
+        const request = db.transaction('songs', 'readonly').objectStore('songs').getAll();
+        request.onsuccess = () => resolve(request.result as Array<{ settings: unknown }>);
+        request.onerror = () => reject(request.error);
+      });
+      const settings = existing[0]?.settings ?? {};
+      const now = Date.now();
+      const transaction = db.transaction('songs', 'readwrite');
+      const store = transaction.objectStore('songs');
+      for (let index = 0; index < count; index++) {
+        store.put({
+          id: `cover-${index}`,
+          source: `{title: A very long songbook cover title number ${index} that wraps over several lines because it keeps going and going and going without any reason at all, just to test the cover guard properly}\n[Am]one short line`,
+          settings,
+          createdAt: now + index,
+          updatedAt: now + index
+        });
+      }
+      await new Promise<void>((resolve, reject) => {
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+      });
+      db.close();
+    }, 40);
+    await page.reload();
+    await expect(page.locator('.cm-editor')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Songbook', exact: true }).click();
+    const dialog = page.locator('.songbook-modal');
+    await dialog
+      .locator('.songbook-pick')
+      .evaluateAll((buttons) =>
+        (buttons as HTMLButtonElement[]).forEach((button) => button.click())
+      );
+    await expect(dialog.locator('.songbook-order .songbook-title')).toHaveCount(41);
+
+    await stubPrint(page);
+    await dialog.getByRole('button', { name: 'Export PDF' }).click();
+
+    const guard = page.getByRole('dialog');
+    await expect(guard).toBeVisible({ timeout: 15_000 });
+    await expect(guard.getByRole('heading')).toContainText("won't fit on one page");
+    await expect(guard.locator('.summary li')).toHaveText(['Cover page (too many titles)']);
+    expect(await page.evaluate(() => Boolean((window as PrintWindow).__printed))).toBe(false);
+
+    await guard.getByRole('button', { name: 'Cancel' }).click();
+    await expect(guard).toBeHidden();
+    await expect(page.locator('.songbook')).toHaveCount(0);
+  });
 });

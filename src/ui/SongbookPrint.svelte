@@ -28,7 +28,9 @@
 
   const fitted = new SvelteSet<string>();
   const overflowTitles = new SvelteMap<string, string>();
-  let printing = false;
+  let coverEl = $state<HTMLElement | null>(null);
+  let coverContentEl = $state<HTMLElement | null>(null);
+  let finishing = false;
 
   const coverDefaults = defaultSettings();
   const coverStyle = [
@@ -38,6 +40,41 @@
     `--chord-color: ${coverDefaults.chordColor}`,
     `--comment-color: ${coverDefaults.commentColor}`
   ].join('; ');
+
+  /**
+   * The cover is a fixed A4 page with a centered title and list. Measure the
+   * actual span from the heading to the last title: if it exceeds the page
+   * content box, the list would spill onto another sheet or be clipped.
+   */
+  function coverOverflows(): boolean {
+    const page = coverEl;
+    const content = coverContentEl;
+    if (!page || !content) return false;
+    const heading = content.querySelector('h1');
+    const list = content.querySelector('ol');
+    if (!heading || !list) return false;
+    const style = getComputedStyle(page);
+    const paddingTop = Number.parseFloat(style.paddingTop) || 0;
+    const paddingBottom = Number.parseFloat(style.paddingBottom) || 0;
+    const available = page.clientHeight - paddingTop - paddingBottom;
+    const contentHeight = list.getBoundingClientRect().bottom - heading.getBoundingClientRect().top;
+    return contentHeight > available + 1;
+  }
+
+  function finish(extraTitles: string[] = []) {
+    if (finishing) return;
+    finishing = true;
+    // Fonts and layout settle before the dialog opens: what is measured is
+    // what gets printed.
+    void document.fonts.ready.then(() => {
+      requestAnimationFrame(() => {
+        const titles = [...extraTitles, ...overflowTitles.values()];
+        if (draft.cover && coverOverflows()) titles.push('Cover page (too many titles)');
+        if (titles.length > 0) onOverflow(titles);
+        else onReady();
+      });
+    });
+  }
 
   $effect(() => {
     document.body.dataset.printMode = 'book';
@@ -57,16 +94,8 @@
       if (page) overflowTitles.set(id, page.title);
     }
     fitted.add(id);
-    if (printing || fitted.size < pages.length) return;
-    printing = true;
-    // Fonts and layout settle before the dialog opens: what is measured is
-    // what gets printed.
-    void document.fonts.ready.then(() => {
-      requestAnimationFrame(() => {
-        if (overflowTitles.size > 0) onOverflow([...overflowTitles.values()]);
-        else onReady();
-      });
-    });
+    if (fitted.size < pages.length) return;
+    finish();
   }
 
   // Safety net: if a sheet never reports its fit (slow layout, broken
@@ -75,11 +104,9 @@
   $effect(() => {
     if (pages.length === 0) return;
     const timer = setTimeout(() => {
-      if (printing) return;
-      printing = true;
+      if (finishing) return;
       const pending = pages.filter((page) => !fitted.has(page.id)).map((page) => page.title);
-      if (pending.length > 0) onOverflow(pending);
-      else onReady();
+      finish(pending);
     }, 5000);
     return () => clearTimeout(timer);
   });
@@ -90,11 +117,13 @@
 <div class="songbook">
   {#if draft.cover}
     <div class="songbook-item">
-      <div class="page songbook-cover" style={coverStyle}>
-        <h1>Songbook</h1>
-        <ol>
-          {#each pages as page (page.id)}<li>{page.title}</li>{/each}
-        </ol>
+      <div class="page songbook-cover" style={coverStyle} bind:this={coverEl}>
+        <div class="songbook-cover-content" bind:this={coverContentEl}>
+          <h1>Songbook</h1>
+          <ol>
+            {#each pages as page (page.id)}<li>{page.title}</li>{/each}
+          </ol>
+        </div>
       </div>
     </div>
   {/if}

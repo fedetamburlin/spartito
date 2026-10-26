@@ -1,7 +1,7 @@
 {
   "name": "spartito-app",
   "private": true,
-  "version": "0.2.0",
+  "version": "1.0.0",
   "type": "module",
   "description": "Turn ChordPro lyrics and chords into one-page A4 PDFs for tablet use.",
   "license": "MIT",

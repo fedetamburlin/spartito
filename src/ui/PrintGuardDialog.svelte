@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { trapFocus } from './focus';
+
   interface Props {
     title: string;
     message: string;
@@ -27,6 +29,7 @@
     aria-modal="true"
     aria-labelledby="print-guard-title"
     tabindex="-1"
+    use:trapFocus={{ fallbackSelector: '[data-print-trigger]' }}
   >
     <h2 id="print-guard-title">{title}</h2>
     <p class="hint">{message}</p>
@@ -39,7 +42,7 @@
     {/if}
     <footer>
       <span class="spacer"></span>
-      <button onclick={onCancel}>Cancel</button>
+      <button data-autofocus onclick={onCancel}>Cancel</button>
       <button class="primary" onclick={onConfirm}>{confirmLabel}</button>
     </footer>
   </div>
